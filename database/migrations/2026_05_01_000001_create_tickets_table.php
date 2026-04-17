@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // En create_tickets_table.php
         Schema::create('tickets', function (Blueprint $table) {
             $table->id('id_ticket');
-            $table->foreignId('id_usuario')->constrained('users', 'id'); // 'id' porque en users es así
+            $table->string('asunto'); // <-- Agrégalo aquí
+            $table->foreignId('id_usuario')->constrained('users', 'id');
             $table->foreignId('id_tipo_equipo')->constrained('tipos_equipo', 'id_tipo_equipo');
             $table->foreignId('id_prioridad')->constrained('prioridades', 'id_prioridad');
             $table->foreignId('id_categoria')->constrained('categorias', 'id_categoria');
