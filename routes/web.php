@@ -32,10 +32,30 @@ Route::middleware('auth')->group(function () {
 
 // --- RUTAS DE CLIENTE ---
 Route::middleware(['auth', 'role:cliente'])->group(function () {
+    // El Home del cliente
     Route::get('/dashboard', [TicketClienteController::class, 'home'])->name('dashboard');
+    
+    // Lista de tickets
     Route::get('/mis-tickets', [TicketClienteController::class, 'index'])->name('cliente.tickets.index');
+    
+    // Formulario de creación
     Route::get('/mis-tickets/nuevo', [TicketClienteController::class, 'create'])->name('cliente.tickets.create');
+    
+    // Guardar ticket
     Route::post('/mis-tickets', [TicketClienteController::class, 'store'])->name('cliente.tickets.store');
+
+    // --- AÑADE ESTAS RUTAS ---
+    // Ver detalle del ticket
+    Route::get('/mis-tickets/{ticket}', [TicketClienteController::class, 'show'])->name('cliente.tickets.show');
+
+    // Editar borrador
+    Route::get('/mis-tickets/{ticket}/editar', [TicketClienteController::class, 'edit'])->name('cliente.tickets.edit');
+
+    // Acción de enviar
+    Route::post('/mis-tickets/{ticket}/enviar', [TicketClienteController::class, 'enviar'])->name('cliente.tickets.enviar');
+    // Ruta para procesar la actualización del ticket
+Route::put('/tickets/{id}', [TicketClienteController::class, 'update'])->name('cliente.tickets.update');
+    Route::delete('/tickets/{id}', [TicketClienteController::class, 'destroy'])->name('cliente.tickets.destroy');
 });
 
 // --- RUTAS DE ADMIN ---
