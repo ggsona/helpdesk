@@ -1,4 +1,4 @@
-<x-cliente-layout>
+<x-usuario-layout>
     <div class="row mb-5">
         <div class="col-md-8">
             <h2 class="fw-bold">Hola, {{ Auth::user()->name }} 👋</h2>
@@ -14,7 +14,7 @@
                 </div>
                 <h5 class="fw-bold">Abrir Ticket</h5>
                 <p class="text-muted small">Reporta fallas técnicas o solicita nuevos insumos.</p>
-                <a href="{{ route('cliente.tickets.create') }}" class="btn btn-primary w-100 rounded-pill fw-bold">
+                <a href="{{ route('usuario.tickets.create') }}" class="btn btn-primary w-100 rounded-pill fw-bold">
                     Comenzar
                 </a>
             </div>
@@ -27,10 +27,10 @@
                 </div>
                 <h5 class="fw-bold">Mis Solicitudes</h5>
                 <p class="text-muted small">Revisa el estado de tus reportes anteriores.</p>
-                <a href="{{ route('cliente.tickets.index') }}" class="btn btn-success w-100 rounded-pill fw-bold text-white">
+                <a href="{{ route('usuario.tickets.index') }}" class="btn btn-success w-100 rounded-pill fw-bold text-white">
                     Ver Historial
                 </a>
             </div>
         </div>
     </div>
-</x-cliente-layout>
+</x-usuario-layout>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Cliente; // <-- Fíjate en el \Cliente
+namespace App\Http\Controllers\Usuario; // <-- Actualizado a Usuario
 
 use App\Http\Controllers\Controller; // <-- IMPORTANTE: Debes importar el controlador base
 use App\Models\Ticket;
@@ -11,18 +11,19 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Categoria;
 use App\Models\Prioridad;
 use App\Models\TipoEquipo;
+use App\Models\TicketComentario;
 
-class TicketClienteController extends Controller
+class TicketUsuarioController extends Controller // <-- Actualizado a Usuario
 {
     public function index()
     {
         $tickets = Ticket::where('id_usuario', Auth::id())->latest()->get();
-        return view('cliente.tickets.index', compact('tickets'));
+        return view('usuario.tickets.index', compact('tickets')); // Cambio a vista usuario
     }
 
     public function home()
     {
-        return view('cliente.home'); // Esta es la vista que me acabas de mostrar
+        return view('usuario.home'); // Esta es la vista que me acabas de mostrar
     }
 
     public function create()
@@ -31,7 +32,7 @@ class TicketClienteController extends Controller
         $prioridades = Prioridad::all();
         $tiposEquipo = TipoEquipo::all();
         
-        return view('cliente.tickets.create', compact('categorias', 'prioridades', 'tiposEquipo'));
+        return view('usuario.tickets.create', compact('categorias', 'prioridades', 'tiposEquipo')); // Cambio a vista usuario
     }
 
     public function store(Request $request)
@@ -72,7 +73,7 @@ class TicketClienteController extends Controller
         }
 
         // Retornamos a la lista con un mensaje que aclare que es un borrador
-        return redirect()->route('cliente.tickets.index')
+        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
             ->with('success', 'Ticket guardado como borrador. Puedes revisarlo antes de enviarlo.');
     }
 
@@ -88,14 +89,20 @@ class TicketClienteController extends Controller
         return back()->with('success', '¡Ticket enviado con éxito al equipo de soporte!');
     }
 
-        public function show($id)
+    public function show($id)
     {
-        // Cargamos el técnico y la categoría para el detalle
-        $ticket = Ticket::with(['categoria', 'tecnico', 'prioridad', 'adjuntos'])
-                        ->where('id_usuario', auth()->id())
-                        ->findOrFail($id);
-                        
-        return view('cliente.tickets.show', compact('ticket'));
+        // Usamos 'with' para traer los comentarios y sus autores en una sola consulta (Eager Loading)
+        $ticket = Ticket::with([
+            'categoria', 
+            'tecnico', 
+            'prioridad', 
+            'adjuntos', 
+            'comentarios.usuario' // <--- Importante: cargar el chat y el nombre del que escribió
+        ])
+        ->where('id_usuario', auth()->id())
+        ->findOrFail($id);
+
+        return view('usuario.tickets.show', compact('ticket')); // Cambio a vista usuario
     }
 
     public function edit($id)
@@ -106,7 +113,7 @@ class TicketClienteController extends Controller
                         ->findOrFail($id);
                         
         $categorias = Categoria::all();
-        return view('cliente.tickets.edit', compact('ticket', 'categorias'));
+        return view('usuario.tickets.edit', compact('ticket', 'categorias')); // Cambio a vista usuario
     }
 
     public function destroy($id)
@@ -118,7 +125,7 @@ class TicketClienteController extends Controller
         // Opcional: Eliminar archivos físicos antes de borrar el registro
         $ticket->delete();
 
-        return redirect()->route('cliente.tickets.index')
+        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
                         ->with('success', 'Ticket eliminado correctamente.');
     }
 
@@ -150,16 +157,42 @@ class TicketClienteController extends Controller
                 $nombreArchivo = time() . '_' . $file->getClientOriginalName();
                 $ruta = $file->storeAs('adjuntos_tickets', $nombreArchivo, 'public');
 
-                // Guardar referencia en la tabla de adjuntos
-                ArchivoTicket::create([
+                // CAMBIA ESTA LÍNEA:
+                TicketAdjunto::create([ // <--- Antes decía ArchivoTicket
                     'id_ticket' => $ticket->id_ticket,
                     'ruta_archivo' => $ruta,
                     'nombre_original' => $file->getClientOriginalName(),
+                    // Nota: En tu método 'store' usas también tipo_mimo y tamano
+                    // Si tu migración los requiere, agrégalos aquí también:
+                    'tipo_mimo' => $file->getMimeType(),
+                    'tamano' => $file->getSize(),
                 ]);
             }
         }
 
-        return redirect()->route('cliente.tickets.index')
+        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
                         ->with('success', 'Borrador actualizado correctamente.');
+    }
+
+    public function storeComentario(Request $request, $id)
+    {
+        // 1. Validar que el mensaje no esté vacío
+        $request->validate([
+            'mensaje' => 'required|string|max:1000',
+        ]);
+
+        // 2. Verificar que el ticket pertenezca al usuario (Seguridad)
+        $ticket = Ticket::where('id_usuario', auth()->id())->findOrFail($id);
+
+        // 3. Crear el comentario
+        TicketComentario::create([
+            'id_ticket'  => $ticket->id_ticket,
+            'id_usuario' => auth()->id(),
+            'mensaje'    => $request->mensaje,
+            'es_interno' => false, // Los comentarios del cliente NUNCA son internos
+        ]);
+
+        // 4. Redirigir atrás con un mensaje de éxito
+        return back()->with('success', 'Mensaje enviado correctamente.');
     }
 }

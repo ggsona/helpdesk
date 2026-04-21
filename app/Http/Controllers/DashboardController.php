@@ -15,11 +15,15 @@ class DashboardController extends Controller
             return view('admin.dashboard');
         }
 
+        if ($user->hasRole('gestor')) {
+            return view('gestor.dashboard');
+        }
+
         if ($user->hasRole('tecnico')) {
             return view('tecnico.dashboard');
         }
 
         // Si no es ninguno de los anteriores, asumimos que es cliente
-        return view('cliente.home');
+        return view('usuario.home');
     }
 }

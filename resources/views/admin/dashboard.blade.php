@@ -1,6 +1,8 @@
-<x-admin-layout>
+@extends('layouts.admin')
+
+@section('content')
     <div class="mb-4">
-        <h3 class="fw-bold theme-text">Panel de Control</h3>
+        <h3 class="fw-bold">Panel de Control</h3>
         <p class="text-muted">Resumen general de incidencias y soporte técnico.</p>
     </div>
 
@@ -11,7 +13,8 @@
                 <h2 class="fw-bold mb-0 text-primary">24</h2>
             </div>
         </div>
-        </div>
+        {{-- Puedes añadir más columnas aquí siguiendo el mismo estilo --}}
+    </div>
 
     <div class="card-premium">
         <span class="fw-medium">
@@ -19,4 +22,4 @@
             {{ __("You're logged in!") }}
         </span>
     </div>
-</x-admin-layout>
+@endsection

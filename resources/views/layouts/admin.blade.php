@@ -139,25 +139,66 @@
             </div>
 
             <div class="flex-grow-1">
-                <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Módulos</small>
+                <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Panel Operativo</small>
+                
                 <ul class="nav nav-pills flex-column">
-                    <li><a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="bi bi-grid-1x2-fill me-3"></i>Dashboard</a></li>
-                    <li><a href="#" class="nav-link"><i class="bi bi-ticket-detailed-fill me-3"></i>Gestión de Tickets</a></li>
-                    <li><a href="#" class="nav-link"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
-                    <li><a href="#" class="nav-link"><i class="bi bi-building-fill me-3"></i>Oficinas</a></li>
-                    <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación</a></li>
+                    {{-- DASHBOARD --}}
+                    <li>
+                        @role('admin')
+                            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        @endrole
+                        @role('gestor')
+                            <a href="{{ route('gestor.dashboard') }}" class="nav-link {{ request()->routeIs('gestor.dashboard') ? 'active' : '' }}">
+                        @endrole
+                        @role('tecnico')
+                            <a href="{{ route('tecnico.dashboard') }}" class="nav-link {{ request()->routeIs('tecnico.dashboard') ? 'active' : '' }}">
+                        @endrole
+                            <i class="bi bi-grid-1x2-fill me-3"></i>Dashboard
+                        </a>
+                    </li>
+
+                    {{-- GESTIÓN DE TICKETS --}}
+                    <li>
+                        @hasanyrole('admin|gestor')
+                            <a href="{{ route('gestor.tickets.index') }}" class="nav-link {{ request()->routeIs('gestor.tickets.*') ? 'active' : '' }}">
+                                <i class="bi bi-ticket-detailed-fill me-3"></i>Gestión de Casos
+                            </a>
+                        @else
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-ticket-perforated me-3"></i>Casos Asignados
+                            </a>
+                        @endhasanyrole
+                    </li>
+
+                    {{-- MÓDULOS COMPARTIDOS (ADMIN Y GESTOR) --}}
+                    @hasanyrole('admin|gestor')
+                        <hr class="mx-3 my-2 opacity-25 text-muted">
+                        <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
+
+                        <li><a href="#" class="nav-link"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
+                        <li><a href="#" class="nav-link"><i class="bi bi-building-fill me-3"></i>Oficinas</a></li>
+                        <li><a href="#" class="nav-link"><i class="bi bi-tags-fill me-3"></i>Categorías</a></li>
+                        <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
+                        
+                        <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
+                    @endhasanyrole
                 </ul>
             </div>
 
             <div class="user-footer">
                 <div class="dropend">
-                    <button class="btn border-0 d-flex align-items-center w-100 p-0" data-bs-toggle="dropdown">
+                    <button class="btn border-0 d-flex align-items-center w-100 p-0" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;">
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
                         <div class="ms-3 text-start">
-                            <p class="mb-0 fw-bold small">{{ Auth::user()->name }}</p>
-                            <small class="text-muted" style="font-size: 0.7rem;">Administrador</small>
+                            <p class="mb-0 fw-bold small text-truncate" style="max-width: 120px;">{{ Auth::user()->name }}</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">
+                                @if(Auth::user()->hasRole('admin')) Administrador (Sistemas)
+                                @elseif(Auth::user()->hasRole('gestor')) Gestor de Soporte
+                                @else Técnico
+                                @endif
+                            </small>
                         </div>
                         <i class="bi bi-chevron-right ms-auto text-muted small"></i>
                     </button>
@@ -168,7 +209,9 @@
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</button>
+                                <button type="submit" class="dropdown-item py-2 text-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                </button>
                             </form>
                         </li>
                     </ul>
@@ -178,7 +221,7 @@
 
         <main id="content">
             <div class="container-fluid">
-                {{ $slot }}
+                @yield('content')
             </div>
         </main>
     </div>

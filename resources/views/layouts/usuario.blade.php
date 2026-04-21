@@ -11,11 +11,8 @@
     <style>
         :root { --bg-main: #f4f7fa; }
         [data-bs-theme="dark"] { --bg-main: #0b0c0d; }
-
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-main) !important; transition: 0.3s; }
-        
         .navbar { background-color: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color); }
-        
         .card-premium {
             background: var(--bs-tertiary-bg);
             border: 1px solid var(--bs-border-color);
@@ -28,31 +25,31 @@
 <body>
     <nav class="navbar navbar-expand-lg sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="{{ route('dashboard') }}">
+            <a class="navbar-brand fw-bold text-primary" href="{{ route('usuario.home') }}">
                 <i class="bi bi-headset me-2"></i>GDC <span class="text-body-secondary">Soporte</span>
             </a>
             
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navCliente">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navUsuario">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navCliente">
+            <div class="collapse navbar-collapse" id="navUsuario">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-2">
                     <li class="nav-item">
-                        <a class="nav-link fw-medium {{ request()->routeIs('dashboard') ? 'active text-primary' : '' }}" 
-                        href="{{ route('dashboard') }}">
+                        <a class="nav-link fw-medium {{ request()->routeIs('usuario.home') ? 'active text-primary' : '' }}" 
+                        href="{{ route('usuario.home') }}">
                             <i class="bi bi-house-door me-1"></i> Inicio
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium {{ request()->routeIs('cliente.tickets.create') ? 'active text-primary' : '' }}" 
-                        href="{{ route('cliente.tickets.create') }}">
+                        <a class="nav-link fw-medium {{ request()->routeIs('usuario.tickets.create') ? 'active text-primary' : '' }}" 
+                        href="{{ route('usuario.tickets.create') }}">
                             <i class="bi bi-plus-circle me-1"></i> Nuevo Ticket
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium {{ request()->routeIs('cliente.tickets.index') ? 'active text-primary' : '' }}" 
-                        href="{{ route('cliente.tickets.index') }}">
+                        <a class="nav-link fw-medium {{ request()->routeIs('usuario.tickets.index') ? 'active text-primary' : '' }}" 
+                        href="{{ route('usuario.tickets.index') }}">
                             <i class="bi bi-ticket-perforated me-1"></i> Mis Casos
                         </a>
                     </li>

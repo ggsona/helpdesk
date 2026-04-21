@@ -3,17 +3,14 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Cliente\TicketClienteController;
+// Controlador actualizado
+use App\Http\Controllers\Usuario\TicketUsuarioController; 
+use App\Http\Controllers\Gestor\TicketGestorController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 Route::get('/', function () {
@@ -30,44 +27,45 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// --- RUTAS DE CLIENTE ---
+// --- RUTAS DE USUARIO ---
 Route::middleware(['auth', 'role:cliente'])->group(function () {
-    // El Home del cliente
-    Route::get('/dashboard', [TicketClienteController::class, 'home'])->name('dashboard');
     
-    // Lista de tickets
-    Route::get('/mis-tickets', [TicketClienteController::class, 'index'])->name('cliente.tickets.index');
+    // Redirección interna para el usuario
+    Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])->name('usuario.home');
     
-    // Formulario de creación
-    Route::get('/mis-tickets/nuevo', [TicketClienteController::class, 'create'])->name('cliente.tickets.create');
+    // Gestión de Tickets del Usuario usando TicketUsuarioController
+    Route::get('/mis-tickets', [TicketUsuarioController::class, 'index'])->name('usuario.tickets.index');
+    Route::get('/mis-tickets/nuevo', [TicketUsuarioController::class, 'create'])->name('usuario.tickets.create');
+    Route::post('/mis-tickets', [TicketUsuarioController::class, 'store'])->name('usuario.tickets.store');
+    Route::get('/mis-tickets/{ticket}', [TicketUsuarioController::class, 'show'])->name('usuario.tickets.show');
+    Route::get('/mis-tickets/{ticket}/editar', [TicketUsuarioController::class, 'edit'])->name('usuario.tickets.edit');
     
-    // Guardar ticket
-    Route::post('/mis-tickets', [TicketClienteController::class, 'store'])->name('cliente.tickets.store');
+    // Acciones específicas
+    Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])->name('usuario.tickets.enviar');
+    Route::put('/tickets/{id}', [TicketUsuarioController::class, 'update'])->name('usuario.tickets.update');
+    Route::delete('/tickets/{id}', [TicketUsuarioController::class, 'destroy'])->name('usuario.tickets.destroy');
+    Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])->name('usuario.tickets.comentar');
+});
 
-    // --- AÑADE ESTAS RUTAS ---
-    // Ver detalle del ticket
-    Route::get('/mis-tickets/{ticket}', [TicketClienteController::class, 'show'])->name('cliente.tickets.show');
-
-    // Editar borrador
-    Route::get('/mis-tickets/{ticket}/editar', [TicketClienteController::class, 'edit'])->name('cliente.tickets.edit');
-
-    // Acción de enviar
-    Route::post('/mis-tickets/{ticket}/enviar', [TicketClienteController::class, 'enviar'])->name('cliente.tickets.enviar');
-    // Ruta para procesar la actualización del ticket
-Route::put('/tickets/{id}', [TicketClienteController::class, 'update'])->name('cliente.tickets.update');
-    Route::delete('/tickets/{id}', [TicketClienteController::class, 'destroy'])->name('cliente.tickets.destroy');
+// --- RUTAS DE GESTOR ---
+Route::middleware(['auth', 'role:gestor'])->prefix('gestor')->name('gestor.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // --- RUTAS DE ADMIN ---
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    // Agrega aquí más rutas de admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // --- RUTAS DE TECNICO ---
-Route::middleware(['auth', 'role:tecnico'])->group(function () {
-    Route::get('/tecnico/dashboard', [DashboardController::class, 'index'])->name('tecnico.dashboard');
-    // Agrega aquí más rutas de técnico
+Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+// --- GESTIÓN PARA GESTOR/ADMIN ---
+Route::middleware(['auth', 'role:gestor|admin'])->prefix('gestor')->name('gestor.')->group(function () {
+    Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
+    Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
 });
 
 require __DIR__.'/auth.php';

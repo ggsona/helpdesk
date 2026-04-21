@@ -1,10 +1,10 @@
-<x-cliente-layout>
+<x-usuario-layout>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold theme-text mb-1">Mis Tickets</h2>
             <p class="text-muted">Gestiona y revisa el estado de tus solicitudes técnicas.</p>
         </div>
-        <a href="{{ route('cliente.tickets.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        <a href="{{ route('usuario.tickets.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
             <i class="bi bi-plus-lg me-2"></i>Nuevo Ticket
         </a>
     </div>
@@ -59,14 +59,14 @@
                                 <td class="text-end pe-4">
                                     <div class="d-flex justify-content-end gap-2">
                                         {{-- Ver Detalle --}}
-                                        <a href="{{ route('cliente.tickets.show', $ticket->id_ticket) }}" 
+                                        <a href="{{ route('usuario.tickets.show', $ticket->id_ticket) }}" 
                                            class="btn btn-sm btn-outline-info border shadow-sm px-2" title="Ver Detalle">
                                             <i class="bi bi-eye-fill"></i>
                                         </a>
 
                                         @if($ticket->estatus == 0)
                                             {{-- Enviar --}}
-                                            <form action="{{ route('cliente.tickets.enviar', $ticket->id_ticket) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('usuario.tickets.enviar', $ticket->id_ticket) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-outline-success border shadow-sm px-2" title="Enviar ahora">
                                                     <i class="bi bi-send-fill"></i>
@@ -74,13 +74,13 @@
                                             </form>
 
                                             {{-- Editar --}}
-                                            <a href="{{ route('cliente.tickets.edit', $ticket->id_ticket) }}" 
+                                            <a href="{{ route('usuario.tickets.edit', $ticket->id_ticket) }}" 
                                                class="btn btn-sm btn-outline-warning border shadow-sm px-2" title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
 
                                             {{-- Eliminar (Solo borradores) --}}
-                                            <form action="{{ route('cliente.tickets.destroy', $ticket->id_ticket) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este borrador?')">
+                                            <form action="{{ route('usuario.tickets.destroy', $ticket->id_ticket) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este borrador?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger border shadow-sm px-2" title="Eliminar">
@@ -104,4 +104,4 @@
             </div>
         </div>
     </div>
-</x-cliente-layout>
+</x-usuario-layout>

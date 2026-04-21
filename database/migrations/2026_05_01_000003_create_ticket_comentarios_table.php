@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // En create_comentarios_table.php
-        Schema::create('comentarios', function (Blueprint $table) {
+        Schema::create('ticket_comentarios', function (Blueprint $table) {
             $table->id('id_comentario');
+            // Relación con el ticket (asegúrate que el nombre de la tabla sea 'tickets' y el PK 'id_ticket')
             $table->foreignId('id_ticket')->constrained('tickets', 'id_ticket')->onDelete('cascade');
-            $table->foreignId('id_usuario')->constrained('users', 'id'); // <--- Cambio aquí
+            // Quién escribe el mensaje
+            $table->foreignId('id_usuario')->constrained('users');
+            
             $table->text('mensaje');
+            $table->boolean('es_interno')->default(false); // true = solo técnicos, false = público
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comentarios');
+        Schema::dropIfExists('ticket_comentarios');
     }
 };

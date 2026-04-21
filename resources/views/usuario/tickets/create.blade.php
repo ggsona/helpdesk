@@ -1,7 +1,7 @@
-<x-cliente-layout>
+<x-usuario-layout>
     <div class="container-fluid py-4">
         <div class="mb-4">
-            <a href="{{ route('cliente.tickets.index') }}" class="text-decoration-none small text-muted hover-primary">
+            <a href="{{ route('usuario.tickets.index') }}" class="text-decoration-none small text-muted hover-primary">
                 <i class="bi bi-arrow-left me-1"></i> Volver a la lista de tickets
             </a>
             <h2 class="fw-bold theme-text mt-3">Crear Nueva Solicitud</h2>
@@ -11,7 +11,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="card-premium shadow-sm p-4 mb-4">
-                    <form action="{{ route('cliente.tickets.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('usuario.tickets.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row g-3">
@@ -96,4 +96,4 @@
             </div>
         </div>
     </div>
-</x-cliente-layout>
+</x-usuario-layout>

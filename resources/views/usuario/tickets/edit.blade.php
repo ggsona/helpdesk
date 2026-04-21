@@ -1,7 +1,7 @@
-<x-cliente-layout>
+<x-usuario-layout>
     <div class="container-fluid py-4">
         <div class="mb-4">
-            <a href="{{ route('cliente.tickets.index') }}" class="btn btn-link text-decoration-none p-0 text-muted">
+            <a href="{{ route('usuario.tickets.index') }}" class="btn btn-link text-decoration-none p-0 text-muted">
                 <i class="bi bi-arrow-left"></i> Cancelar y volver
             </a>
             <h2 class="fw-bold mt-3">Editar Borrador #{{ $ticket->id_ticket }}</h2>
@@ -9,7 +9,7 @@
 
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <form action="{{ route('cliente.tickets.update', $ticket->id_ticket) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('usuario.tickets.update', $ticket->id_ticket) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -56,4 +56,4 @@
             </div>
         </div>
     </div>
-</x-cliente-layout>
+</x-usuario-layout>

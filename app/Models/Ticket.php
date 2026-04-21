@@ -41,12 +41,19 @@ class Ticket extends Model {
     // "Traductor" para que el estatus (1, 2, 3) se vea como texto en la tabla
     public function getEstadoTextoAttribute() {
         return match($this->estatus) {
+            0 => 'Borrador',
             1 => 'Abierto',
             2 => 'En Proceso',
             3 => 'Resuelto',
             4 => 'Cerrado',
             default => 'Desconocido',
         };
+    }
+
+    public function comentarios()
+    {
+        // Cambiamos Comentario::class por TicketComentario::class
+        return $this->hasMany(TicketComentario::class, 'id_ticket', 'id_ticket');
     }
 }
 

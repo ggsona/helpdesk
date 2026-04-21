@@ -19,9 +19,10 @@ class DatabaseSeeder extends Seeder
     {
         // --- 1. CONFIGURACIÓN DE ROLES (Spatie) ---
         // Los creamos primero para poder asignarlos después
-        $roleAdmin   = Role::create(['name' => 'admin']);
-        $roleTecnico = Role::create(['name' => 'tecnico']);
-        $roleCliente = Role::create(['name' => 'cliente']);
+        $roleAdmin   = Role::updateOrCreate(['id' => 1], ['name' => 'admin']);
+        $roleGestor  = Role::updateOrCreate(['id' => 2], ['name' => 'gestor']);
+        $roleTecnico = Role::updateOrCreate(['id' => 3], ['name' => 'tecnico']);
+        $roleUsuario = Role::updateOrCreate(['id' => 4], ['name' => 'usuario']);
 
         // --- 2. CONFIGURACIÓN DE TABLAS MAESTRAS ---
         Oficina::create(['nombre_oficina' => 'Sede Central']);
@@ -48,6 +49,13 @@ class DatabaseSeeder extends Seeder
             'id_oficina' => 1
         ]);
 
+        $personaGestor = Persona::create([
+            'nombre' => 'Gestor',
+            'apellido' => 'De Soporte',
+            'telefono' => '12345678',
+            'id_oficina' => 1
+        ]);
+
         $personaTecnico = Persona::create([
             'nombre' => 'Tecnico',
             'apellido' => 'General',
@@ -55,9 +63,9 @@ class DatabaseSeeder extends Seeder
             'id_oficina' => 1
         ]);
 
-        $personaCliente = Persona::create([
-            'nombre' => 'Cliente',
-            'apellido' => 'General',
+        $personaUsuario = Persona::create([
+            'nombre' => 'usuario',
+            'apellido' => 'Final',
             'telefono' => '00000000',
             'id_oficina' => 2
         ]);
@@ -75,25 +83,33 @@ class DatabaseSeeder extends Seeder
         // Asignar rol de Spatie
         $admin->assignRole($roleAdmin);
 
+        $gestor = User::create([
+            'name' => 'Gestor de Soporte',
+            'email' => 'gestor@helpdesk.com',
+            'role' => '2', // Siguiendo tu lógica de columna manual
+            'password' => Hash::make('gestor123'),
+            'id_persona' => $personaGestor->id_persona,
+        ]);
+        $gestor->assignRole($roleGestor);
+
         $admin = User::create([
             'name' => 'Tecnico',
             'email' => 'tecnico@helpdesk.com',
-            'role' => '2', // Tu columna manual
+            'role' => '3', // Tu columna manual
             'password' => Hash::make('tecnico123'),
             'id_persona' => $personaTecnico->id_persona,
         ]);
         // Asignar rol de Spatie
         $admin->assignRole($roleTecnico);
 
-        // Crear Cliente
-        $cliente = User::create([
-            'name' => 'Cliente',
-            'email' => 'cliente@helpdesk.com',
-            'role' => '3', // Tu columna manual
-            'password' => Hash::make('cliente123'),
-            'id_persona' => $personaCliente->id_persona,
+        // Crear Usuario
+        $usuarioFinal = User::create([
+            'name' => 'Usuario GDC',
+            'email' => 'usuario@helpdesk.com',
+            'role' => '4',
+            'password' => Hash::make('usuario123'),
+            'id_persona' => $personaUsuario->id_persona,
         ]);
-        // Asignar rol de Spatie
-        $cliente->assignRole($roleCliente);
+        $usuarioFinal->assignRole($roleUsuario);
     }
 }
