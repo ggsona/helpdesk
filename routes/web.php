@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- RUTAS DE USUARIO ---
-Route::middleware(['auth', 'role:cliente'])->group(function () {
+Route::middleware(['auth', 'role:usuario'])->group(function () {
     
     // Redirección interna para el usuario
     Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])->name('usuario.home');
@@ -57,15 +57,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-// --- RUTAS DE TECNICO ---
-Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
-
-// --- GESTIÓN PARA GESTOR/ADMIN ---
+// --- GESTIÓN COMPARTIDA (GESTIÓN DE TICKETS) ---
+// Agrupamos las rutas que ambos pueden ver usando el prefijo 'gestor' 
+// para que coincida con el nombre 'gestor.tickets.index' de tu sidebar
 Route::middleware(['auth', 'role:gestor|admin'])->prefix('gestor')->name('gestor.')->group(function () {
     Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
     Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
+    Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])->name('tickets.comentar');
+});
+
+// --- RUTAS DE TECNICO ---
+Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

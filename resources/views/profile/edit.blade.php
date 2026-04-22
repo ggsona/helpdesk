@@ -1,5 +1,10 @@
 @php
-    $layout = auth()->user()->hasRole('admin') ? 'admin-layout' : (auth()->user()->hasRole('tecnico') ? 'admin-layout' : 'cliente-layout');
+    if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('tecnico') || auth()->user()->hasRole('gestor')) {
+        $layout = 'admin-layout';
+    } else {
+        // Cambiamos 'cliente-layout' por 'usuario-layout'
+        $layout = 'usuario-layout'; 
+    }
 @endphp
 
 <x-dynamic-component :component="$layout">

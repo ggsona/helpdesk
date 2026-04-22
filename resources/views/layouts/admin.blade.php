@@ -144,15 +144,14 @@
                 <ul class="nav nav-pills flex-column">
                     {{-- DASHBOARD --}}
                     <li>
-                        @role('admin')
-                            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                        @endrole
-                        @role('gestor')
-                            <a href="{{ route('gestor.dashboard') }}" class="nav-link {{ request()->routeIs('gestor.dashboard') ? 'active' : '' }}">
-                        @endrole
-                        @role('tecnico')
-                            <a href="{{ route('tecnico.dashboard') }}" class="nav-link {{ request()->routeIs('tecnico.dashboard') ? 'active' : '' }}">
-                        @endrole
+                        @php
+                            $route = 'login'; // Ruta por defecto
+                            if(Auth::user()->hasRole('admin')) $route = 'admin.dashboard';
+                            elseif(Auth::user()->hasRole('gestor')) $route = 'gestor.dashboard';
+                            elseif(Auth::user()->hasRole('tecnico')) $route = 'tecnico.dashboard';
+                        @endphp
+                        
+                        <a href="{{ route($route) }}" class="nav-link {{ request()->routeIs('*.dashboard') ? 'active' : '' }}">
                             <i class="bi bi-grid-1x2-fill me-3"></i>Dashboard
                         </a>
                     </li>

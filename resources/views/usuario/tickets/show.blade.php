@@ -2,7 +2,7 @@
     <div class="container-fluid py-4">
         {{-- Encabezado --}}
         <div class="mb-4">
-            <a href="{{ route('cliente.tickets.index') }}" class="btn btn-link text-decoration-none p-0 text-secondary">
+            <a href="{{ route('usuario.tickets.index') }}" class="btn btn-link text-decoration-none p-0 text-secondary">
                 <i class="bi bi-arrow-left"></i> Volver al listado
             </a>
             <div class="d-flex justify-content-between align-items-center mt-3">
@@ -13,10 +13,10 @@
                 <div class="d-flex gap-2">
                     @if($ticket->estatus == 0)
                         <span class="badge bg-secondary fs-6 px-3 shadow-sm">Borrador</span>
-                        <a href="{{ route('cliente.tickets.edit', $ticket->id_ticket) }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('usuario.tickets.edit', $ticket->id_ticket) }}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
-                        <form action="{{ route('cliente.tickets.enviar', $ticket->id_ticket) }}" method="POST">
+                        <form action="{{ route('usuario.tickets.enviar', $ticket->id_ticket) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success btn-sm">
                                 <i class="bi bi-send-check"></i> Enviar a Soporte
@@ -116,7 +116,7 @@
                     {{-- Caja de Texto --}}
                     @if($ticket->estatus != 0)
                         <div class="card-footer bg-white border-top p-3">
-                            <form action="{{ route('cliente.tickets.comentar', $ticket->id_ticket) }}" method="POST">
+                            <form action="{{ route('usuario.tickets.comentar', $ticket->id_ticket) }}" method="POST">
                                 @csrf
                                 <div class="input-group">
                                     <textarea name="mensaje" class="form-control border shadow-none" placeholder="Escribe tu mensaje aquí..." rows="2" required style="resize: none;"></textarea>

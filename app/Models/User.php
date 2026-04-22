@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // Importante añadir esto
 
 class User extends Authenticatable
 {
@@ -22,7 +23,19 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'id_persona', // Asegúrate de que este campo esté en tu tabla 'users'
     ];
+
+    /**
+     * Relación con la información personal del usuario.
+     */
+    public function persona(): BelongsTo
+    {
+        // 1er parámetro: Modelo relacionado
+        // 2do parámetro: Llave foránea en la tabla 'users'
+        // 3er parámetro: Llave primaria en la tabla 'personas'
+        return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

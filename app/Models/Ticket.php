@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\TicketAdjunto;
 
 class Ticket extends Model {
@@ -26,9 +28,22 @@ class Ticket extends Model {
 
     public function usuario() { return $this->belongsTo(User::class, 'id_usuario'); }
 
-    public function tecnico() { return $this->belongsTo(User::class, 'id_usuario_tecnico'); }
+    public function tecnico()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            TicketAsignacion::class,
+            'id_ticket', // Llave foránea en ticket_asignaciones
+            'id',        // Llave foránea en users
+            'id_ticket', // Llave local en tickets
+            'id_usuario_tecnico' // Llave local en ticket_asignaciones
+        );
+    }
 
-    public function prioridad() { return $this->belongsTo(Prioridad::class, 'id_prioridad'); }
+    public function prioridad() 
+    { 
+        return $this->belongsTo(Prioridad::class, 'id_prioridad'); 
+    }
 
     public function categoria() { return $this->belongsTo(Categoria::class, 'id_categoria'); }
 
@@ -36,6 +51,13 @@ class Ticket extends Model {
     
     public function adjuntos() { 
         return $this->hasMany(TicketAdjunto::class, 'id_ticket'); 
+    }
+
+    public function asignacion(): HasOne
+    {
+        // El segundo parámetro es la llave foránea en 'ticket_asignaciones'
+        // El tercer parámetro es la llave local en 'tickets'
+        return $this->hasOne(TicketAsignacion::class, 'id_ticket', 'id_ticket'); 
     }
 
     // "Traductor" para que el estatus (1, 2, 3) se vea como texto en la tabla
