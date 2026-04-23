@@ -2,30 +2,6 @@
 
 @section('content')
 
-<style>
-    /* Ajuste para modo oscuro y píldoras */
-    .nav-pills .nav-link {
-        color: #adb5bd; 
-        transition: all 0.3s ease;
-    }
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd !important;
-        color: #fff !important;
-    }
-    .pills-container {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 5px;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    /* Ajuste de tablas para modo oscuro */
-    .table { color: #e9ecef; }
-    .table-light { background-color: rgba(255, 255, 255, 0.05) !important; color: #fff; border-bottom: 1px solid #444; }
-    .card { background-color: #1a1d20; border: 1px solid #373b3e; }
-    .text-muted-custom { color: #adb5bd !important; }
-</style>
-
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -37,26 +13,30 @@
                 </div>
                 
                 <div class="card-body">
-                    <div class="pills-container mb-4 shadow-sm">
-                        <ul class="nav nav-pills nav-fill" id="pills-tab" role="tablist">
+                    <div class="pills-container mb-4 shadow-sm p-2 rounded-3">
+                        <ul class="nav nav-pills nav-fill gap-2" id="pills-tab" role="tablist">
+                            
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active fw-bold" id="pills-nuevos-tab" data-bs-toggle="pill" data-bs-target="#pills-nuevos" type="button" role="tab">
+                                <button class="nav-link active fw-bold rounded-3" id="pills-nuevos-tab" data-bs-toggle="pill" data-bs-target="#pills-nuevos" type="button" role="tab">
                                     <i class="bi bi-plus-circle me-2"></i> Por Asignar
-                                    <span class="badge bg-primary ms-2">{{ $ticketsNuevos->count() }}</span>
+                                    <span class="badge bg-danger text-dark ms-2">{{ $ticketsNuevos->count() }}</span>
                                 </button>
                             </li>
+                            
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="pills-proceso-tab" data-bs-toggle="pill" data-bs-target="#pills-proceso" type="button" role="tab">
+                                <button class="nav-link fw-bold rounded-3" id="pills-proceso-tab" data-bs-toggle="pill" data-bs-target="#pills-proceso" type="button" role="tab">
                                     <i class="bi bi-clock-history me-2"></i> En Gestión
                                     <span class="badge bg-warning text-dark ms-2">{{ $ticketsAsignados->count() }}</span>
                                 </button>
                             </li>
+                            
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link fw-bold" id="pills-resueltos-tab" data-bs-toggle="pill" data-bs-target="#pills-resueltos" type="button" role="tab">
+                                <button class="nav-link fw-bold rounded-3" id="pills-resueltos-tab" data-bs-toggle="pill" data-bs-target="#pills-resueltos" type="button" role="tab">
                                     <i class="bi bi-check-all me-2"></i> Resueltos
-                                    <span class="badge bg-success ms-2">{{ $ticketsResueltos->count() }}</span>
+                                    <span class="badge bg-success text-dark ms-2">{{ $ticketsResueltos->count() }}</span>
                                 </button>
                             </li>
+                            
                         </ul>
                     </div>
 
@@ -178,6 +158,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            {{-- Asegúrate de tener este modal creado o incluido --}}
                                         @empty
                                             <tr><td colspan="6" class="text-center py-5 text-muted">No hay casos resueltos todavía.</td></tr>
                                         @endforelse
@@ -191,4 +172,6 @@
         </div>
     </div>
 </div>
+
+
 @endsection
