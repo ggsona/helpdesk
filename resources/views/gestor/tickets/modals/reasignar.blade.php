@@ -18,9 +18,15 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nuevo Técnico</label>
                         <select name="id_usuario_tecnico" class="form-select" required>
+                            <option value="" selected disabled>Seleccione un técnico...</option>
                             @foreach($tecnicos as $tecnico)
-                                <option value="{{ $tecnico->id }}" {{ $ticket->asignacion->id_usuario_tecnico == $tecnico->id ? 'disabled' : '' }}>
-                                    {{ $tecnico->name }} {{ $ticket->asignacion->id_usuario_tecnico == $tecnico->id ? '(Actual)' : '' }}
+                                @php
+                                    // Verificamos si existe la asignación y si coincide con el técnico del loop
+                                    $esActual = $ticket->asignacion && $ticket->asignacion->id_usuario_tecnico == $tecnico->id;
+                                @endphp
+                                
+                                <option value="{{ $tecnico->id }}" {{ $esActual ? 'disabled' : '' }}>
+                                    {{ $tecnico->name }} {{ $esActual ? '(Actual)' : '' }}
                                 </option>
                             @endforeach
                         </select>

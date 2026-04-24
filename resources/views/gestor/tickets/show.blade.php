@@ -7,23 +7,29 @@
         <a href="{{ route('gestor.tickets.index') }}" class="btn btn-link text-decoration-none p-0 text-secondary mb-2">
             <i class="bi bi-arrow-left"></i> Volver al panel global
         </a>
-        <div class="d-flex justify-content-between align-items-end">
-            <div>
-                <h2 class="fw-bold mb-1 text-white">Ticket #{{ $ticket->id_ticket }}</h2>
-                <p class="text-muted small mb-0">
-                    <i class="bi bi-calendar3 me-1"></i> Recibido el {{ $ticket->created_at->format('d/m/Y h:i A') }}
-                </p>
+
+        <div class="p-4 bg-dark border-0 shadow-sm rounded-3 border-start border-primary border-5 d-flex justify-content-between align-items-end">
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h2 class="fw-bold mb-1 mr-40 text-white">Ticket #{{ $ticket->id_ticket }}</h2>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-calendar3 me-1"></i> Recibido el {{ $ticket->created_at->format('d/m/Y h:i A') }}
+                    </p>
+                </div>
             </div>
-            <div class="card-body">
-                @if($ticket->estatus == 1) {{-- Si está pendiente --}}
-                    <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#asignarModal{{ $ticket->id_ticket }}">
-                        Asignar Técnico
-                    </button>
-                @elseif($ticket->estatus == 2) {{-- Si ya está asignado --}}
-                    <button class="btn btn-warning w-100 mb-2 text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#asignarModal{{ $ticket->id_ticket }}">
-                        Reasignar Técnico
-                    </button>
-                @endif
+
+            <div class="d-flex justify-content-between align-items-end">
+                <div class="card-body">
+                    @if($ticket->estatus == 1) {{-- Si está pendiente --}}
+                        <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#asignarModal{{ $ticket->id_ticket }}">
+                            Asignar Técnico
+                        </button>
+                    @elseif($ticket->estatus == 2) {{-- Si ya está asignado --}}
+                        <button class="btn btn-warning w-30 mb-2 text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#reasignarModal{{ $ticket->id_ticket }}">
+                            Reasignar Técnico
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -180,71 +186,11 @@
     </div>
 </div>
 
-<style>
-    .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
-    .rounded-chat-self { border-radius: 15px 15px 2px 15px; }
-    .rounded-chat-other { border-radius: 15px 15px 15px 2px; }
-    .hover-zoom:hover { transform: scale(1.02); transition: 0.3s; }
-    .chat-container::-webkit-scrollbar { width: 5px; }
-    .chat-container::-webkit-scrollbar-thumb { background: #444; border-radius: 5px; }
-</style>
 
-{{-- Modal de Asignación/Reasignación (Tal cual estaba en tu original) --}}
-<div class="modal fade" id="asignarModal{{ $ticket->id_ticket }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg bg-dark text-white">
-            {{-- Header con degradado --}}
-            <div class="modal-header border-0 bg-primary text-white p-4">
-                <div class="d-flex align-items-center">
-                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="bi bi-person-gear fs-4"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title fw-bold mb-0">Gestionar Responsable</h5>
-                        <small class="opacity-75">Ticket #{{ $ticket->id_ticket }}</small>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
 
-            <form action="{{ route('gestor.tickets.asignar', $ticket->id_ticket) }}" method="POST">
-                @csrf
-                <div class="modal-body p-4">
-                    <div class="alert alert-info bg-info bg-opacity-10 border-0 small mb-4 text-info">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        @if($ticket->asignacion)
-                            Este ticket ya está asignado a <strong>{{ $ticket->asignacion->tecnico->name }}</strong>. Al seleccionar otro técnico, se notificará el cambio.
-                        @else
-                            Selecciona un técnico especializado para atender este requerimiento.
-                        @endif
-                    </div>
+{{-- Modal de Asignación/Reasignación  --}}
+@include('gestor.tickets.modals.asignar')
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small text-uppercase text-secondary">Técnico Especialista</label>
-                        <select name="id_usuario_tecnico" class="form-select border-secondary bg-black text-white p-3 shadow-none" required>
-                            <option value="" selected disabled>Seleccionar técnico...</option>
-                            @foreach($tecnicos as $tecnico)
-                                <option value="{{ $tecnico->id }}" {{ ($ticket->asignacion->id_usuario_tecnico ?? '') == $tecnico->id ? 'selected' : '' }}>
-                                    {{ $tecnico->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+@include('gestor.tickets.modals.reasignar')
 
-                    <div class="mb-0">
-                        <label class="form-label fw-bold small text-uppercase text-secondary">Nota de Instrucción (Opcional)</label>
-                        <textarea name="nota" class="form-control border-secondary bg-black text-white p-3 shadow-none" rows="3" placeholder="Escribe aquí alguna indicación técnica para el compañero..."></textarea>
-                    </div>
-                </div>
-
-                <div class="modal-footer border-0 p-4 bg-black bg-opacity-25">
-                    <button type="button" class="btn btn-link text-secondary text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm rounded-pill">
-                        <i class="bi bi-check2-circle me-1"></i> Confirmar Asignación
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection

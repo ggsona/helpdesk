@@ -97,8 +97,9 @@ class TicketGestorController extends Controller
     {
         $ticket = Ticket::with(['usuario.persona.oficina', 'asignacion.tecnico'])->findOrFail($id);
         $tecnicos = User::role('tecnico')->get();
+        $prioridades = \App\Models\Prioridad::all();
 
-        return view('gestor.tickets.show', compact('ticket', 'tecnicos'));
+        return view('gestor.tickets.show', compact('ticket', 'tecnicos', 'prioridades'));
     }
 
     public function comentar(Request $request, $id)
