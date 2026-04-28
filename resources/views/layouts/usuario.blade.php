@@ -11,15 +11,62 @@
     <style>
         :root { --bg-main: #f4f7fa; }
         [data-bs-theme="dark"] { --bg-main: #0b0c0d; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main) !important; transition: 0.3s; }
-        .navbar { background-color: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color); }
-        .card-premium {
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main) !important; 
+            transition: 0.3s; 
+        }
+
+        .navbar { 
+            background-color: var(--bs-tertiary-bg); 
+            border-bottom: 1px solid var(--bs-border-color); 
+        }
+
+        /* Cards Premium y Efectos Hover */
+        .card-premium, .hover-shadow {
             background: var(--bs-tertiary-bg);
             border: 1px solid var(--bs-border-color);
             border-radius: 16px;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
         }
-        .card-premium:hover { transform: translateY(-5px); }
+
+        .card-premium:hover, .hover-shadow:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+
+        /* Personalización del Scrollbar para el Chat */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(128, 128, 128, 0.2);
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .card-premium, 
+        .card-body, 
+        .text-muted-custom, /* Si usas una clase personalizada para descripciones */
+        h1, h2, h3, h4, h5, h6, label, p {
+            /* Si el contenedor es oscuro como en tu imagen, el texto debe ser blanco */
+            color: #ffffff !important; 
+        }
+
+        /* Si quieres ser más específico solo para la zona de contenido del ticket */
+        .show-ticket-content {
+            color: #ffffff !important;
+        }
+
+        /* Ajuste para inputs o áreas de texto deshabilitadas que se ven grises */
+        .form-control:disabled, .form-control[readonly] {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ffffff !important;
+            border-color: var(--bs-border-color);
+        }
     </style>
 </head>
 <body>

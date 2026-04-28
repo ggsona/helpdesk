@@ -112,7 +112,7 @@ class TicketGestorController extends Controller
             'id_ticket'  => $id,
             'id_usuario' => auth()->id(),
             'mensaje'    => $request->mensaje,
-            'es_interno' => false,
+            'es_interno' => $request->has('es_interno'),
         ]);
 
         return back()->with('success', 'Mensaje enviado correctamente.');

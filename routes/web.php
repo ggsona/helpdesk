@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 // Controlador actualizado
 use App\Http\Controllers\Usuario\TicketUsuarioController; 
 use App\Http\Controllers\Gestor\TicketGestorController;
+use App\Http\Controllers\Tecnico\TicketTecnicoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,6 +71,14 @@ Route::middleware(['auth', 'role:gestor|admin'])->prefix('gestor')->name('gestor
 // --- RUTAS DE TECNICO ---
 Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/tickets', [TicketTecnicoController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])->name('tickets.show');
+    
+    // Acción para mensajes (Igual que gestor)
+    Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])->name('tickets.comentar');
+    
+    // Acción para solucionar el caso
+    Route::post('/tickets/{id}/resolver', [TicketTecnicoController::class, 'resolver'])->name('tickets.resolver');
 });
 
 require __DIR__.'/auth.php';
