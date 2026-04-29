@@ -9,63 +9,73 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        :root { --bg-main: #f4f7fa; }
-        [data-bs-theme="dark"] { --bg-main: #0b0c0d; }
-        
+        :root { 
+            --bg-main: #f0f2f5; 
+            --card-bg: #ffffff;
+            --text-main: #1a1c1e;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+        }
+
+        [data-bs-theme="dark"] { 
+            --bg-main: #0b0c0d; 
+            --card-bg: #111214;
+            --text-main: #e9ecef;
+            --text-muted: #a0a5aa;
+            --border-color: #2d2f31;
+            --input-bg: #1a1c1e;
+        }
+
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-main) !important; 
-            transition: 0.3s; 
+            color: var(--text-main);
+            transition: all 0.3s ease; 
         }
 
-        .navbar { 
-            background-color: var(--bs-tertiary-bg); 
-            border-bottom: 1px solid var(--bs-border-color); 
-        }
-
-        /* Cards Premium y Efectos Hover */
-        .card-premium, .hover-shadow {
-            background: var(--bs-tertiary-bg);
-            border: 1px solid var(--bs-border-color);
+        /* Card Premium mejorada */
+        .card-premium {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
             border-radius: 16px;
+            color: var(--text-main) !important;
             transition: all 0.3s ease;
         }
 
-        .card-premium:hover, .hover-shadow:hover { 
+        .hover-shadow:hover { 
             transform: translateY(-5px); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
         }
 
-        /* Personalización del Scrollbar para el Chat */
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-container::-webkit-scrollbar-thumb {
-            background-color: rgba(128, 128, 128, 0.2);
+        /* Texto adaptable */
+        .theme-text { color: var(--text-main) !important; }
+        .theme-muted { color: var(--text-muted) !important; }
+
+        /* Inputs Premium que no se quedan blancos */
+        .form-control-premium {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-main) !important;
             border-radius: 10px;
-        }
-        .chat-container::-webkit-scrollbar-track {
-            background: transparent;
+            padding: 0.75rem 1rem;
         }
 
-        .card-premium, 
-        .card-body, 
-        .text-muted-custom, /* Si usas una clase personalizada para descripciones */
-        h1, h2, h3, h4, h5, h6, label, p {
-            /* Si el contenedor es oscuro como en tu imagen, el texto debe ser blanco */
-            color: #ffffff !important; 
+        .form-control-premium:focus {
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
         }
 
-        /* Si quieres ser más específico solo para la zona de contenido del ticket */
-        .show-ticket-content {
-            color: #ffffff !important;
+        /* Contenedor de subida de archivos */
+        .dupload-container {
+            background-color: var(--bg-main) !important;
+            border: 2px dashed var(--border-color) !important;
         }
 
-        /* Ajuste para inputs o áreas de texto deshabilitadas que se ven grises */
-        .form-control:disabled, .form-control[readonly] {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #ffffff !important;
-            border-color: var(--bs-border-color);
+        /* Navbar adaptable */
+        .navbar { 
+            background-color: var(--card-bg) !important; 
+            border-bottom: 1px solid var(--border-color) !important; 
         }
     </style>
 </head>

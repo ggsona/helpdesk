@@ -43,11 +43,10 @@
                     {{-- NUEVO: Selección de Prioridad --}}
                     <div class="mb-4">
                         <label class="form-label fw-bold small text-uppercase text-secondary">Prioridad del Ticket</label>
-                        <select name="id_prioridad" class="form-select border-secondary bg-black text-white p-3 shadow-none" required>
+                        <select name="id_prioridad" class="form-select form-control-premium shadow-none" required>
                             <option value="" selected disabled>Definir prioridad...</option>
                             @foreach($prioridades as $prioridad)
-                                {{-- Usamos id_prioridad que es el nombre real en tu DB --}}
-                                <option value="{{ $prioridad->id_prioridad }}" {{ $ticket->id_prioridad == $prioridad->id_prioridad ? 'selected' : '' }}>
+                                <option value="{{ $prioridad->id_prioridad }}">
                                     {{ $prioridad->nombre_prioridad }}
                                 </option>
                             @endforeach

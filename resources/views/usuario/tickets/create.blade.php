@@ -19,7 +19,7 @@
                                 <label class="form-label fw-bold theme-text">Asunto del Ticket</label>
                                 <input type="text" name="asunto" 
                                        class="form-control form-control-premium @error('asunto') is-invalid @enderror" 
-                                       placeholder="Resumen corto (ej: Mi laptop no enciende)" 
+                                       placeholder="Resumen corto del problema..." 
                                        value="{{ old('asunto') }}" required>
                                 @error('asunto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
@@ -54,7 +54,7 @@
 
                             <div class="col-12">
                                 <label class="form-label fw-bold theme-text">Archivos Adjuntos (Opcional)</label>
-                                <div class="upload-container border border-dashed rounded p-4 text-center bg-light theme-bg-dark border-primary-subtle">
+                                <div class="card-premium dupload-container border border-dashed rounded p-4 text-center bg-light theme-bg-dark border-primary-subtle">
                                     <i class="bi bi-cloud-arrow-up fs-1 text-primary mb-2 d-block"></i>
                                     <input type="file" name="adjuntos[]" id="adjuntos" 
                                            class="form-control shadow-none border-0 bg-transparent" 
@@ -78,12 +78,7 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="card-premium bg-primary text-white p-4 shadow-sm border-0 mb-4">
-                    <h5 class="fw-bold"><i class="bi bi-lightbulb me-2"></i>¿Sabías que?</h5>
-                    <p class="small opacity-75 mb-0">
-                        Adjuntar una captura de pantalla del error ayuda a nuestros técnicos a resolver tu problema hasta un 40% más rápido.
-                    </p>
-                </div>
+                
                 
                 <div class="card-premium p-4 shadow-sm">
                     <h6 class="fw-bold theme-text">Formatos permitidos:</h6>

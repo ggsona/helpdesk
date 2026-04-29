@@ -53,6 +53,10 @@ class Ticket extends Model {
         return $this->hasMany(TicketAdjunto::class, 'id_ticket'); 
     }
 
+    public function solucion() {
+        return $this->hasOne(SolucionTecnica::class, 'id_ticket');
+    }
+
     public function asignacion(): HasOne
     {
         // El segundo parámetro es la llave foránea en 'ticket_asignaciones'

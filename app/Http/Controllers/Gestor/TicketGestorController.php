@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\TicketComentario;
 use App\Models\TicketAsignacion;
 use Illuminate\Http\Request;
+use App\Models\Prioridad;
 
 class TicketGestorController extends Controller
 {
@@ -17,22 +18,28 @@ class TicketGestorController extends Controller
     public function index() 
     {
         // 1. Tickets por asignar (Estatus 1: Enviado / Pendiente)
-        $ticketsNuevos = Ticket::where('estatus', 1)->latest()->get();
+        // Agregamos 'prioridad' por si la vista intenta mostrarla aunque sea nula
+        $ticketsNuevos = Ticket::with('prioridad')->where('estatus', 1)->latest()->get();
 
         // 2. Tickets en proceso (Estatus 2: Asignado / En Gestión)
-        $ticketsAsignados = Ticket::with('prioridad')->where('estatus', 2)->latest()->get();
+        $ticketsAsignados = Ticket::with('prioridad', 'asignacion.tecnico')->where('estatus', 2)->latest()->get();
 
         // 3. Tickets resueltos (Estatus 3: Cerrado / Solucionado)
-        $ticketsResueltos = Ticket::where('estatus', 3)->latest()->get();
+        $ticketsResueltos = Ticket::with('prioridad', 'solucion')->where('estatus', 3)->latest()->get();
 
-        // Lista de técnicos para las modales
+        // 4. Lista de técnicos para poblar el SELECT del modal de asignación
         $tecnicos = User::role('tecnico')->get(); 
+
+        // 5. NUEVO: Lista de prioridades para el SELECT del modal de asignación
+        // Esto resuelve el error "Undefined variable $prioridades"
+        $prioridades = \App\Models\Prioridad::all(); 
 
         return view('gestor.tickets.index', compact(
             'ticketsNuevos', 
             'ticketsAsignados', 
             'ticketsResueltos', 
-            'tecnicos'
+            'tecnicos',
+            'prioridades' // <-- Enviamos la variable a la vista
         ));
     }
 
