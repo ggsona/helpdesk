@@ -11,7 +11,7 @@
     <style>
         :root { 
             --sb-width: 270px;
-            --bg-main: #ada8a8; /* Gris claro que no cansa la vista */
+            --bg-main: #f4f7fa; /* Gris claro que no cansa la vista */
             --sb-bg: #ffffff;
         }
 
@@ -66,8 +66,7 @@
 
         [data-bs-theme="dark"] .card-premium {
             background: #1a1c1e;
-            text: var(--bs-body-color);
-
+            
         }
 
         /* Footer de Usuario fijo abajo */
@@ -132,74 +131,6 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         }
     </style>
-
-    <style>
-        :root { 
-            --sb-width: 270px;
-            --bg-main: #d8d8df; /* Gris muy claro profesional */
-            --sb-bg: #ffffff;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #6c757d;
-            --border-color: #dee2e6;
-            --color-texto-principal: #000000; /* Negro para tema claro */
-        }
-
-        [data-bs-theme="dark"] {
-            --bg-main: #0b0c0d;
-            --sb-bg: #111214;
-            --card-bg: #1a1c1e;
-            --text-main: #e9ecef;
-            --text-muted: #a0a5aa;
-            --border-color: #2d2f31;
-            --color-texto-principal: #ffffff; /* Blanco para tema oscuro */
-        }
-
-        .ticket-asunto, .table td {
-            color: var(--color-texto-principal);
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main) !important;
-            color: var(--text-main);
-            transition: all 0.3s ease;
-        }
-
-        /* Sidebar */
-        #sidebar { 
-            width: var(--sb-width); 
-            min-width: var(--sb-width); 
-            height: 100vh;
-            background: var(--sb-bg);
-            border-right: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Tarjeta que cambia de color según el tema */
-        .card-premium {
-            background: var(--card-bg) !important;
-            border: 1px solid var(--border-color) !important;
-            border-radius: 16px;
-            color: var(--text-main) !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        /* Ajuste para los textos secundarios en las listas */
-        /* .text-custom-muted {
-            color: var(--text-muted) !important;
-        } */
-
-        /* Evitar que los inputs se queden blancos en modo oscuro */
-        .form-control-premium {
-            background-color: var(--bg-main) !important;
-            border: 1px solid var(--border-color);
-            color: var(--text-main) !important;
-        }
-    </style>
 </head>
 <body>
     <div class="d-flex">
@@ -233,7 +164,7 @@
                                 <i class="bi bi-ticket-detailed-fill me-3"></i>Gestión de Casos
                             </a>
                         @else
-                            <a href="{{ route('tecnico.tickets.index') }}" class="nav-link {{ request()->routeIs('tecnico.tickets.*') ? 'active' : '' }}">
+                            <a href="#" class="nav-link">
                                 <i class="bi bi-ticket-perforated me-3"></i>Casos Asignados
                             </a>
                         @endhasanyrole
@@ -291,10 +222,6 @@
         <main id="content">
             <div class="container-fluid">
                 @yield('content')
-
-                @if(isset($slot))
-                    {{ $slot }} {{-- Para la vista de perfil que usa x-dynamic-component --}}
-                @endif
             </div>
         </main>
     </div>
