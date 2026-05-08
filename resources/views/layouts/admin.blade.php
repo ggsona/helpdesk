@@ -164,7 +164,7 @@
                                 <i class="bi bi-ticket-detailed-fill me-3"></i>Gestión de Casos
                             </a>
                         @else
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('tecnico.tickets.index') }}" class="nav-link {{ request()->routeIs('tecnico.tickets.*') ? 'active' : '' }}">
                                 <i class="bi bi-ticket-perforated me-3"></i>Casos Asignados
                             </a>
                         @endhasanyrole
@@ -222,6 +222,9 @@
         <main id="content">
             <div class="container-fluid">
                 @yield('content')
+                @if(isset($slot))
+                    {{ $slot }} {{-- Para la vista de perfil que usa x-dynamic-component --}}
+                @endif
             </div>
         </main>
     </div>
