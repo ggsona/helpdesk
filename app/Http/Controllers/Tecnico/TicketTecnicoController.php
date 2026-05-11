@@ -121,4 +121,39 @@ class TicketTecnicoController extends Controller
         return redirect()->route('tecnico.tickets.index')
                          ->with('success', 'Solución publicada y ticket cerrado correctamente.');
     }
+
+    public function editarSolucion($id)
+    {
+        // Buscamos el ticket con su solución
+        $ticket = Ticket::with('solucion')->findOrFail($id);
+
+        // Verificamos que tenga una solución que editar
+        if (!$ticket->solucion) {
+            return redirect()->route('tecnico.tickets.crearSolucion', $id);
+        }
+
+        return view('tecnico.tickets.editar_solucion', compact('ticket'));
+    }
+
+    /**
+     * Actualiza los datos en la tabla soluciones_tecnicas
+     */
+    public function actualizarSolucion(Request $request, $id)
+    {
+        $request->validate([
+            'resumen_usuario' => 'required|string|max:255',
+            'procedimiento_detallado' => 'required|string',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        // Actualizamos el registro en la tabla soluciones_tecnicas
+        $ticket->solucion->update([
+            'resumen_usuario' => $request->resumen_usuario,
+            'procedimiento_detallado' => $request->procedimiento_detallado,
+        ]);
+
+        return redirect()->route('tecnico.tickets.index')
+                        ->with('success', 'La solución técnica ha sido actualizada.');
+    }
 }

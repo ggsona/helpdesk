@@ -60,10 +60,17 @@
                            style="border: 1px solid var(--border-color); color: var(--text-main); background: var(--bg-main);">
                             <i class="bi bi-eye me-1"></i> Ver
                         </a>
-                        {{-- Botón para ir directo a la Solución --}}
-                        <a href="{{ route('tecnico.tickets.resolver', $ticket->id_ticket) }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-check2-circle"></i> Resolver
-                        </a>
+                        @if($ticket->estatus == 2)
+                            {{-- Si está asignado: Botón Resolver --}}
+                            <a href="{{ route('tecnico.tickets.resolver', $ticket->id_ticket) }}" class="btn btn-sm btn-success rounded-pill px-3">
+                                <i class="bi bi-check2-circle"></i> Resolver
+                            </a>
+                        @elseif($ticket->estatus == 3)
+                            {{-- Si está resuelto: Botón Editar Solución --}}
+                            <a href="{{ route('tecnico.tickets.editar-solucion', $ticket->id_ticket) }}" class="btn btn-sm btn-warning rounded-pill px-3">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                        @endif
                     </td>
                 </tr>
             @empty

@@ -80,6 +80,8 @@ Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')
     // Acción para solucionar el caso
     Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])->name('tickets.resolver');
     Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('tickets.guardar-solucion');
+    Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('tickets.editar-solucion');
+    Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('tickets.actualizar-solucion');
 });
 
 require __DIR__.'/auth.php';
