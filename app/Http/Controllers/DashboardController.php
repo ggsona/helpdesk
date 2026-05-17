@@ -11,19 +11,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
-            return view('admin.dashboard');
+        if ($user->can('ver-panel-operativo')) {
+            return view('soporte.dashboard');
         }
 
-        if ($user->hasRole('gestor')) {
-            return view('gestor.dashboard');
-        }
-
-        if ($user->hasRole('tecnico')) {
-            return view('tecnico.dashboard');
-        }
-
-        // Si no es ninguno de los anteriores, asumimos que es cliente
-        return view('usuario.home');
+        // Si no tiene acceso al panel operativo, se le redirige al inicio de cliente
+        return redirect()->route('usuario.home');
     }
 }

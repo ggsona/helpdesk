@@ -29,20 +29,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // --- AGREGA ESTA LÍNEA AQUÍ ---
         $user = auth()->user(); 
 
-        // Lógica de redirección por rol
-        if ($user->hasRole('admin')) {
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
-        if ($user->hasRole('tecnico')) {
-            return redirect()->intended(route('tecnico.dashboard'));
+        // Lógica de redirección por permisos de Spatie
+        if ($user->can('ver-panel-operativo')) {
+            return redirect()->intended(route('soporte.dashboard'));
         }
 
         // Por defecto para clientes
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('usuario.home'));
     }
 
     /**

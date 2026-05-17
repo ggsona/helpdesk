@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Técnico - Helpdesk GDC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --font-headings: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 320px;
+            --primary-color: #0d6efd;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-body: #334155;
+            --border-color: #e2e8f0;
+        }
+        
+        [data-bs-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-body: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            font-size: 1rem;
+            line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-headings);
+            font-weight: 700;
+        }
+
+        /* Layout Structure */
+        #app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Search and Nav */
+        .search-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            border-radius: 30px;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem 0.6rem 2.5rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .sidebar-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item-h1 {
+            font-family: var(--font-headings);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.2rem 0.8rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-h2 {
+            font-size: 0.88rem;
+            margin: 2px 0;
+        }
+
+        .menu-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-body);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-link:hover {
+            background-color: rgba(13, 110, 253, 0.08);
+            color: var(--primary-color);
+        }
+
+        .menu-link.active {
+            background-color: var(--primary-color);
+            color: #ffffff !important;
+            font-weight: 500;
+        }
+
+        /* Code Block Premium styling */
+        .code-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-header {
+            font-family: var(--font-headings);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        pre[class*="language-"] {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            font-size: 0.9rem !important;
+            border-radius: 0 !important;
+            background: #1e293b !important;
+        }
+
+        code[class*="language-"] {
+            text-shadow: none !important;
+            font-family: 'Courier New', Courier, monospace !important;
+        }
+
+        .btn-copy {
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy:hover {
+            color: #ffffff !important;
+        }
+
+        /* Inline styles */
+        code:not([class*="language-"]) {
+            background-color: rgba(13, 110, 253, 0.08);
+            color: var(--primary-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* Customized elements */
+        .lead-body {
+            font-size: 1.05rem;
+            color: var(--text-body);
+            opacity: 0.9;
+        }
+
+        .list-custom {
+            padding-left: 1.5rem;
+        }
+
+        .list-custom li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        /* Top sticky settings bar */
+        .settings-bar {
+            position: sticky;
+            top: 0;
+            background-color: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        [data-bs-theme="dark"] .settings-bar {
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Back to top */
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: none;
+            z-index: 99;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="p-4 border-bottom border-color">
+                <h5 class="fw-bold mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-headset me-2 fs-4"></i>
+                    Helpdesk GDC
+                </h5>
+                <span class="text-muted small">Documentación de Sistemas</span>
+            </div>
+            
+            <div class="search-container position-relative">
+                <i class="bi bi-search position-absolute text-muted" style="left: 2.2rem; top: 2.1rem;"></i>
+                <input type="text" id="search-input" class="form-control search-input w-100" placeholder="Buscar secciones..." onkeyup="filterSidebar()">
+            </div>
+
+            <div class="sidebar-menu">
+                <ul class="menu-list">
+                    <li class="menu-item-h1">MANUAL INTEGRAL Y GUÍA DE RECREACIÓN: HELPDESK GDC</li>
+<li class="menu-item-h2"><a href="#ndice" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>ÍNDICE</a></li>
+<li class="menu-item-h2"><a href="#1-arquitectura-general" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>1. ARQUITECTURA GENERAL</a></li>
+<li class="menu-item-h2"><a href="#2-estructura-y-modelado-de-base-de-datos" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>2. ESTRUCTURA Y MODELADO DE BASE DE DATOS</a></li>
+<li class="menu-item-h2"><a href="#3-configuracin-de-seguridad-y-roles-rbac" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>3. CONFIGURACIÓN DE SEGURIDAD Y ROLES (RBAC)</a></li>
+<li class="menu-item-h2"><a href="#4-modelos-eloquent-y-relaciones" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>4. MODELOS ELOQUENT Y RELACIONES</a></li>
+<li class="menu-item-h2"><a href="#5-capa-de-controladores-e-hilos-de-trabajo" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>5. CAPA DE CONTROLADORES E HILOS DE TRABAJO</a></li>
+<li class="menu-item-h2"><a href="#6-sistema-de-enrutamiento-y-middleware" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>6. SISTEMA DE ENRUTAMIENTO Y MIDDLEWARE</a></li>
+<li class="menu-item-h2"><a href="#7-interfaz-grfica-layouts-y-vistas-blade" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>7. INTERFAZ GRÁFICA (LAYOUTS Y VISTAS BLADE)</a></li>
+<li class="menu-item-h1">sidebar {</li>
+<li class="menu-item-h1">content { flex-grow: 1; padding: 2.5rem; }</li>
+<li class="menu-item-h2"><a href="#8-pasos-para-recrear-el-proyecto-desde-cero" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>8. PASOS PARA RECREAR EL PROYECTO DESDE CERO</a></li>
+<li class="menu-item-h1">1. Crear nuevo proyecto en Laravel 10</li>
+<li class="menu-item-h1">2. Instalar el paquete de Roles y Permisos de Spatie</li>
+<li class="menu-item-h1">3. Instalar la suite de autenticación base (Laravel Breeze con blade)</li>
+<li class="menu-item-h1">4. Instalar las dependencias NPM y Bootstrap para los estilos premium</li>
+<li class="menu-item-h1">Ejecutar el compilador en desarrollo</li>
+<li class="menu-item-h1">En otra terminal, inicializar el servidor Laravel</li>
+
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Body -->
+        <div class="w-100">
+            <!-- Settings Bar (Sticky Top) -->
+            <div class="settings-bar d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    <i class="bi bi-journal-bookmark-fill me-1 text-primary"></i> Manual Técnico Integral
+                </div>
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none border-0" onclick="toggleTheme()">
+                    <i id="theme-icon" class="bi bi-circle-half me-2"></i>Cambiar Tema
+                </button>
+            </div>
+
+            <!-- Page Content -->
+            <main id="main-content">
+                <h1 id="manual-integral-y-gua-de-recreacin-helpdesk-gdc" class="display-5 fw-bold mt-5 mb-4 text-primary border-bottom pb-2 heading-section">MANUAL INTEGRAL Y GUÍA DE RECREACIÓN: HELPDESK GDC</h1>
+<p class="lead-body my-3">Este manual técnico proporciona una documentación exhaustiva de la aplicación <strong>Helpdesk GDC</strong> desarrollada bajo el framework <strong>Laravel 10</strong>, utilizando <strong>Bootstrap 5.3.3</strong> para una interfaz premium adaptativa (Light/Dark Mode) y <strong>Spatie Laravel Permission</strong> para el control de accesos basado en roles (RBAC).</p>
+<p class="lead-body my-3">El objetivo de este manual es servir como documentación del sistema actual y proporcionar una guía paso a paso, con todo el código necesario, para recrear la aplicación desde cero.</p>
+<p class="lead-body my-3">---</p>
+<h2 id="ndice" class="fw-bold mt-5 mb-3 text-secondary heading-section">ÍNDICE</h2>
+<p class="lead-body my-3">1. <a href="#1-arquitectura-general" target="_blank">Arquitectura General</a></p>
+<p class="lead-body my-3">2. <a href="#2-estructura-y-modelado-de-base-de-datos" target="_blank">Estructura y Modelado de Base de Datos</a></p>
+<p class="lead-body my-3">3. <a href="#3-configuración-de-seguridad-y-roles-rbac" target="_blank">Configuración de Seguridad y Roles (RBAC)</a></p>
+<p class="lead-body my-3">4. <a href="#4-modelos-eloquent-y-relaciones" target="_blank">Modelos Eloquent y Relaciones</a></p>
+<p class="lead-body my-3">5. <a href="#5-capa-de-controladores-e-hilos-de-trabajo" target="_blank">Capa de Controladores e Hilos de Trabajo</a></p>
+<p class="lead-body my-3">6. <a href="#6-sistema-de-enrutamiento-y-middleware" target="_blank">Sistema de Enrutamiento y Middleware</a></p>
+<p class="lead-body my-3">7. <a href="#7-interfaz-gráfica-layouts-y-vistas-blade" target="_blank">Interfaz Gráfica (Layouts y Vistas Blade)</a></p>
+<p class="lead-body my-3">8. <a href="#8-pasos-para-recrear-el-proyecto-desde-cero" target="_blank">Pasos para Recrear el Proyecto desde Cero</a></p>
+<p class="lead-body my-3">---</p>
+<h2 id="1-arquitectura-general" class="fw-bold mt-5 mb-3 text-secondary heading-section">1. ARQUITECTURA GENERAL</h2>
+<p class="lead-body my-3">La aplicación sigue el patrón arquitectónico <strong>Modelo-Vista-Controlador (MVC)</strong> característico de Laravel, enriquecido con un sistema de roles para segmentar los privilegios de los usuarios.</p>
+<h3 id="componentes-principales" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Componentes Principales:</h3>
+<ul class="list-custom mb-3">
+<li>  <strong>Backend</strong>: Laravel 10 con PHP 8.1+.</li>
+<li>  <strong>Base de datos</strong>: Relacional (MySQL / MariaDB).</li>
+<li>  <strong>Frontend</strong>: Plantillas Blade, compiladas a través de <strong>Vite</strong>, complementadas con <strong>Bootstrap 5.3.3</strong> e <strong>iconos de Bootstrap (Bootstrap Icons)</strong>.</li>
+<li>  <strong>Estilos y Temas</strong>: Soporte premium integrado para el cambio de temas (Claro / Oscuro) persistido a través de <code>localStorage</code> del navegador en el cliente.</li>
+<li>  <strong>Control de Acceso</strong>: <strong>Spatie Laravel Permission</strong>, configurado en combinación con un campo numérico manual en la tabla de usuarios (<code>role</code>).</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h2 id="2-estructura-y-modelado-de-base-de-datos" class="fw-bold mt-5 mb-3 text-secondary heading-section">2. ESTRUCTURA Y MODELADO DE BASE DE DATOS</h2>
+<p class="lead-body my-3">El sistema cuenta con un esquema de base de datos relacional robusto. A continuación se presentan las migraciones clave con el código completo y optimizado.</p>
+<h3 id="cdigo-completo-de-migraciones" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Código Completo de Migraciones</h3>
+<h4 id="a-tablas-maestras" class="fw-bold mt-3 mb-2 heading-section">A. Tablas Maestras</h4>
+<p class="lead-body my-3">Estas tablas proveen los datos estáticos de parametrización para el sistema de soporte.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2023_01_01_000001_create_oficinas_table.php
+Schema::create('oficinas', function (Blueprint $table) {
+    $table-&gt;id('id_oficina');
+    $table-&gt;string('nombre_oficina', 100);
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2023_01_01_000002_create_prioridades_table.php
+Schema::create('prioridades', function (Blueprint $table) {
+    $table-&gt;id('id_prioridad');
+    $table-&gt;string('nombre_prioridad', 50); // Baja, Media, Alta, Crítica
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2023_01_01_000003_create_categorias_table.php
+Schema::create('categorias', function (Blueprint $table) {
+    $table-&gt;id('id_categoria');
+    $table-&gt;string('nombre_categoria', 100); // Hardware, Software, Redes, etc.
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2023_01_01_000004_create_tipos_equipo_table.php
+Schema::create('tipos_equipo', function (Blueprint $table) {
+    $table-&gt;id('id_tipo_equipo');
+    $table-&gt;string('nombre_tipo_equipo', 100); // Laptop, Desktop, Impresora
+    $table-&gt;timestamps();
+});
+</code></pre></div>
+<h4 id="b-estructura-de-usuarios-y-personas" class="fw-bold mt-3 mb-2 heading-section">B. Estructura de Usuarios y Personas</h4>
+<p class="lead-body my-3">Una estructura modular donde los datos personales se almacenan en <code>personas</code> y las credenciales de acceso en <code>users</code>.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2023_01_01_000005_create_personas_table.php
+Schema::create('personas', function (Blueprint $table) {
+    $table-&gt;id('id_persona');
+    $table-&gt;string('nombre', 100);
+    $table-&gt;string('apellido', 100);
+    $table-&gt;string('telefono', 20)-&gt;nullable();
+    $table-&gt;foreignId('id_oficina')-&gt;constrained('oficinas', 'id_oficina');
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2014_10_12_000000_create_users_table.php (Modificada)
+Schema::create('users', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;string('name');
+    $table-&gt;string('email')-&gt;unique();
+    $table-&gt;timestamp('email_verified_at')-&gt;nullable();
+    $table-&gt;string('password');
+    $table-&gt;string('role')-&gt;nullable(); // Campo numérico para compatibilidad manual
+    $table-&gt;foreignId('id_persona')-&gt;nullable()-&gt;constrained('personas', 'id_persona')-&gt;onDelete('set null');
+    $table-&gt;rememberToken();
+    $table-&gt;timestamps();
+});
+</code></pre></div>
+<h4 id="c-tabla-principal-de-tickets" class="fw-bold mt-3 mb-2 heading-section">C. Tabla Principal de Tickets</h4>
+<p class="lead-body my-3">Esta tabla centraliza los reportes de soporte e implementa la lógica de borradores (los tickets inician en <code>estatus = 0</code> y la prioridad/técnico son <code>nullable</code>).</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_01_000001_create_tickets_table.php
+Schema::create('tickets', function (Blueprint $table) {
+    $table-&gt;id('id_ticket');
+    $table-&gt;string('asunto', 200);
+    $table-&gt;foreignId('id_usuario')-&gt;constrained('users', 'id');
+    $table-&gt;foreignId('id_tipo_equipo')-&gt;constrained('tipos_equipo', 'id_tipo_equipo');
+    $table-&gt;foreignId('id_prioridad')-&gt;nullable()-&gt;constrained('prioridades', 'id_prioridad'); // Nullable para Borradores
+    $table-&gt;foreignId('id_categoria')-&gt;constrained('categorias', 'id_categoria');
+    $table-&gt;text('descripcion_problema');
+    $table-&gt;integer('estatus')-&gt;default(0); // 0 = Borrador, 1 = Abierto, 2 = En Proceso, 3 = Resuelto
+    $table-&gt;timestamp('fecha_cierre')-&gt;nullable();
+    $table-&gt;timestamps();
+});
+</code></pre></div>
+<h4 id="d-tablas-de-operacin-y-chat" class="fw-bold mt-3 mb-2 heading-section">D. Tablas de Operación y Chat</h4>
+<p class="lead-body my-3">Soporta las asignaciones de especialistas, hilos de conversación, adjuntos físicos y soluciones técnicas formales.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_01_000005_create_ticket_asignaciones_table.php
+Schema::create('ticket_asignaciones', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;foreignId('id_ticket')-&gt;constrained('tickets', 'id_ticket')-&gt;onDelete('cascade');
+    $table-&gt;foreignId('id_usuario_tecnico')-&gt;constrained('users', 'id');
+    $table-&gt;text('nota')-&gt;nullable(); // Nota inicial de asignación/reasignación
+    $table-&gt;timestamp('fecha_asignacion')-&gt;useCurrent();
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2026_05_01_000003_create_ticket_comentarios_table.php
+Schema::create('ticket_comentarios', function (Blueprint $table) {
+    $table-&gt;id('id_comentario');
+    $table-&gt;foreignId('id_ticket')-&gt;constrained('tickets', 'id_ticket')-&gt;onDelete('cascade');
+    $table-&gt;foreignId('id_usuario')-&gt;constrained('users', 'id');
+    $table-&gt;text('mensaje');
+    $table-&gt;boolean('es_interno')-&gt;default(false); // true = Visible sólo para Gestor y Técnico
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2026_05_01_000007_create_ticket_adjuntos_table.php
+Schema::create('ticket_adjuntos', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;foreignId('id_ticket')-&gt;constrained('tickets', 'id_ticket')-&gt;onDelete('cascade');
+    $table-&gt;string('ruta_archivo');
+    $table-&gt;string('nombre_original');
+    $table-&gt;string('tipo_mimo', 100)-&gt;nullable();
+    $table-&gt;bigInteger('tamano')-&gt;nullable();
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2026_05_01_000008_create_soluciones_tecnicas_table.php
+Schema::create('soluciones_tecnicas', function (Blueprint $table) {
+    $table-&gt;id('id_solucion');
+    $table-&gt;foreignId('id_ticket')-&gt;constrained('tickets', 'id_ticket')-&gt;onDelete('cascade');
+    $table-&gt;foreignId('id_usuario_tecnico')-&gt;constrained('users', 'id');
+    $table-&gt;string('resumen_usuario', 255); // Resumen en lenguaje sencillo para el cliente
+    $table-&gt;text('procedimiento_detallado'); // Pasos técnicos detallados en lenguaje interno
+    $table-&gt;timestamps();
+});
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="3-configuracin-de-seguridad-y-roles-rbac" class="fw-bold mt-5 mb-3 text-secondary heading-section">3. CONFIGURACIÓN DE SEGURIDAD Y ROLES (RBAC)</h2>
+<p class="lead-body my-3">El sistema utiliza <strong>Spatie Laravel Permission</strong> para proteger rutas y componentes. Los roles establecidos son:</p>
+<p class="lead-body my-3">1.  <strong>admin</strong> (Administrador): Acceso total y configuraciones globales.</p>
+<p class="lead-body my-3">2.  <strong>gestor</strong> (Gestor de Soporte): Despacho de tickets, asignación técnica, reasignaciones y chats.</p>
+<p class="lead-body my-3">3.  <strong>tecnico</strong> (Especialista Técnico): Solución de tickets asignados, comentarios internos/públicos.</p>
+<p class="lead-body my-3">4.  <strong>usuario</strong> (Usuario Final/Cliente): Creación de borradores, edición, envío a soporte e interacción del caso.</p>
+<h3 id="registro-del-middleware" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Registro del Middleware</h3>
+<p class="lead-body my-3">Para utilizar la validación de roles en rutas, se asocia el alias en el Kernel de la aplicación:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Kernel.php
+protected $middlewareAliases = [
+    // ... otros middlewares
+    'role' =&gt; \Spatie\Permission\Middleware\RoleMiddleware::class,
+];
+</code></pre></div>
+<h3 id="inicializacin-semilla-seeder-completo" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Inicialización Semilla (Seeder Completo)</h3>
+<p class="lead-body my-3">Este Seeder automatiza la creación de roles, datos maestros de configuración y usuarios iniciales con sus respectivos roles asignados.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use App\Models\Oficina;
+use App\Models\Prioridad;
+use App\Models\Categoria;
+use App\Models\TipoEquipo;
+use App\Models\Persona;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // 1. Crear Roles de Spatie
+        $roleAdmin   = Role::updateOrCreate(['name' =&gt; 'admin']);
+        $roleGestor  = Role::updateOrCreate(['name' =&gt; 'gestor']);
+        $roleTecnico = Role::updateOrCreate(['name' =&gt; 'tecnico']);
+        $roleUsuario = Role::updateOrCreate(['name' =&gt; 'usuario']);
+
+        // 2. Poblar Tablas Maestras
+        $ofiCentral = Oficina::create(['nombre_oficina' =&gt; 'Sede Central']);
+        $ofiNorte   = Oficina::create(['nombre_oficina' =&gt; 'Sucursal Norte']);
+
+        Prioridad::create(['nombre_prioridad' =&gt; 'Baja']);
+        Prioridad::create(['nombre_prioridad' =&gt; 'Media']);
+        Prioridad::create(['nombre_prioridad' =&gt; 'Alta']);
+        Prioridad::create(['nombre_prioridad' =&gt; 'Crítica']);
+
+        Categoria::create(['nombre_categoria' =&gt; 'Hardware']);
+        Categoria::create(['nombre_categoria' =&gt; 'Software']);
+        Categoria::create(['nombre_categoria' =&gt; 'Redes']);
+
+        TipoEquipo::create(['nombre_tipo_equipo' =&gt; 'Laptop']);
+        TipoEquipo::create(['nombre_tipo_equipo' =&gt; 'Desktop']);
+        TipoEquipo::create(['nombre_tipo_equipo' =&gt; 'Impresora']);
+
+        // 3. Crear Información Personal (Personas)
+        $pAdmin = Persona::create(['nombre' =&gt; 'Admin', 'apellido' =&gt; 'Sistemas', 'telefono' =&gt; '99999999', 'id_oficina' =&gt; $ofiCentral-&gt;id_oficina]);
+        $pGestor = Persona::create(['nombre' =&gt; 'Gestor', 'apellido' =&gt; 'Soporte', 'telefono' =&gt; '88888888', 'id_oficina' =&gt; $ofiCentral-&gt;id_oficina]);
+        $pTecnico = Persona::create(['nombre' =&gt; 'Tecnico', 'apellido' =&gt; 'Especialista', 'telefono' =&gt; '77777777', 'id_oficina' =&gt; $ofiCentral-&gt;id_oficina]);
+        $pUsuario = Persona::create(['nombre' =&gt; 'Usuario', 'apellido' =&gt; 'Final', 'telefono' =&gt; '66666666', 'id_oficina' =&gt; $ofiNorte-&gt;id_oficina]);
+
+        // 4. Crear Credenciales de Acceso y Asignar Roles
+        $admin = User::create([
+            'name' =&gt; 'Administrador',
+            'email' =&gt; 'admin@helpdesk.com',
+            'password' =&gt; Hash::make('admin123'),
+            'role' =&gt; '1',
+            'id_persona' =&gt; $pAdmin-&gt;id_persona,
+        ]);
+        $admin-&gt;assignRole($roleAdmin);
+
+        $gestor = User::create([
+            'name' =&gt; 'Gestor de Soporte',
+            'email' =&gt; 'gestor@helpdesk.com',
+            'password' =&gt; Hash::make('gestor123'),
+            'role' =&gt; '2',
+            'id_persona' =&gt; $pGestor-&gt;id_persona,
+        ]);
+        $gestor-&gt;assignRole($roleGestor);
+
+        $tecnico = User::create([
+            'name' =&gt; 'Tecnico de Soporte',
+            'email' =&gt; 'tecnico@helpdesk.com',
+            'password' =&gt; Hash::make('tecnico123'),
+            'role' =&gt; '3',
+            'id_persona' =&gt; $pTecnico-&gt;id_persona,
+        ]);
+        $tecnico-&gt;assignRole($roleTecnico);
+
+        $usuario = User::create([
+            'name' =&gt; 'Usuario Final GDC',
+            'email' =&gt; 'usuario@helpdesk.com',
+            'password' =&gt; Hash::make('usuario123'),
+            'role' =&gt; '4',
+            'id_persona' =&gt; $pUsuario-&gt;id_persona,
+        ]);
+        $usuario-&gt;assignRole($roleUsuario);
+    }
+}
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="4-modelos-eloquent-y-relaciones" class="fw-bold mt-5 mb-3 text-secondary heading-section">4. MODELOS ELOQUENT Y RELACIONES</h2>
+<p class="lead-body my-3">Eloquent simplifica la comunicación con la Base de Datos. El modelo central es <code>Ticket.php</code>.</p>
+<h3 id="cdigo-de-modelos-principales" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Código de Modelos Principales</h3>
+<h4 id="a-modelo-ticketphp" class="fw-bold mt-3 mb-2 heading-section">A. Modelo `Ticket.php`</h4>
+<p class="lead-body my-3">Define todas las relaciones críticas, adjuntos, chat y un accesor dinámico para traducir códigos numéricos de estado a texto legible.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Ticket extends Model {
+
+    protected $table = 'tickets';
+    protected $primaryKey = 'id_ticket';
+
+    protected $fillable = [
+        'asunto', 
+        'id_usuario', 
+        'id_tipo_equipo', 
+        'id_prioridad', 
+        'id_categoria', 
+        'descripcion_problema', 
+        'estatus', 
+        'fecha_cierre'
+    ];
+
+    public function usuario(): BelongsTo { 
+        return $this-&gt;belongsTo(User::class, 'id_usuario'); 
+    }
+
+    public function tecnico() {
+        return $this-&gt;hasOneThrough(
+            User::class,
+            TicketAsignacion::class,
+            'id_ticket',         // Llave foránea en ticket_asignaciones
+            'id',                // Llave foránea en users
+            'id_ticket',         // Llave local en tickets
+            'id_usuario_tecnico' // Llave local en ticket_asignaciones
+        );
+    }
+
+    public function prioridad(): BelongsTo { 
+        return $this-&gt;belongsTo(Prioridad::class, 'id_prioridad'); 
+    }
+
+    public function categoria(): BelongsTo { 
+        return $this-&gt;belongsTo(Categoria::class, 'id_categoria'); 
+    }
+
+    public function tipoEquipo(): BelongsTo { 
+        return $this-&gt;belongsTo(TipoEquipo::class, 'id_tipo_equipo'); 
+    }
+    
+    public function adjuntos(): HasMany { 
+        return $this-&gt;hasMany(TicketAdjunto::class, 'id_ticket'); 
+    }
+
+    public function solucion(): HasOne {
+        return $this-&gt;hasOne(SolucionTecnica::class, 'id_ticket');
+    }
+
+    public function asignacion(): HasOne {
+        return $this-&gt;hasOne(TicketAsignacion::class, 'id_ticket', 'id_ticket'); 
+    }
+
+    public function comentarios(): HasMany {
+        return $this-&gt;hasMany(TicketComentario::class, 'id_ticket', 'id_ticket');
+    }
+
+    // Accesor Dinámico para el Estado
+    public function getEstadoTextoAttribute() {
+        return match($this-&gt;estatus) {
+            0 =&gt; 'Borrador',
+            1 =&gt; 'Abierto',
+            2 =&gt; 'En Proceso',
+            3 =&gt; 'Resuelto',
+            default =&gt; 'Desconocido',
+        };
+    }
+}
+</code></pre></div>
+<h4 id="b-modelo-userphp" class="fw-bold mt-3 mb-2 heading-section">B. Modelo `User.php`</h4>
+<p class="lead-body my-3">Utiliza el trait <code>HasRoles</code> de Spatie y enlaza al usuario con su ficha de datos personales.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class User extends Authenticatable
+{
+    use Notifiable, HasRoles;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'id_persona',
+        'role'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    public function persona(): BelongsTo
+    {
+        return $this-&gt;belongsTo(Persona::class, 'id_persona', 'id_persona');
+    }
+}
+</code></pre></div>
+<h4 id="c-ficha-personal-personaphp" class="fw-bold mt-3 mb-2 heading-section">C. Ficha Personal (`Persona.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Persona extends Model
+{
+    protected $table = 'personas';
+    protected $primaryKey = 'id_persona';
+    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_oficina'];
+
+    public function oficina(): BelongsTo
+    {
+        return $this-&gt;belongsTo(Oficina::class, 'id_oficina');
+    }
+}
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="5-capa-de-controladores-e-hilos-de-trabajo" class="fw-bold mt-5 mb-3 text-secondary heading-section">5. CAPA DE CONTROLADORES E HILOS DE TRABAJO</h2>
+<p class="lead-body my-3">El flujo operativo del sistema está segmentado en tres controladores específicos por rol y un controlador de redirección para el inicio de sesión.</p>
+<h3 id="a-controlador-de-redireccin-automtica" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Controlador de Redirección Automática</h3>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Controllers/DashboardController.php
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\Auth;
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+
+        if ($user-&gt;can('ver-panel-operativo')) {
+            return view('soporte.dashboard');
+        }
+
+        // Si es cliente/usuario regular se le redirige a su bandeja
+        return redirect()-&gt;route('usuario.home');
+    }
+}
+</code></pre></div>
+<h3 id="b-mdulo-de-usuario-cliente" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Módulo de Usuario (Cliente)</h3>
+<p class="lead-body my-3">Permite al usuario redactar reportes en estado <strong>Borrador (0)</strong>, adjuntar archivos físicos, editar datos antes del envío definitivo, y formalizar el ticket al pasarlo a <strong>Abierto (1)</strong>.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Controllers/Usuario/TicketUsuarioController.php
+namespace App\Http\Controllers\Usuario;
+
+use App\Http\Controllers\Controller;
+use App\Models\Ticket;
+use App\Models\TicketAdjunto;
+use App\Models\Categoria;
+use App\Models\Prioridad;
+use App\Models\TipoEquipo;
+use App\Models\TicketComentario;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class TicketUsuarioController extends Controller
+{
+    public function index()
+    {
+        $tickets = Ticket::where('id_usuario', Auth::id())-&gt;latest()-&gt;get();
+        return view('usuario.tickets.index', compact('tickets'));
+    }
+
+    public function home()
+    {
+        return view('usuario.home');
+    }
+
+    public function create()
+    {
+        $categorias = Categoria::all();
+        $prioridades = Prioridad::all();
+        $tiposEquipo = TipoEquipo::all();
+        return view('usuario.tickets.create', compact('categorias', 'prioridades', 'tiposEquipo'));
+    }
+
+    public function store(Request $request)
+    {
+        $request-&gt;validate([
+            'asunto' =&gt; 'required|string|max:200',
+            'descripcion_problema' =&gt; 'required|string',
+            'id_categoria' =&gt; 'required|exists:categorias,id_categoria',
+            'id_tipo_equipo' =&gt; 'required|exists:tipos_equipo,id_tipo_equipo',
+            'adjuntos.*' =&gt; 'nullable|file|max:10240',
+        ]);
+
+        // Crea en estatus 0 (Borrador)
+        $ticket = Ticket::create([
+            'id_usuario' =&gt; Auth::id(),
+            'asunto' =&gt; $request-&gt;asunto,
+            'id_categoria' =&gt; $request-&gt;id_categoria,
+            'id_tipo_equipo' =&gt; $request-&gt;id_tipo_equipo,
+            'descripcion_problema' =&gt; $request-&gt;descripcion_problema,
+            'id_prioridad' =&gt; null, 
+            'estatus' =&gt; 0,
+        ]);
+
+        if ($request-&gt;hasFile('adjuntos')) {
+            foreach ($request-&gt;file('adjuntos') as $archivo) {
+                $ruta = $archivo-&gt;store('tickets/' . $ticket-&gt;id_ticket, 'public');
+
+                TicketAdjunto::create([
+                    'id_ticket' =&gt; $ticket-&gt;id_ticket,
+                    'ruta_archivo' =&gt; $ruta,
+                    'nombre_original' =&gt; $archivo-&gt;getClientOriginalName(),
+                    'tipo_mimo' =&gt; $archivo-&gt;getMimeType(),
+                    'tamano' =&gt; $archivo-&gt;getSize(),
+                ]);
+            }
+        }
+
+        return redirect()-&gt;route('usuario.tickets.index')
+            -&gt;with('success', 'Ticket guardado como borrador. Por favor envíalo cuando desees reportarlo.');
+    }
+
+    public function enviar(Ticket $ticket) 
+    {
+        if ($ticket-&gt;id_usuario !== Auth::id()) {
+            abort(403);
+        }
+
+        $ticket-&gt;update(['estatus' =&gt; 1]); // Pasa de Borrador a Abierto
+
+        return back()-&gt;with('success', '¡Ticket enviado exitosamente al equipo de soporte!');
+    }
+
+    public function show($id)
+    {
+        $ticket = Ticket::with([
+            'categoria', 
+            'tecnico', 
+            'prioridad', 
+            'adjuntos', 
+            'comentarios.usuario'
+        ])
+        -&gt;where('id_usuario', Auth::id())
+        -&gt;findOrFail($id);
+
+        return view('usuario.tickets.show', compact('ticket'));
+    }
+
+    public function edit($id)
+    {
+        $ticket = Ticket::where('id_usuario', Auth::id())-&gt;where('estatus', 0)-&gt;findOrFail($id);
+        $categorias = Categoria::all();
+        return view('usuario.tickets.edit', compact('ticket', 'categorias'));
+    }
+
+    public function destroy($id)
+    {
+        $ticket = Ticket::where('id_usuario', Auth::id())-&gt;where('estatus', 0)-&gt;findOrFail($id);
+        $ticket-&gt;delete();
+        return redirect()-&gt;route('usuario.tickets.index')-&gt;with('success', 'Ticket borrador eliminado.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $ticket = Ticket::where('id_usuario', Auth::id())-&gt;where('estatus', 0)-&gt;findOrFail($id);
+        $request-&gt;validate([
+            'asunto' =&gt; 'required|string|max:255',
+            'descripcion_problema' =&gt; 'nullable|string',
+            'id_categoria' =&gt; 'required|exists:categorias,id_categoria',
+        ]);
+
+        $ticket-&gt;update([
+            'asunto' =&gt; $request-&gt;asunto,
+            'descripcion_problema' =&gt; $request-&gt;descripcion_problema,
+            'id_categoria' =&gt; $request-&gt;id_categoria,
+        ]);
+
+        return redirect()-&gt;route('usuario.tickets.index')-&gt;with('success', 'Borrador actualizado.');
+    }
+
+    public function storeComentario(Request $request, $id)
+    {
+        $request-&gt;validate(['mensaje' =&gt; 'required|string|max:1000']);
+        $ticket = Ticket::where('id_usuario', Auth::id())-&gt;findOrFail($id);
+
+        TicketComentario::create([
+            'id_ticket'  =&gt; $ticket-&gt;id_ticket,
+            'id_usuario' =&gt; Auth::id(),
+            'mensaje'    =&gt; $request-&gt;mensaje,
+            'es_interno' =&gt; false, // Cliente no puede escribir notas ocultas
+        ]);
+
+        return back()-&gt;with('success', 'Mensaje enviado.');
+    }
+}
+</code></pre></div>
+<h3 id="c-mdulo-de-gestor" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Módulo de Gestor</h3>
+<p class="lead-body my-3">El Gestor visualiza los tickets mediante un panel distribuido en 3 categorías (*Por Asignar*, *En Gestión*, y *Resueltos*). Puede asignar un técnico y establecer la prioridad, lo cual cambia el estado del ticket a <strong>En Proceso (2)</strong>, emitiendo una notificación automática en el historial del chat.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Controllers/Gestor/TicketGestorController.php
+namespace App\Http\Controllers\Gestor;
+
+use App\Http\Controllers\Controller;
+use App\Models\Ticket;
+use App\Models\User;
+use App\Models\TicketComentario;
+use App\Models\TicketAsignacion;
+use App\Models\Prioridad;
+use Illuminate\Http\Request;
+
+class TicketGestorController extends Controller
+{
+    public function index() 
+    {
+        $ticketsNuevos = Ticket::with('prioridad')-&gt;where('estatus', 1)-&gt;latest()-&gt;get();
+        $ticketsAsignados = Ticket::with('prioridad', 'asignacion.tecnico')-&gt;where('estatus', 2)-&gt;latest()-&gt;get();
+        $ticketsResueltos = Ticket::with('prioridad', 'solucion')-&gt;where('estatus', 3)-&gt;latest()-&gt;get();
+        
+        $tecnicos = User::role('tecnico')-&gt;get(); 
+        $prioridades = Prioridad::all(); 
+
+        return view('gestor.tickets.index', compact(
+            'ticketsNuevos', 
+            'ticketsAsignados', 
+            'ticketsResueltos', 
+            'tecnicos',
+            'prioridades'
+        ));
+    }
+
+    public function asignar(Request $request, $id)
+    {
+        $request-&gt;validate([
+            'id_usuario_tecnico' =&gt; 'required|exists:users,id',
+            'id_prioridad' =&gt; 'required|exists:prioridades,id_prioridad',
+            'nota' =&gt; 'nullable|string'
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+        $esReasignacion = TicketAsignacion::where('id_ticket', $id)-&gt;exists();
+
+        TicketAsignacion::updateOrCreate(
+            ['id_ticket' =&gt; $id],
+            [
+                'id_usuario_tecnico' =&gt; $request-&gt;id_usuario_tecnico,
+                'nota' =&gt; $request-&gt;nota, 
+                'fecha_asignacion' =&gt; now()
+            ]
+        );
+
+        $ticket-&gt;update([
+            'id_prioridad' =&gt; $request-&gt;id_prioridad,
+            'estatus' =&gt; 2 // Cambia a "En Proceso"
+        ]);
+
+        $tecnicoNombre = User::find($request-&gt;id_usuario_tecnico)-&gt;name;
+        if ($esReasignacion) {
+            $mensaje = "🔄 **Reasignación**: El caso ha sido reasignado al especialista " . $tecnicoNombre;
+            $etiqueta = "Motivo";
+        } else {
+            $mensaje = "✅ **Asignación**: El caso ha sido asignado al técnico " . $tecnicoNombre;
+            $etiqueta = "Instrucciones";
+        }
+        
+        if ($request-&gt;nota) {
+            $mensaje .= "\n\n**" . $etiqueta . "**: " . $request-&gt;nota;
+        }
+
+        TicketComentario::create([
+            'id_ticket' =&gt; $id,
+            'id_usuario' =&gt; auth()-&gt;id(),
+            'mensaje' =&gt; $mensaje,
+            'es_interno' =&gt; false 
+        ]);
+
+        return redirect()-&gt;back()-&gt;with('success', 'Asignación procesada con éxito.');
+    }
+
+    public function show($id)
+    {
+        $ticket = Ticket::with(['usuario.persona.oficina', 'asignacion.tecnico', 'comentarios.usuario'])-&gt;findOrFail($id);
+        $tecnicos = User::role('tecnico')-&gt;get();
+        $prioridades = Prioridad::all();
+
+        return view('gestor.tickets.show', compact('ticket', 'tecnicos', 'prioridades'));
+    }
+
+    public function comentar(Request $request, $id)
+    {
+        $request-&gt;validate(['mensaje' =&gt; 'required|string|max:1000']);
+
+        TicketComentario::create([
+            'id_ticket'  =&gt; $id,
+            'id_usuario' =&gt; auth()-&gt;id(),
+            'mensaje'    =&gt; $request-&gt;mensaje,
+            'es_interno' =&gt; $request-&gt;has('es_interno'), // Puede redactar notas privadas
+        ]);
+
+        return back()-&gt;with('success', 'Mensaje enviado.');
+    }
+}
+</code></pre></div>
+<h3 id="d-mdulo-tcnico" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">D. Módulo Técnico</h3>
+<p class="lead-body my-3">El Técnico atiende sus asignaciones ordenadas por jerarquía de prioridad. Puede comentar privadamente con los gestores o públicamente con el cliente. Para solucionar el problema, escribe un resumen final para el cliente y un informe detallado interno, cerrando el ticket a <strong>Resuelto (3)</strong>.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Controllers/Tecnico/TicketTecnicoController.php
+namespace App\Http\Controllers\Tecnico;
+
+use App\Http\Controllers\Controller;
+use App\Models\Ticket;
+use App\Models\TicketComentario;
+use App\Models\SolucionTecnica;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class TicketTecnicoController extends Controller
+{
+    public function index() 
+    {
+        $usuarioId = Auth::id();
+
+        $queryAsignados = Ticket::with(['prioridad', 'usuario.persona.oficina'])
+            -&gt;whereHas('asignacion', function ($q) use ($usuarioId) {
+                $q-&gt;where('id_usuario_tecnico', $usuarioId);
+            })
+            -&gt;where('estatus', 2);
+
+        $ticketsCriticos = (clone $queryAsignados)-&gt;where('id_prioridad', 4)-&gt;latest()-&gt;get();
+        $ticketsAltos    = (clone $queryAsignados)-&gt;where('id_prioridad', 3)-&gt;latest()-&gt;get();
+        $ticketsMedios   = (clone $queryAsignados)-&gt;where('id_prioridad', 2)-&gt;latest()-&gt;get();
+        $ticketsBajos    = (clone $queryAsignados)-&gt;where('id_prioridad', 1)-&gt;latest()-&gt;get();
+
+        $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.oficina', 'solucion'])
+            -&gt;whereHas('asignacion', function ($q) use ($usuarioId) {
+                $q-&gt;where('id_usuario_tecnico', $usuarioId);
+            })
+            -&gt;where('estatus', 3)
+            -&gt;latest()
+            -&gt;get();
+
+        return view('tecnico.tickets.index', compact(
+            'ticketsCriticos', 'ticketsAltos', 'ticketsMedios', 'ticketsBajos', 'ticketsResueltos'
+        ));
+    }
+
+    public function show($id)
+    {
+        $usuarioId = Auth::id();
+        $ticket = Ticket::with(['usuario.persona.oficina', 'asignacion.tecnico', 'comentarios.usuario', 'prioridad'])
+            -&gt;whereHas('asignacion', function ($q) use ($usuarioId) {
+                $q-&gt;where('id_usuario_tecnico', $usuarioId);
+            })
+            -&gt;findOrFail($id);
+
+        return view('tecnico.tickets.show', compact('ticket'));
+    }
+
+    public function comentar(Request $request, $id)
+    {
+        $request-&gt;validate(['mensaje' =&gt; 'required|string|max:1000']);
+
+        TicketComentario::create([
+            'id_ticket'  =&gt; $id,
+            'id_usuario' =&gt; Auth::id(),
+            'mensaje'    =&gt; $request-&gt;mensaje,
+            'es_interno' =&gt; $request-&gt;has('es_interno'),
+        ]);
+
+        return back()-&gt;with('success', 'Mensaje enviado.');
+    }
+
+    public function crearSolucion($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        if ($ticket-&gt;estatus == 3) {
+            return redirect()-&gt;route('tecnico.tickets.index')-&gt;with('info', 'Este caso ya fue cerrado.');
+        }
+        return view('tecnico.tickets.resolver', compact('ticket'));
+    }
+
+    public function guardarSolucion(Request $request, $id)
+    {
+        $request-&gt;validate([
+            'resumen_usuario' =&gt; 'required|string|max:255',
+            'procedimiento_detallado' =&gt; 'required|string',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        SolucionTecnica::create([
+            'id_ticket' =&gt; $id,
+            'id_usuario_tecnico' =&gt; Auth::id(),
+            'resumen_usuario' =&gt; $request-&gt;resumen_usuario,
+            'procedimiento_detallado' =&gt; $request-&gt;procedimiento_detallado,
+        ]);
+
+        $ticket-&gt;update([
+            'estatus' =&gt; 3, // Cambia a "Resuelto"
+            'fecha_cierre' =&gt; now(),
+        ]);
+
+        return redirect()-&gt;route('tecnico.tickets.index')
+                         -&gt;with('success', 'Solución publicada y ticket cerrado satisfactoriamente.');
+    }
+
+    public function editarSolucion($id)
+    {
+        $ticket = Ticket::with('solucion')-&gt;findOrFail($id);
+        if (!$ticket-&gt;solucion) {
+            return redirect()-&gt;route('tecnico.tickets.resolver', $id);
+        }
+        return view('tecnico.tickets.editar_solucion', compact('ticket'));
+    }
+
+    public function actualizarSolucion(Request $request, $id)
+    {
+        $request-&gt;validate([
+            'resumen_usuario' =&gt; 'required|string|max:255',
+            'procedimiento_detallado' =&gt; 'required|string',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+        $ticket-&gt;solucion-&gt;update([
+            'resumen_usuario' =&gt; $request-&gt;resumen_usuario,
+            'procedimiento_detallado' =&gt; $request-&gt;procedimiento_detallado,
+        ]);
+
+        return redirect()-&gt;route('tecnico.tickets.index')-&gt;with('success', 'Solución técnica actualizada.');
+    }
+}
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="6-sistema-de-enrutamiento-y-middleware" class="fw-bold mt-5 mb-3 text-secondary heading-section">6. SISTEMA DE ENRUTAMIENTO Y MIDDLEWARE</h2>
+<p class="lead-body my-3">El archivo <code>routes/web.php</code> establece las rutas agrupadas y protegidas por autenticación y asignación de roles.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Usuario\TicketUsuarioController; 
+use App\Http\Controllers\Gestor\TicketGestorController;
+use App\Http\Controllers\Tecnico\TicketTecnicoController;
+
+// Página de bienvenida pública
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Enrutador inteligente de ingreso
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    -&gt;middleware(['auth', 'verified'])
+    -&gt;name('dashboard');
+
+// Rutas de Perfil (Compartidas para usuarios logueados)
+Route::middleware('auth')-&gt;group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])-&gt;name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])-&gt;name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])-&gt;name('profile.destroy');
+});
+
+// --- RUTAS DE USUARIO CLIENTE (Rol: usuario) ---
+Route::middleware(['auth', 'role:usuario'])-&gt;group(function () {
+    Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])-&gt;name('usuario.home');
+    
+    // CRUD y Acciones de Ticket del Cliente
+    Route::get('/mis-tickets', [TicketUsuarioController::class, 'index'])-&gt;name('usuario.tickets.index');
+    Route::get('/mis-tickets/nuevo', [TicketUsuarioController::class, 'create'])-&gt;name('usuario.tickets.create');
+    Route::post('/mis-tickets', [TicketUsuarioController::class, 'store'])-&gt;name('usuario.tickets.store');
+    Route::get('/mis-tickets/{ticket}', [TicketUsuarioController::class, 'show'])-&gt;name('usuario.tickets.show');
+    Route::get('/mis-tickets/{ticket}/editar', [TicketUsuarioController::class, 'edit'])-&gt;name('usuario.tickets.edit');
+    Route::put('/tickets/{id}', [TicketUsuarioController::class, 'update'])-&gt;name('usuario.tickets.update');
+    Route::delete('/tickets/{id}', [TicketUsuarioController::class, 'destroy'])-&gt;name('usuario.tickets.destroy');
+    
+    // Enviar borrador a soporte y chatear
+    Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])-&gt;name('usuario.tickets.enviar');
+    Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])-&gt;name('usuario.tickets.comentar');
+});
+
+// --- RUTAS DE GESTOR Y ADMIN (Acceso Operativo Compartido) ---
+Route::middleware(['auth', 'role:gestor|admin'])-&gt;prefix('gestor')-&gt;name('gestor.')-&gt;group(function () {
+    Route::get('/tickets', [TicketGestorController::class, 'index'])-&gt;name('tickets.index');
+    Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])-&gt;name('tickets.asignar');
+    Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])-&gt;name('tickets.show');
+    Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])-&gt;name('tickets.comentar');
+});
+
+// --- RUTAS DE TECNICO ESPECIALISTA (Rol: tecnico) ---
+Route::middleware(['auth', 'role:tecnico'])-&gt;prefix('tecnico')-&gt;name('tecnico.')-&gt;group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])-&gt;name('dashboard');
+    Route::get('/tickets', [TicketTecnicoController::class, 'index'])-&gt;name('tickets.index');
+    Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])-&gt;name('tickets.show');
+    Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])-&gt;name('tickets.comentar');
+    
+    // Resolver y gestionar soluciones
+    Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])-&gt;name('tickets.resolver');
+    Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])-&gt;name('tickets.guardar-solucion');
+    Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])-&gt;name('tickets.editar-solucion');
+    Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])-&gt;name('tickets.actualizar-solucion');
+});
+
+// Rutas de autenticación por defecto (Laravel Breeze)
+require __DIR__.'/auth.php';
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="7-interfaz-grfica-layouts-y-vistas-blade" class="fw-bold mt-5 mb-3 text-secondary heading-section">7. INTERFAZ GRÁFICA (LAYOUTS Y VISTAS BLADE)</h2>
+<p class="lead-body my-3">El sistema cuenta con un frontend responsivo premium, implementado con <strong>Bootstrap 5.3.3</strong> e iconos vectoriales. Soporta cambiar dinámicamente entre el tema claro y oscuro de manera integrada.</p>
+<h3 id="a-layout-operativo-de-especialistas-y-gestores" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Layout Operativo de Especialistas y Gestores</h3>
+<p class="lead-body my-3">Este layout define un sidebar lateral estático para administradores, gestores y técnicos, y añade el botón para alternar el esquema de colores de la interfaz.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>HTML</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-html">&lt;!-- resources/views/layouts/admin.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es" data-bs-theme="light"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;Helpdesk GDC&lt;/title&gt;
+    &lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"&gt;
+    
+    &lt;style&gt;
+        :root { 
+            --sb-width: 270px;
+            --bg-main: #f4f7fa;
+            --sb-bg: #ffffff;
+        }
+        [data-bs-theme="dark"] {
+            --bg-main: #0b0c0d;
+            --sb-bg: #111214;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main) !important;
+            transition: all 0.3s ease;
+        }
+        #sidebar { 
+            width: var(--sb-width); 
+            min-width: var(--sb-width); 
+            height: 100vh;
+            background: var(--sb-bg);
+            border-right: 1px solid var(--bs-border-color);
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .nav-link { 
+            color: var(--bs-body-color) !important; 
+            font-size: 0.88rem; 
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 2px 10px;
+        }
+        .nav-link:hover { background: var(--bs-secondary-bg); }
+        .nav-link.active { background: #0d6efd !important; color: #fff !important; }
+        #content { flex-grow: 1; padding: 2.5rem; }
+        .card-premium {
+            background: var(--bs-custom-card-bg, #fff);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            color: var(--bs-body-color);
+        }
+        [data-bs-theme="dark"] .card-premium { background: #1a1c1e; }
+        .user-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            border-top: 1px solid var(--bs-border-color);
+            background: var(--bs-tertiary-bg);
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="d-flex"&gt;
+        &lt;!-- Sidebar --&gt;
+        &lt;nav id="sidebar"&gt;
+            &lt;div class="p-4 mb-2"&gt;
+                &lt;h5 class="fw-bold mb-0 text-primary"&gt;&lt;i class="bi bi-headset me-2"&gt;&lt;/i&gt;Helpdesk GDC&lt;/h5&gt;
+            &lt;/div&gt;
+
+            &lt;div class="flex-grow-1"&gt;
+                &lt;small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;"&gt;Panel Operativo&lt;/small&gt;
+                &lt;ul class="nav nav-pills flex-column"&gt;
+                    &lt;li&gt;
+                        &lt;a href="{{ route('soporte.dashboard') }}" class="nav-link {{ request()-&gt;routeIs('soporte.dashboard') ? 'active' : '' }}"&gt;
+                            &lt;i class="bi bi-grid-1x2-fill me-3"&gt;&lt;/i&gt;Dashboard
+                        &lt;/a&gt;
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        @can('asignar-tickets')
+                            &lt;a href="{{ route('soporte.tickets.index') }}" class="nav-link {{ request()-&gt;routeIs('soporte.tickets.*') &amp;&amp; !request()-&gt;routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}"&gt;
+                                &lt;i class="bi bi-ticket-detailed-fill me-3"&gt;&lt;/i&gt;Mesa de Despacho
+                            &lt;/a&gt;
+                        @elsecan('resolver-tickets')
+                            &lt;a href="{{ route('soporte.tickets.tecnico.index') }}" class="nav-link {{ request()-&gt;routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}"&gt;
+                                &lt;i class="bi bi-ticket-perforated me-3"&gt;&lt;/i&gt;Mis Tareas Activas
+                            &lt;/a&gt;
+                        @endcan
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+
+            &lt;!-- Footer de Sidebar con datos de Usuario y Cambio de Tema --&gt;
+            &lt;div class="user-footer"&gt;
+                &lt;div class="dropend"&gt;
+                    &lt;button class="btn border-0 d-flex align-items-center w-100 p-0" data-bs-toggle="dropdown" aria-expanded="false"&gt;
+                        &lt;div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;"&gt;
+                            {{ substr(Auth::user()-&gt;name, 0, 1) }}
+                        &lt;/div&gt;
+                        &lt;div class="ms-3 text-start"&gt;
+                            &lt;p class="mb-0 fw-bold small text-truncate" style="max-width: 120px;"&gt;{{ Auth::user()-&gt;name }}&lt;/p&gt;
+                            &lt;small class="text-muted" style="font-size: 0.7rem;"&gt;
+                                @if(Auth::user()-&gt;hasRole('admin')) Administrador (Sistemas)
+                                @elseif(Auth::user()-&gt;hasRole('gestor')) Gestor de Soporte
+                                @else Técnico
+                                @endif
+                            &lt;/small&gt;
+                        &lt;/div&gt;
+                        &lt;i class="bi bi-chevron-right ms-auto text-muted small"&gt;&lt;/i&gt;
+                    &lt;/button&gt;
+                    &lt;ul class="dropdown-menu shadow-lg border-0 mb-2"&gt;
+                        &lt;li&gt;&lt;a class="dropdown-item py-2" href="{{ route('profile.edit') }}"&gt;&lt;i class="bi bi-person me-2"&gt;&lt;/i&gt; Mi Perfil&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;button class="dropdown-item py-2" onclick="toggleTheme()"&gt;&lt;i class="bi bi-moon-stars me-2"&gt;&lt;/i&gt; Cambiar Tema&lt;/button&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;hr class="dropdown-divider"&gt;&lt;/li&gt;
+                        &lt;li&gt;
+                            &lt;form method="POST" action="{{ route('logout') }}"&gt;
+                                @csrf
+                                &lt;button type="submit" class="dropdown-item py-2 text-danger"&gt;
+                                    &lt;i class="bi bi-box-arrow-right me-2"&gt;&lt;/i&gt; Cerrar Sesión
+                                &lt;/button&gt;
+                            &lt;/form&gt;
+                        &lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/nav&gt;
+
+        &lt;!-- Main Content --&gt;
+        &lt;main id="content"&gt;
+            &lt;div class="container-fluid"&gt;
+                @yield('content')
+            &lt;/div&gt;
+        &lt;/main&gt;
+    &lt;/div&gt;
+
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    &lt;script&gt;
+        function toggleTheme() {
+            const html = document.documentElement;
+            const target = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', target);
+            localStorage.setItem('theme', target);
+        }
+        document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme') || 'light');
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div>
+<h3 id="b-layout-de-clientes-usuarios-finales" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Layout de Clientes (Usuarios Finales)</h3>
+<p class="lead-body my-3">Este define una cabecera horizontal y navegación dinámica superior, manteniendo un enfoque enfocado y libre de distracciones operativas.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>HTML</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-html">&lt;!-- resources/views/layouts/usuario.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es" data-bs-theme="light"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;Soporte GDC&lt;/title&gt;
+    &lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"&gt;
+    
+    &lt;style&gt;
+        :root { 
+            --bg-main: #f0f2f5; 
+            --card-bg: #ffffff;
+            --text-main: #1a1c1e;
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+        }
+        [data-bs-theme="dark"] { 
+            --bg-main: #0b0c0d; 
+            --card-bg: #111214;
+            --text-main: #e9ecef;
+            --border-color: #2d2f31;
+            --input-bg: #1a1c1e;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main) !important; 
+            color: var(--text-main);
+            transition: all 0.3s ease; 
+        }
+        .card-premium {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 16px;
+            color: var(--text-main) !important;
+        }
+        .form-control-premium {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-main) !important;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+        }
+        .form-control-premium:focus {
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15) !important;
+        }
+        .navbar { 
+            background-color: var(--card-bg) !important; 
+            border-bottom: 1px solid var(--border-color) !important; 
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar navbar-expand-lg sticky-top py-3"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand fw-bold text-primary" href="{{ route('usuario.home') }}"&gt;
+                &lt;i class="bi bi-headset me-2"&gt;&lt;/i&gt;GDC &lt;span class="text-body-secondary"&gt;Soporte&lt;/span&gt;
+            &lt;/a&gt;
+            
+            &lt;button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navUsuario"&gt;
+                &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+            &lt;/button&gt;
+
+            &lt;div class="collapse navbar-collapse" id="navUsuario"&gt;
+                &lt;ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-2"&gt;
+                    &lt;li class="nav-item"&gt;
+                        &lt;a class="nav-link fw-medium {{ request()-&gt;routeIs('usuario.home') ? 'active text-primary' : '' }}" href="{{ route('usuario.home') }}"&gt;
+                            &lt;i class="bi bi-house-door me-1"&gt;&lt;/i&gt; Inicio
+                        &lt;/a&gt;
+                    &lt;/li&gt;
+                    &lt;li class="nav-item"&gt;
+                        &lt;a class="nav-link fw-medium {{ request()-&gt;routeIs('usuario.tickets.create') ? 'active text-primary' : '' }}" href="{{ route('usuario.tickets.create') }}"&gt;
+                            &lt;i class="bi bi-plus-circle me-1"&gt;&lt;/i&gt; Nuevo Ticket
+                        &lt;/a&gt;
+                    &lt;/li&gt;
+                    &lt;li class="nav-item"&gt;
+                        &lt;a class="nav-link fw-medium {{ request()-&gt;routeIs('usuario.tickets.index') ? 'active text-primary' : '' }}" href="{{ route('usuario.tickets.index') }}"&gt;
+                            &lt;i class="bi bi-ticket-perforated me-1"&gt;&lt;/i&gt; Mis Casos
+                        &lt;/a&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+
+                &lt;div class="d-flex align-items-center gap-3"&gt;
+                    &lt;button class="btn btn-link text-body p-0 shadow-none border-0" onclick="toggleTheme()"&gt;
+                        &lt;i class="bi bi-circle-half"&gt;&lt;/i&gt;
+                    &lt;/button&gt;
+
+                    &lt;div class="dropdown"&gt;
+                        &lt;button class="btn border-0 d-flex align-items-center p-0" data-bs-toggle="dropdown"&gt;
+                            &lt;div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 35px; height: 35px;"&gt;
+                                {{ substr(Auth::user()-&gt;name, 0, 1) }}
+                            &lt;/div&gt;
+                        &lt;/button&gt;
+                        &lt;ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3"&gt;
+                            &lt;li&gt;&lt;a class="dropdown-item py-2" href="{{ route('profile.edit') }}"&gt;&lt;i class="bi bi-person me-2"&gt;&lt;/i&gt; Perfil&lt;/a&gt;&lt;/li&gt;
+                            &lt;li&gt;&lt;hr class="dropdown-divider"&gt;&lt;/li&gt;
+                            &lt;li&gt;
+                                &lt;form method="POST" action="{{ route('logout') }}"&gt;
+                                    @csrf
+                                    &lt;button type="submit" class="dropdown-item py-2 text-danger"&gt;&lt;i class="bi bi-box-arrow-right me-2"&gt;&lt;/i&gt; Salir&lt;/button&gt;
+                                &lt;/form&gt;
+                            &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;main class="container py-5"&gt;
+        {{ $slot }}
+    &lt;/main&gt;
+
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    &lt;script&gt;
+        function toggleTheme() {
+            const html = document.documentElement;
+            const target = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', target);
+            localStorage.setItem('theme', target);
+        }
+        document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme') || 'light');
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div>
+<h3 id="c-componente-de-layout-de-usuario" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Componente de Layout de Usuario</h3>
+<p class="lead-body my-3">Para asegurar que <code>&lt;x-usuario-layout&gt;</code> renderice la vista correctamente:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/View/Components/UsuarioLayout.php
+namespace App\View\Components;
+
+use Illuminate\View\Component;
+use Illuminate\View\View;
+
+class UsuarioLayout extends Component
+{
+    public function render(): View
+    {
+        return view('layouts.usuario');
+    }
+}
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="8-pasos-para-recrear-el-proyecto-desde-cero" class="fw-bold mt-5 mb-3 text-secondary heading-section">8. PASOS PARA RECREAR EL PROYECTO DESDE CERO</h2>
+<p class="lead-body my-3">Sigue esta secuencia exacta de comandos y código para reconstruir y desplegar el sistema Helpdesk GDC en un nuevo entorno.</p>
+<h3 id="paso-1-instalacin-de-dependencias" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 1: Instalación de Dependencias</h3>
+<p class="lead-body my-3">Asegúrate de tener PHP 8.1+ y Composer instalados en tu sistema.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>BASH</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-bash"># 1. Crear nuevo proyecto en Laravel 10
+composer create-project laravel/laravel helpdesk-gdc "10.*"
+cd helpdesk-gdc
+
+# 2. Instalar el paquete de Roles y Permisos de Spatie
+composer require spatie/laravel-permission "^6.25"
+
+# 3. Instalar la suite de autenticación base (Laravel Breeze con blade)
+composer require laravel/breeze --dev
+php artisan breeze:install blade
+
+# 4. Instalar las dependencias NPM y Bootstrap para los estilos premium
+npm install bootstrap@5.3.3 @popperjs/core sass bootstrap-icons
+</code></pre></div>
+<h3 id="paso-2-configuracin-del-archivo-env" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 2: Configuración del Archivo `.env`</h3>
+<p class="lead-body my-3">Configura las credenciales de tu servidor de base de datos MySQL en la raíz:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>ENV</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-env">DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=helpdesk_laravel
+DB_USERNAME=root
+DB_PASSWORD=tu_contrasena
+</code></pre></div>
+<h3 id="paso-3-publicacin-de-migraciones-de-spatie" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 3: Publicación de Migraciones de Spatie</h3>
+<p class="lead-body my-3">Genera los archivos para la estructura de roles de Spatie:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>BASH</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-bash">php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+</code></pre></div>
+<h3 id="paso-4-creacin-de-archivos-de-cdigo" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 4: Creación de Archivos de Código</h3>
+<p class="lead-body my-3">Copia el código detallado provisto en las secciones anteriores en sus respectivos archivos:</p>
+<p class="lead-body my-3">1.  <strong>Migraciones</strong>: Ubicadas en <code>database/migrations/</code>.</p>
+<p class="lead-body my-3">2.  <strong>Modelos</strong>: Ubicados en <code>app/Models/</code>.</p>
+<p class="lead-body my-3">3.  <strong>Controladores</strong>: Ubicados en <code>app/Http/Controllers/</code>.</p>
+<p class="lead-body my-3">4.  <strong>Rutas</strong>: Reemplaza el archivo <code>routes/web.php</code>.</p>
+<p class="lead-body my-3">5.  <strong>Layouts y Vistas</strong>: Ubicados en <code>resources/views/</code>.</p>
+<h3 id="paso-5-despliegue-de-base-de-datos-y-semillas-seed" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 5: Despliegue de Base de Datos y Semillas (Seed)</h3>
+<p class="lead-body my-3">Aplica los cambios de migración y ejecuta los semilleros automatizados para poblar los usuarios de prueba:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>BASH</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-bash">php artisan migrate:fresh --seed
+</code></pre></div>
+<h3 id="paso-6-compilacin-de-frontend-y-servidor-de-desarrollo" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 6: Compilación de Frontend y Servidor de Desarrollo</h3>
+<p class="lead-body my-3">Inicia el motor de plantillas y el compilador de activos Vite para visualizar el proyecto:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>BASH</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-bash"># Ejecutar el compilador en desarrollo
+npm run dev
+
+# En otra terminal, inicializar el servidor Laravel
+php artisan serve
+</code></pre></div>
+<h3 id="paso-7-cuentas-de-acceso-de-prueba" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 7: Cuentas de Acceso de Prueba</h3>
+<p class="lead-body my-3">Accede a <code>http://localhost:8000</code> y prueba el sistema con los siguientes perfiles seeded:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Gestor</strong>: <code>gestor@helpdesk.com</code> | Contraseña: <code>gestor123</code></li>
+<li>  <strong>Técnico</strong>: <code>tecnico@helpdesk.com</code> | Contraseña: <code>tecnico123</code></li>
+<li>  <strong>Usuario</strong>: <code>usuario@helpdesk.com</code> | Contraseña: <code>usuario123</code></li>
+</ul>
+<p class="lead-body my-3">---</p>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Back to top button -->
+    <button type="button" class="btn btn-primary btn-lg" id="btn-back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Toggle theme capability
+        function toggleTheme() {
+            const html = document.documentElement;
+            const target = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', target);
+            localStorage.setItem('theme', target);
+            updateThemeButton(target);
+        }
+
+        function updateThemeButton(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.className = 'bi bi-moon-stars me-2';
+            } else {
+                icon.className = 'bi bi-sun me-2';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        updateThemeButton(savedTheme);
+
+        // Copy code script
+        function copyCode(button) {
+            const container = button.closest('.code-container');
+            const codeBlock = container.querySelector('code');
+            
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerHTML = '<i class="bi bi-check-lg me-1 text-success"></i>Copiado!';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copiar';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar el código: ', err);
+            });
+        }
+
+        // Sidebar link activation on scroll
+        const sections = document.querySelectorAll('.heading-section');
+        const navLinks = document.querySelectorAll('.menu-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Search filter sidebar
+        function filterSidebar() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-menu .menu-item-h2');
+            const h1s = document.querySelectorAll('.sidebar-menu .menu-item-h1');
+            
+            links.forEach(item => {
+                const text = item.textContent || item.innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+            
+            if (filter !== "") {
+                h1s.forEach(h1 => h1.style.display = "none");
+            } else {
+                h1s.forEach(h1 => h1.style.display = "");
+            }
+        }
+
+        // Back to top button controller
+        let mybutton = document.getElementById("btn-back-to-top");
+        window.onscroll = function () {
+            scrollFunction();
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        mybutton.addEventListener("click", backToTop);
+        function backToTop() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+</body>
+</html>

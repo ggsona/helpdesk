@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Auth;
 class TicketTecnicoController extends Controller
 {
     /**
+     * Proteger el controlador con middleware de permisos
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'can:resolver-tickets']);
+    }
+
+    /**
      * Vista principal con Tabs (Pills) para Asignados y Resueltos.
      */
     public function index() 
@@ -32,7 +40,7 @@ class TicketTecnicoController extends Controller
         $ticketsBajos    = (clone $queryAsignados)->where('id_prioridad', 1)->latest()->get();
 
         // 2. ACTUALIZACIÓN AQUÍ: Agregamos 'solucion' a la carga
-        $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.oficina', 'solucion']) // <--- Agregado 'solucion'
+        $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.oficina', 'solucion'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
             })
@@ -40,7 +48,7 @@ class TicketTecnicoController extends Controller
             ->latest()
             ->get();
 
-        return view('tecnico.tickets.index', compact(
+        return view('soporte.tickets.index', compact(
             'ticketsCriticos', 
             'ticketsAltos', 
             'ticketsMedios', 
@@ -62,7 +70,7 @@ class TicketTecnicoController extends Controller
             })
             ->findOrFail($id);
 
-        return view('tecnico.tickets.show', compact('ticket'));
+        return view('soporte.tickets.show', compact('ticket'));
     }
 
     /**
@@ -88,11 +96,11 @@ class TicketTecnicoController extends Controller
         
         // Seguridad: si ya está resuelto, mandarlo de vuelta
         if ($ticket->estatus == 3) {
-            return redirect()->route('tecnico.tickets.index')
+            return redirect()->route('soporte.tickets.tecnico.index')
                              ->with('info', 'Este ticket ya fue resuelto.');
         }
 
-        return view('tecnico.tickets.resolver', compact('ticket'));
+        return view('soporte.tickets.resolver', compact('ticket'));
     }
 
     public function guardarSolucion(Request $request, $id)
@@ -118,7 +126,7 @@ class TicketTecnicoController extends Controller
             'fecha_cierre' => now(),
         ]);
 
-        return redirect()->route('tecnico.tickets.index')
+        return redirect()->route('soporte.tickets.tecnico.index')
                          ->with('success', 'Solución publicada y ticket cerrado correctamente.');
     }
 
@@ -129,10 +137,10 @@ class TicketTecnicoController extends Controller
 
         // Verificamos que tenga una solución que editar
         if (!$ticket->solucion) {
-            return redirect()->route('tecnico.tickets.crearSolucion', $id);
+            return redirect()->route('soporte.tickets.tecnico.resolver', $id);
         }
 
-        return view('tecnico.tickets.editar_solucion', compact('ticket'));
+        return view('soporte.tickets.editar_solucion', compact('ticket'));
     }
 
     /**
@@ -153,7 +161,7 @@ class TicketTecnicoController extends Controller
             'procedimiento_detallado' => $request->procedimiento_detallado,
         ]);
 
-        return redirect()->route('tecnico.tickets.index')
+        return redirect()->route('soporte.tickets.tecnico.index')
                         ->with('success', 'La solución técnica ha sido actualizada.');
     }
 }

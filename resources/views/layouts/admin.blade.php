@@ -37,6 +37,48 @@
             top: 0;
             display: flex;
             flex-direction: column; /* Permite empujar el footer al fondo */
+            z-index: 1000;
+            overflow: hidden; /* Evitar que el sidebar completo se desborde */
+        }
+
+        /* Scrollbar premium y minimalista para el menú interno */
+        .sidebar-scrollable {
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .sidebar-scrollable::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scrollable::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+        [data-bs-theme="dark"] .sidebar-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Estilos del menú desplegable del pie de página (Dropup) */
+        .user-footer .dropdown-menu {
+            position: absolute !important;
+            bottom: 100% !important;
+            left: 0 !important;
+            width: 100% !important;
+            margin-bottom: 8px !important;
+            border: 1px solid var(--bs-border-color) !important;
+            background-color: var(--sb-bg) !important;
+            z-index: 1100;
+        }
+        .user-footer .dropdown-menu.show {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        [data-bs-theme="dark"] .user-footer .dropdown-menu {
+            background-color: #1e293b !important;
         }
 
         .nav-link { 
@@ -75,6 +117,8 @@
             padding: 1.2rem;
             border-top: 1px solid var(--bs-border-color);
             background: var(--bs-tertiary-bg);
+            position: relative;
+            z-index: 1050; /* Garantiza que se dibuje por encima de la lista de scroll */
         }
 
         /* Estilos para formularios Premium */
@@ -139,39 +183,43 @@
                 <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-headset me-2"></i>Helpdesk GDC</h5>
             </div>
 
-            <div class="flex-grow-1">
+            <div class="sidebar-scrollable">
                 <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Panel Operativo</small>
                 
                 <ul class="nav nav-pills flex-column">
-                    {{-- DASHBOARD --}}
+                    {{-- DASHBOARD COMPARTIDO --}}
                     <li>
-                        @php
-                            $route = 'login'; // Ruta por defecto
-                            if(Auth::user()->hasRole('admin')) $route = 'admin.dashboard';
-                            elseif(Auth::user()->hasRole('gestor')) $route = 'gestor.dashboard';
-                            elseif(Auth::user()->hasRole('tecnico')) $route = 'tecnico.dashboard';
-                        @endphp
-                        
-                        <a href="{{ route($route) }}" class="nav-link {{ request()->routeIs('*.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('soporte.dashboard') }}" class="nav-link {{ request()->routeIs('soporte.dashboard') ? 'active' : '' }}">
                             <i class="bi bi-grid-1x2-fill me-3"></i>Dashboard
                         </a>
                     </li>
 
-                    {{-- GESTIÓN DE TICKETS --}}
+                    {{-- GESTIÓN DE TICKETS SEGÚN ROL --}}
                     <li>
-                        @hasanyrole('admin|gestor')
-                            <a href="{{ route('gestor.tickets.index') }}" class="nav-link {{ request()->routeIs('gestor.tickets.*') ? 'active' : '' }}">
-                                <i class="bi bi-ticket-detailed-fill me-3"></i>Gestión de Casos
+                        @can('asignar-tickets')
+                            <a href="{{ route('soporte.tickets.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.*') && !request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
+                                <i class="bi bi-ticket-detailed-fill me-3"></i>Mesa de Despacho
                             </a>
-                        @else
-                            <a href="{{ route('tecnico.tickets.index') }}" class="nav-link {{ request()->routeIs('tecnico.tickets.*') ? 'active' : '' }}">
-                                <i class="bi bi-ticket-perforated me-3"></i>Casos Asignados
+                        @elsecan('resolver-tickets')
+                            <a href="{{ route('soporte.tickets.tecnico.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
+                                <i class="bi bi-ticket-perforated me-3"></i>Mis Tareas Activas
                             </a>
-                        @endhasanyrole
+                        @endcan
                     </li>
 
-                    {{-- MÓDULOS COMPARTIDOS (ADMIN Y GESTOR) --}}
-                    @hasanyrole('admin|gestor')
+                    {{-- CONTROL DE ACCESOS (SÓLO ADMINISTRADORES) --}}
+                    @can('gestionar-roles')
+                        <hr class="mx-3 my-2 opacity-25 text-muted">
+                        <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Control de Accesos</small>
+                        <li>
+                            <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <i class="bi bi-shield-lock-fill me-3"></i>Roles y Permisos
+                            </a>
+                        </li>
+                    @endcan
+
+                    {{-- CONFIGURACIÓN Y ACTIVOS (COORDINADORES Y GESTORES) --}}
+                    @can('asignar-tickets')
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
 
@@ -179,28 +227,24 @@
                         <li><a href="#" class="nav-link"><i class="bi bi-building-fill me-3"></i>Oficinas</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-tags-fill me-3"></i>Categorías</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
-                        
                         <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
-                    @endhasanyrole
+                    @endcan
                 </ul>
             </div>
 
             <div class="user-footer">
-                <div class="dropend">
-                    <button class="btn border-0 d-flex align-items-center w-100 p-0" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="dropup" style="position: relative; z-index: 1050;">
+                    <button class="btn border-0 d-flex align-items-center w-100 p-0" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 38px; height: 38px;">
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
                         <div class="ms-3 text-start">
                             <p class="mb-0 fw-bold small text-truncate" style="max-width: 120px;">{{ Auth::user()->name }}</p>
-                            <small class="text-muted" style="font-size: 0.7rem;">
-                                @if(Auth::user()->hasRole('admin')) Administrador (Sistemas)
-                                @elseif(Auth::user()->hasRole('gestor')) Gestor de Soporte
-                                @else Técnico
-                                @endif
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.6rem; letter-spacing: 0.3px;">
+                                {{ Auth::user()->roles->pluck('name')->implode(', ') ?: 'Soporte' }}
                             </small>
                         </div>
-                        <i class="bi bi-chevron-right ms-auto text-muted small"></i>
+                        <i class="bi bi-chevron-up ms-auto text-muted small"></i>
                     </button>
                     <ul class="dropdown-menu shadow-lg border-0 mb-2">
                         <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>

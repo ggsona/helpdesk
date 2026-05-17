@@ -13,12 +13,19 @@ use App\Models\Prioridad;
 class TicketGestorController extends Controller
 {
     /**
+     * Proteger el controlador con middleware de permisos
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'can:asignar-tickets']);
+    }
+
+    /**
      * Vista principal con las 3 listas (Pestañas)
      */
     public function index() 
     {
         // 1. Tickets por asignar (Estatus 1: Enviado / Pendiente)
-        // Agregamos 'prioridad' por si la vista intenta mostrarla aunque sea nula
         $ticketsNuevos = Ticket::with('prioridad')->where('estatus', 1)->latest()->get();
 
         // 2. Tickets en proceso (Estatus 2: Asignado / En Gestión)
@@ -30,16 +37,15 @@ class TicketGestorController extends Controller
         // 4. Lista de técnicos para poblar el SELECT del modal de asignación
         $tecnicos = User::role('tecnico')->get(); 
 
-        // 5. NUEVO: Lista de prioridades para el SELECT del modal de asignación
-        // Esto resuelve el error "Undefined variable $prioridades"
+        // 5. Lista de prioridades para el SELECT del modal de asignación
         $prioridades = \App\Models\Prioridad::all(); 
 
-        return view('gestor.tickets.index', compact(
+        return view('soporte.tickets.index', compact(
             'ticketsNuevos', 
             'ticketsAsignados', 
             'ticketsResueltos', 
             'tecnicos',
-            'prioridades' // <-- Enviamos la variable a la vista
+            'prioridades'
         ));
     }
 
@@ -106,7 +112,7 @@ class TicketGestorController extends Controller
         $tecnicos = User::role('tecnico')->get();
         $prioridades = \App\Models\Prioridad::all();
 
-        return view('gestor.tickets.show', compact('ticket', 'tecnicos', 'prioridades'));
+        return view('soporte.tickets.show', compact('ticket', 'tecnicos', 'prioridades'));
     }
 
     public function comentar(Request $request, $id)

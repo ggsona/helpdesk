@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Técnico - Helpdesk GDC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --font-headings: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --sidebar-width: 320px;
+            --primary-color: #0d6efd;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-body: #334155;
+            --border-color: #e2e8f0;
+        }
+        
+        [data-bs-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-body: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            font-size: 1rem;
+            line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-headings);
+            font-weight: 700;
+        }
+
+        /* Layout Structure */
+        #app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Search and Nav */
+        .search-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            border-radius: 30px;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem 0.6rem 2.5rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .sidebar-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item-h1 {
+            font-family: var(--font-headings);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.2rem 0.8rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item-h2 {
+            font-size: 0.88rem;
+            margin: 2px 0;
+        }
+
+        .menu-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-body);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-link:hover {
+            background-color: rgba(13, 110, 253, 0.08);
+            color: var(--primary-color);
+        }
+
+        .menu-link.active {
+            background-color: var(--primary-color);
+            color: #ffffff !important;
+            font-weight: 500;
+        }
+
+        /* Code Block Premium styling */
+        .code-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-header {
+            font-family: var(--font-headings);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        pre[class*="language-"] {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            font-size: 0.9rem !important;
+            border-radius: 0 !important;
+            background: #1e293b !important;
+        }
+
+        code[class*="language-"] {
+            text-shadow: none !important;
+            font-family: 'Courier New', Courier, monospace !important;
+        }
+
+        .btn-copy {
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy:hover {
+            color: #ffffff !important;
+        }
+
+        /* Inline styles */
+        code:not([class*="language-"]) {
+            background-color: rgba(13, 110, 253, 0.08);
+            color: var(--primary-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* Customized elements */
+        .lead-body {
+            font-size: 1.05rem;
+            color: var(--text-body);
+            opacity: 0.9;
+        }
+
+        .list-custom {
+            padding-left: 1.5rem;
+        }
+
+        .list-custom li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        /* Top sticky settings bar */
+        .settings-bar {
+            position: sticky;
+            top: 0;
+            background-color: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        [data-bs-theme="dark"] .settings-bar {
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Back to top */
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: none;
+            z-index: 99;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="p-4 border-bottom border-color">
+                <h5 class="fw-bold mb-0 text-primary d-flex align-items-center">
+                    <i class="bi bi-headset me-2 fs-4"></i>
+                    Helpdesk GDC
+                </h5>
+                <span class="text-muted small">Documentación de Sistemas</span>
+            </div>
+            
+            <div class="search-container position-relative">
+                <i class="bi bi-search position-absolute text-muted" style="left: 2.2rem; top: 2.1rem;"></i>
+                <input type="text" id="search-input" class="form-control search-input w-100" placeholder="Buscar secciones..." onkeyup="filterSidebar()">
+            </div>
+
+            <div class="sidebar-menu">
+                <ul class="menu-list">
+                    <li class="menu-item-h1">MANUAL DE USUARIO: HELPDESK GDC</li>
+<li class="menu-item-h2"><a href="#1-matriz-de-roles-y-accesos" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>1. MATRIZ DE ROLES Y ACCESOS</a></li>
+<li class="menu-item-h2"><a href="#2-el-ciclo-de-vida-de-un-ticket-estatus" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>2. EL CICLO DE VIDA DE UN TICKET (ESTATUS)</a></li>
+<li class="menu-item-h2"><a href="#3-manual-del-usuario-final-cliente" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>3. MANUAL DEL USUARIO FINAL (CLIENTE)</a></li>
+<li class="menu-item-h2"><a href="#4-manual-del-gestor-despachador-de-soporte" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>4. MANUAL DEL GESTOR (DESPACHADOR DE SOPORTE)</a></li>
+<li class="menu-item-h2"><a href="#5-manual-del-tcnico-especialista-en-resolucin" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>5. MANUAL DEL TÉCNICO (ESPECIALISTA EN RESOLUCIÓN)</a></li>
+
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Body -->
+        <div class="w-100">
+            <!-- Settings Bar (Sticky Top) -->
+            <div class="settings-bar d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    <i class="bi bi-journal-bookmark-fill me-1 text-primary"></i> Manual Técnico Integral
+                </div>
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-none border-0" onclick="toggleTheme()">
+                    <i id="theme-icon" class="bi bi-circle-half me-2"></i>Cambiar Tema
+                </button>
+            </div>
+
+            <!-- Page Content -->
+            <main id="main-content">
+                <h1 id="manual-de-usuario-helpdesk-gdc" class="display-5 fw-bold mt-5 mb-4 text-primary border-bottom pb-2 heading-section">MANUAL DE USUARIO: HELPDESK GDC</h1>
+<p class="lead-body my-3">Bienvenido al <strong>Manual de Usuario de Helpdesk GDC</strong>. Esta guía está diseñada para explicar de forma detallada, visual y sencilla todas las funcionalidades y elementos del sistema de mesa de ayuda (Helpdesk) estructurados por los diferentes roles de usuario.</p>
+<p class="lead-body my-3">---</p>
+<h2 id="1-matriz-de-roles-y-accesos" class="fw-bold mt-5 mb-3 text-secondary heading-section">1. MATRIZ DE ROLES Y ACCESOS</h2>
+<p class="lead-body my-3">El sistema cuenta con un control de accesos que divide las funciones según las tareas operativas de cada miembro de la organización:</p>
+<p class="lead-body my-3">| Rol | Usuario Objetivo | Vista Principal | Funciones Clave |</p>
+<p class="lead-body my-3">| :--- | :--- | :--- | :--- |</p>
+<p class="lead-body my-3">| <strong>Usuario (Cliente)</strong> | Personal de oficinas que reporta incidentes. | <code>mis-tickets</code> / <code>Inicio</code> | Crear borradores, adjuntar archivos, enviar a soporte, y chatear con el técnico. |</p>
+<p class="lead-body my-3">| <strong>Gestor (Despachador)</strong> | Coordinador del área de TI / Soporte. | <code>Gestión de Casos</code> | Ver tickets abiertos, asignar técnicos, definir prioridades, reasignar casos y chatear (público/interno). |</p>
+<p class="lead-body my-3">| <strong>Técnico (Especialista)</strong>| Resolutor técnico del problema. | <code>Casos Asignados</code> | Ver bandeja ordenada por prioridad, chatear (público/interno), resolver tickets y editar soluciones. |</p>
+<p class="lead-body my-3">| <strong>Admin (Administrador)</strong> | Jefe de sistemas / Soporte técnico global. | <code>Dashboard</code> | Acceso global del sistema y configuraciones. |</p>
+<p class="lead-body my-3">---</p>
+<h2 id="2-el-ciclo-de-vida-de-un-ticket-estatus" class="fw-bold mt-5 mb-3 text-secondary heading-section">2. EL CICLO DE VIDA DE UN TICKET (ESTATUS)</h2>
+<p class="lead-body my-3">Los tickets en el Helpdesk GDC atraviesan 4 estados lógicos bien definidos. Comprender este flujo es fundamental para el uso correcto de la plataforma:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PLAINTEXT</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-plaintext">[ Borrador (Estatus 0) ]  --&gt; Solo visible para el Cliente (Editable/Eliminable)
+         │
+         ▼ (Acción: Enviar)
+[ Abierto (Estatus 1) ]   --&gt; Visible para el Gestor "Por Asignar"
+         │
+         ▼ (Acción: Asignar Especialista)
+[ En Proceso (Estatus 2) ] --&gt; Asignado al Técnico (Chat y Notas activas)
+         │
+         ▼ (Acción: Resolver Caso)
+[ Resuelto (Estatus 3) ]  --&gt; Ticket Cerrado (Publicación de Solución Técnica)
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h2 id="3-manual-del-usuario-final-cliente" class="fw-bold mt-5 mb-3 text-secondary heading-section">3. MANUAL DEL USUARIO FINAL (CLIENTE)</h2>
+<p class="lead-body my-3">Este módulo está optimizado para que cualquier colaborador de la empresa reporte fallas de forma simple y amigable.</p>
+<h3 id="a-pantalla-de-inicio" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Pantalla de Inicio</h3>
+<p class="lead-body my-3">Al iniciar sesión, el cliente es recibido por un panel interactivo con dos acciones principales:</p>
+<p class="lead-body my-3">1.  <strong>Abrir Ticket</strong>: Formulario para reportar un nuevo incidente.</p>
+<p class="lead-body my-3">2.  <strong>Mis Solicitudes</strong>: Acceso directo al historial y estado de sus tickets anteriores.</p>
+<h3 id="b-crear-un-ticket-como-borrador" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Crear un Ticket como Borrador</h3>
+<p class="lead-body my-3">El sistema utiliza una lógica de <strong>Borrador</strong>. Al llenar el formulario, el ticket no se envía inmediatamente al soporte técnico, lo que permite revisarlo, corregirlo o adjuntar más pruebas antes del envío definitivo.</p>
+<h4 id="pasos-para-crear-un-reporte" class="fw-bold mt-3 mb-2 heading-section">Pasos para Crear un Reporte:</h4>
+<p class="lead-body my-3">1.  Ingresa a <strong>Nuevo Ticket</strong> desde la barra de navegación superior o el botón de Inicio.</p>
+<p class="lead-body my-3">2.  <strong>Asunto</strong>: Escribe un título conciso (Ej: *"Impresora no enciende en administración"*).</p>
+<p class="lead-body my-3">3.  <strong>Categoría</strong>: Selecciona si es una falla de <code>Hardware</code> (físico), <code>Software</code> (programas) o <code>Redes</code> (internet/cables).</p>
+<p class="lead-body my-3">4.  <strong>Equipo Afectado</strong>: Elige el tipo de hardware (Ej: <code>Laptop</code>, <code>Desktop</code>, <code>Impresora</code>).</p>
+<p class="lead-body my-3">5.  <strong>Descripción del Problema</strong>: Detalla ampliamente la falla (qué estabas haciendo, códigos de error, etc.).</p>
+<p class="lead-body my-3">6.  <strong>Archivos Adjuntos (Opcional)</strong>: Sube capturas de pantalla, fotos tomadas con tu celular o archivos PDF (Tamaño máximo: 10MB por archivo).</p>
+<p class="lead-body my-3">7.  Haz clic en <strong>Enviar Ticket</strong>. El sistema guardará el registro en estado <strong>Borrador</strong>.</p>
+<h3 id="c-bandeja-de-mis-casos" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Bandeja de "Mis Casos"</h3>
+<p class="lead-body my-3">En esta sección puedes administrar todos tus reportes. Si un ticket está en estado <strong>Borrador</strong>, verás las siguientes acciones en la columna de la derecha:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Detalles (Ojo)</strong>: Permite entrar a ver el borrador completo.</li>
+<li>  <strong>Enviar (Icono Avión/Flecha)</strong>: Hace clic para enviar el ticket oficialmente a soporte técnico. Una vez enviado, cambia a <strong>Abierto</strong> y el equipo de soporte técnico podrá verlo y asignarle un especialista.</li>
+<li>  <strong>Editar (Lápiz)</strong>: Modifica el borrador (asunto, descripción o categoría).</li>
+<li>  <strong>Eliminar (Basurero)</strong>: Cancela definitivamente el reporte de forma permanente.</li>
+</ul>
+<h3 id="d-chat-del-ticket-y-seguimiento" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">D. Chat del Ticket y Seguimiento</h3>
+<p class="lead-body my-3">Al entrar a los <strong>Detalles</strong> de un ticket enviado, tendrás acceso a:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Ficha Técnica</strong>: Ver quién es tu técnico asignado, la prioridad del caso y los archivos adjuntos que cargaste.</li>
+<li>  <strong>Chat en Vivo</strong>: Escribe mensajes directamente en la parte inferior para responder preguntas del técnico o consultar el estado de tu caso.</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h2 id="4-manual-del-gestor-despachador-de-soporte" class="fw-bold mt-5 mb-3 text-secondary heading-section">4. MANUAL DEL GESTOR (DESPACHADOR DE SOPORTE)</h2>
+<p class="lead-body my-3">El Gestor actúa como el cerebro de la operación, coordinando las cargas de trabajo y distribuyendo los incidentes.</p>
+<h3 id="a-panel-de-gestin-de-casos" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Panel de Gestión de Casos</h3>
+<p class="lead-body my-3">Es un tablero Kanban dinámico organizado en tres pestañas operativas (Pills):</p>
+<p class="lead-body my-3">1.  <strong>Por Asignar</strong>: Muestra todos los tickets en estado <strong>Abierto</strong> (enviados por los clientes) que no tienen técnico responsable.</p>
+<p class="lead-body my-3">2.  <strong>En Gestión</strong>: Muestra todos los tickets en estado <strong>En Proceso</strong> que están siendo atendidos por los técnicos.</p>
+<p class="lead-body my-3">3.  <strong>Resueltos</strong>: Historial completo de tickets que ya fueron cerrados con éxito.</p>
+<h3 id="b-proceso-de-asignacin-inicial" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Proceso de Asignación Inicial</h3>
+<p class="lead-body my-3">Cuando un caso ingresa a <strong>Por Asignar</strong>, el gestor debe:</p>
+<p class="lead-body my-3">1.  Hacer clic en el botón <strong>Asignar</strong> del ticket correspondiente.</p>
+<p class="lead-body my-3">2.  Se abrirá una ventana emergente (modal) con los siguientes campos:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Técnico Especialista</strong>: Un listado desplegable que muestra únicamente al personal calificado con el rol de <code>Técnico</code>.</li>
+<li>  <strong>Prioridad del Ticket</strong>: Define el tiempo de atención obligatorio (<code>Baja</code>, <code>Media</code>, <code>Alta</code>, <code>Crítica</code>).</li>
+<li>  <strong>Nota de Instrucción (Opcional)</strong>: Indicaciones específicas del gestor para el técnico (Ej: *"Revisar tarjeta de red física, el usuario reporta que ya reinició el equipo"*).</li>
+</ul>
+<p class="lead-body my-3">3.  Confirmar la asignación. El ticket automáticamente pasa a la pestaña <strong>En Gestión</strong> (estatus 2: En Proceso) y se crea un comentario en el chat del ticket notificando el cambio de estado.</p>
+<h3 id="c-reasignacin-de-casos" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Reasignación de Casos</h3>
+<p class="lead-body my-3">Si un técnico no puede atender un caso (por vacaciones, sobrecarga de tareas o porque requiere otra especialidad), el gestor puede reasignarlo:</p>
+<p class="lead-body my-3">1.  Ve a la pestaña <strong>En Gestión</strong>.</p>
+<p class="lead-body my-3">2.  Haz clic en <strong>Reasignar</strong> sobre el ticket correspondiente.</p>
+<p class="lead-body my-3">3.  Selecciona al nuevo técnico especialista, redefine la prioridad si es necesario, y escribe el motivo de la reasignación en el campo de notas.</p>
+<p class="lead-body my-3">4.  Al confirmar, el sistema actualiza el responsable en la base de datos y publica un comentario automático en el chat notificando la reasignación para mantener la transparencia del proceso.</p>
+<h3 id="d-notas-internas-chat-privado" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">D. Notas Internas (Chat Privado)</h3>
+<p class="lead-body my-3">En el detalle del ticket, el gestor puede escribir mensajes. Tiene una casilla de verificación llamada <strong>"Mensaje Interno"</strong>:</p>
+<ul class="list-custom mb-3">
+<li>  Si se marca, el mensaje se guarda como <strong>Nota Interna</strong> (con un fondo distintivo en la vista).</li>
+<li>  <strong>Importante</strong>: Las notas internas son visibles <strong>únicamente</strong> para los técnicos y gestores. El cliente final <strong>no</strong> podrá ver este contenido bajo ninguna circunstancia.</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h2 id="5-manual-del-tcnico-especialista-en-resolucin" class="fw-bold mt-5 mb-3 text-secondary heading-section">5. MANUAL DEL TÉCNICO (ESPECIALISTA EN RESOLUCIÓN)</h2>
+<p class="lead-body my-3">El Técnico es responsable de ejecutar el trabajo técnico en sitio o de forma remota y dejar registro formal del proceso.</p>
+<h3 id="a-tablero-de-control-tcnico" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Tablero de Control Técnico</h3>
+<p class="lead-body my-3">Muestra una bandeja de entrada adaptada a su carga personal de trabajo, dividida en dos secciones:</p>
+<p class="lead-body my-3">1.  <strong>Mis Casos Asignados</strong>: Agrupados y clasificados visualmente con semáforos de prioridad de color para destacar el trabajo urgente:</p>
+<ul class="list-custom mb-3">
+<li>  🔴 <strong>Prioridad Crítica</strong>: Casos que detienen la operación de la empresa.</li>
+<li>  🟡 <strong>Prioridad Alta</strong>: Fallas severas pero no paralizantes.</li>
+<li>  🔵 <strong>Prioridad Media</strong>: Incidentes estándar.</li>
+<li>  🟢 <strong>Prioridad Baja</strong>: Consultas, solicitudes menores o insumos.</li>
+</ul>
+<p class="lead-body my-3">2.  <strong>Historial de Resueltos</strong>: Casos cerrados recientemente por él.</p>
+<h3 id="b-comunicacin-mixta-chat-y-notas" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Comunicación Mixta (Chat y Notas)</h3>
+<p class="lead-body my-3">El técnico puede chatear en tiempo real con el cliente desde la vista de detalles del ticket. Al igual que el gestor:</p>
+<ul class="list-custom mb-3">
+<li>  Si redacta un comentario normal, el cliente lo recibe en su pantalla de inmediato.</li>
+<li>  Si activa la casilla <strong>"Mensaje Interno"</strong>, entabla una conversación privada con los coordinadores y gestores (Ej: *"Necesito aprobación para comprar repuesto de disco duro"*), oculta para el cliente.</li>
+</ul>
+<h3 id="c-cierre-y-resolucin-del-ticket" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Cierre y Resolución del Ticket</h3>
+<p class="lead-body my-3">Cuando el técnico ha solucionado el incidente:</p>
+<p class="lead-body my-3">1.  Hace clic en el botón <strong>Resolver</strong> en su listado o dentro del ticket.</p>
+<p class="lead-body my-3">2.  Deberá completar el <strong>Formulario de Resolución</strong>, el cual está dividido estratégicamente en dos partes:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Resumen para el Usuario</strong>: Explicación sencilla, en lenguaje no técnico, de lo que causó el problema y cómo se solucionó (Ej: *"Se configuró nuevamente el controlador de la impresora y se realizó prueba de impresión exitosa"*). Este texto se le mostrará al cliente en su bandeja de entrada.</li>
+<li>  <strong>Procedimiento Detallado</strong>: Bitácora técnica exhaustiva para control de la base de conocimientos del equipo de TI (Ej: *"Se reinstaló driver v4.2.1, se reparó puerto TCP/IP asignado 192.168.1.55 y se limpió cola de impresión atascada en spooler de Windows"*).</li>
+</ul>
+<p class="lead-body my-3">3.  Al guardar, el ticket pasa a <strong>Resuelto (3)</strong>, se registra la fecha y hora exacta de cierre y se notifica al usuario.</p>
+<h3 id="d-editar-la-solucin-tcnica" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">D. Editar la Solución Técnica</h3>
+<p class="lead-body my-3">Si posterior al cierre el técnico cometió un error de redacción en el reporte o requiere aportar más detalles técnicos del procedimiento, puede hacerlo:</p>
+<p class="lead-body my-3">1.  Ve a la pestaña <strong>Historial de Resueltos</strong>.</p>
+<p class="lead-body my-3">2.  Haz clic en <strong>Editar Solución</strong> sobre el ticket correspondiente.</p>
+<p class="lead-body my-3">3.  Actualiza los campos necesarios y confirma los cambios. La solución se actualizará sin modificar el estatus del ticket cerrado.</p>
+<p class="lead-body my-3">---</p>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Back to top button -->
+    <button type="button" class="btn btn-primary btn-lg" id="btn-back-to-top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script>
+        // Toggle theme capability
+        function toggleTheme() {
+            const html = document.documentElement;
+            const target = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', target);
+            localStorage.setItem('theme', target);
+            updateThemeButton(target);
+        }
+
+        function updateThemeButton(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.className = 'bi bi-moon-stars me-2';
+            } else {
+                icon.className = 'bi bi-sun me-2';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        updateThemeButton(savedTheme);
+
+        // Copy code script
+        function copyCode(button) {
+            const container = button.closest('.code-container');
+            const codeBlock = container.querySelector('code');
+            
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                button.innerHTML = '<i class="bi bi-check-lg me-1 text-success"></i>Copiado!';
+                setTimeout(() => {
+                    button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Copiar';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar el código: ', err);
+            });
+        }
+
+        // Sidebar link activation on scroll
+        const sections = document.querySelectorAll('.heading-section');
+        const navLinks = document.querySelectorAll('.menu-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Search filter sidebar
+        function filterSidebar() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toLowerCase();
+            const links = document.querySelectorAll('.sidebar-menu .menu-item-h2');
+            const h1s = document.querySelectorAll('.sidebar-menu .menu-item-h1');
+            
+            links.forEach(item => {
+                const text = item.textContent || item.innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+            
+            if (filter !== "") {
+                h1s.forEach(h1 => h1.style.display = "none");
+            } else {
+                h1s.forEach(h1 => h1.style.display = "");
+            }
+        }
+
+        // Back to top button controller
+        let mybutton = document.getElementById("btn-back-to-top");
+        window.onscroll = function () {
+            scrollFunction();
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        mybutton.addEventListener("click", backToTop);
+        function backToTop() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+</body>
+</html>

@@ -23,14 +23,11 @@ class RedirectIfAuthenticated
             if (Auth::guard($guard)->check()) {
                 $user = Auth::user();
 
-                if ($user->hasRole('admin')) {
-                    return redirect(route('admin.dashboard'));
-                }
-                if ($user->hasRole('tecnico')) {
-                    return redirect(route('tecnico.dashboard'));
+                if ($user->can('ver-panel-operativo')) {
+                    return redirect(route('soporte.dashboard'));
                 }
                 
-                return redirect(route('dashboard'));
+                return redirect(route('usuario.home'));
             }
         }
 

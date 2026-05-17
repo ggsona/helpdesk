@@ -10,8 +10,9 @@ use App\Models\TipoEquipo;
 use App\Models\Persona;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-// Importamos el modelo de roles de Spatie
+// Importamos los modelos de roles y permisos de Spatie
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,92 +25,121 @@ class DatabaseSeeder extends Seeder
         $roleTecnico = Role::updateOrCreate(['id' => 3], ['name' => 'tecnico']);
         $roleUsuario = Role::updateOrCreate(['id' => 4], ['name' => 'usuario']);
 
+        // --- 1.2 CONFIGURACIÓN DE PERMISOS (Spatie) ---
+        $permCrearTickets      = Permission::updateOrCreate(['name' => 'crear-tickets']);
+        $permVerPanelOperativo = Permission::updateOrCreate(['name' => 'ver-panel-operativo']);
+        $permAsignarTickets    = Permission::updateOrCreate(['name' => 'asignar-tickets']);
+        $permResolverTickets   = Permission::updateOrCreate(['name' => 'resolver-tickets']);
+        $permComentarInterno   = Permission::updateOrCreate(['name' => 'comentar-interno']);
+        $permGestionarRoles    = Permission::updateOrCreate(['name' => 'gestionar-roles']);
+
+        // --- 1.3 ASIGNACIÓN DE PERMISOS A ROLES ---
+        // Rol Usuario
+        $roleUsuario->syncPermissions([$permCrearTickets]);
+
+        // Rol Técnico
+        $roleTecnico->syncPermissions([
+            $permVerPanelOperativo,
+            $permResolverTickets,
+            $permComentarInterno
+        ]);
+
+        // Rol Gestor
+        $roleGestor->syncPermissions([
+            $permVerPanelOperativo,
+            $permAsignarTickets,
+            $permComentarInterno
+        ]);
+
+        // Rol Admin (Tiene todos los permisos)
+        $roleAdmin->syncPermissions(Permission::all());
+
         // --- 2. CONFIGURACIÓN DE TABLAS MAESTRAS ---
-        Oficina::create(['nombre_oficina' => 'Sede Central']);
-        Oficina::create(['nombre_oficina' => 'Sucursal Norte']);
+        Oficina::firstOrCreate(['nombre_oficina' => 'Sede Central']);
+        Oficina::firstOrCreate(['nombre_oficina' => 'Sucursal Norte']);
 
-        Prioridad::create(['nombre_prioridad' => 'Baja']);
-        Prioridad::create(['nombre_prioridad' => 'Media']);
-        Prioridad::create(['nombre_prioridad' => 'Alta']);
-        Prioridad::create(['nombre_prioridad' => 'Crítica']);
+        Prioridad::firstOrCreate(['nombre_prioridad' => 'Baja']);
+        Prioridad::firstOrCreate(['nombre_prioridad' => 'Media']);
+        Prioridad::firstOrCreate(['nombre_prioridad' => 'Alta']);
+        Prioridad::firstOrCreate(['nombre_prioridad' => 'Crítica']);
 
-        Categoria::create(['nombre_categoria' => 'Hardware']);
-        Categoria::create(['nombre_categoria' => 'Software']);
-        Categoria::create(['nombre_categoria' => 'Redes']);
+        Categoria::firstOrCreate(['nombre_categoria' => 'Hardware']);
+        Categoria::firstOrCreate(['nombre_categoria' => 'Software']);
+        Categoria::firstOrCreate(['nombre_categoria' => 'Redes']);
 
-        TipoEquipo::create(['nombre_tipo_equipo' => 'Laptop']);
-        TipoEquipo::create(['nombre_tipo_equipo' => 'Desktop']);
-        TipoEquipo::create(['nombre_tipo_equipo' => 'Impresora']);
+        TipoEquipo::firstOrCreate(['nombre_tipo_equipo' => 'Laptop']);
+        TipoEquipo::firstOrCreate(['nombre_tipo_equipo' => 'Desktop']);
+        TipoEquipo::firstOrCreate(['nombre_tipo_equipo' => 'Impresora']);
 
         // --- 3. CREACIÓN DE PERSONAS ---
-        $personaAdmin = Persona::create([
-            'nombre' => 'Admin',
-            'apellido' => 'General',
-            'telefono' => '00000000',
-            'id_oficina' => 1
-        ]);
+        $personaAdmin = Persona::firstOrCreate(
+            ['nombre' => 'Admin', 'apellido' => 'General'],
+            ['telefono' => '00000000', 'id_oficina' => 1]
+        );
 
-        $personaGestor = Persona::create([
-            'nombre' => 'Gestor',
-            'apellido' => 'De Soporte',
-            'telefono' => '12345678',
-            'id_oficina' => 1
-        ]);
+        $personaGestor = Persona::firstOrCreate(
+            ['nombre' => 'Gestor', 'apellido' => 'De Soporte'],
+            ['telefono' => '12345678', 'id_oficina' => 1]
+        );
 
-        $personaTecnico = Persona::create([
-            'nombre' => 'Tecnico',
-            'apellido' => 'General',
-            'telefono' => '00000000',
-            'id_oficina' => 1
-        ]);
+        $personaTecnico = Persona::firstOrCreate(
+            ['nombre' => 'Tecnico', 'apellido' => 'General'],
+            ['telefono' => '00000000', 'id_oficina' => 1]
+        );
 
-        $personaUsuario = Persona::create([
-            'nombre' => 'usuario',
-            'apellido' => 'Final',
-            'telefono' => '00000000',
-            'id_oficina' => 2
-        ]);
+        $personaUsuario = Persona::firstOrCreate(
+            ['nombre' => 'usuario', 'apellido' => 'Final'],
+            ['telefono' => '00000000', 'id_oficina' => 2]
+        );
 
         // --- 4. CREACIÓN DE USUARIOS Y ASIGNACIÓN DE ROLES ---
         
         // Crear Admin
-        $admin = User::create([
-            'name' => 'Administrador',
-            'email' => 'admin@helpdesk.com',
-            'role' => '1', // Tu columna manual
-            'password' => Hash::make('admin123'),
-            'id_persona' => $personaAdmin->id_persona,
-        ]);
-        // Asignar rol de Spatie
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@helpdesk.com'],
+            [
+                'name' => 'Administrador',
+                'role' => '1',
+                'password' => Hash::make('admin123'),
+                'id_persona' => $personaAdmin->id_persona,
+            ]
+        );
         $admin->assignRole($roleAdmin);
 
-        $gestor = User::create([
-            'name' => 'Gestor de Soporte',
-            'email' => 'gestor@helpdesk.com',
-            'role' => '2', // Siguiendo tu lógica de columna manual
-            'password' => Hash::make('gestor123'),
-            'id_persona' => $personaGestor->id_persona,
-        ]);
+        // Crear Gestor
+        $gestor = User::updateOrCreate(
+            ['email' => 'gestor@helpdesk.com'],
+            [
+                'name' => 'Gestor de Soporte',
+                'role' => '2',
+                'password' => Hash::make('gestor123'),
+                'id_persona' => $personaGestor->id_persona,
+            ]
+        );
         $gestor->assignRole($roleGestor);
 
-        $admin = User::create([
-            'name' => 'Tecnico',
-            'email' => 'tecnico@helpdesk.com',
-            'role' => '3', // Tu columna manual
-            'password' => Hash::make('tecnico123'),
-            'id_persona' => $personaTecnico->id_persona,
-        ]);
-        // Asignar rol de Spatie
-        $admin->assignRole($roleTecnico);
+        // Crear Técnico
+        $tecnico = User::updateOrCreate(
+            ['email' => 'tecnico@helpdesk.com'],
+            [
+                'name' => 'Tecnico',
+                'role' => '3',
+                'password' => Hash::make('tecnico123'),
+                'id_persona' => $personaTecnico->id_persona,
+            ]
+        );
+        $tecnico->assignRole($roleTecnico);
 
         // Crear Usuario
-        $usuarioFinal = User::create([
-            'name' => 'Usuario GDC',
-            'email' => 'usuario@helpdesk.com',
-            'role' => '4',
-            'password' => Hash::make('usuario123'),
-            'id_persona' => $personaUsuario->id_persona,
-        ]);
+        $usuarioFinal = User::updateOrCreate(
+            ['email' => 'usuario@helpdesk.com'],
+            [
+                'name' => 'Usuario GDC',
+                'role' => '4',
+                'password' => Hash::make('usuario123'),
+                'id_persona' => $personaUsuario->id_persona,
+            ]
+        );
         $usuarioFinal->assignRole($roleUsuario);
     }
 }

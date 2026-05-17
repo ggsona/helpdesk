@@ -16,3 +16,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/__pycache__
+create_docx.py
+convert_manual.py

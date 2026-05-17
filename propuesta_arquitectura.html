@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Arquitectura: Multi-institucional e Inteligente</title>
+    <!-- Google Fonts & Bootstrap Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-dark: rgba(30, 41, 59, 0.7);
+            --border-glow: rgba(59, 130, 246, 0.2);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 3rem 1.5rem;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header Style */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .badge-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 70%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Cards and Sections */
+        .section-card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .section-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.1);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+
+        .section-title i {
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Option Boxes (Columns/Grid) */
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-options {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .option-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .option-box.accent::before {
+            background: var(--accent);
+        }
+
+        .option-box:hover {
+            transform: translateY(-3px);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .option-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .pros-cons {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            font-size: 0.85rem;
+        }
+
+        .pros-cons span {
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .pro { color: var(--success); }
+        .con { color: var(--text-muted); }
+
+        /* Feature List (Vertical Cards) */
+        .feature-item {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .feature-icon {
+            font-size: 1.75rem;
+            color: #60a5fa;
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 0.25rem;
+        }
+
+        .feature-content h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .feature-content p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Call To Action Panel */
+        .cta-panel {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.05);
+        }
+
+        .cta-panel h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 60%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-panel p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.85rem 2.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <header>
+            <div class="badge-premium">
+                <i class="bi bi-cpu-fill"></i> Propuesta de Innovación & Arquitectura
+            </div>
+            <h1>Sistemas Multi-institucionales e Inteligentes</h1>
+            <p class="subtitle">Estrategia técnica para transformar Helpdesk GDC en una plataforma SaaS escalable e impulsada por Inteligencia Artificial.</p>
+        </header>
+
+        <!-- SECCIÓN 1: ARQUITECTURA MULTI-TENANT -->
+        <section class="section-card">
+            <h2 class="section-title">
+                <i class="bi bi-buildings"></i> 1. Arquitectura Multi-institucional (Multi-tenancy)
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Para permitir que múltiples organizaciones independientes compartan el sistema de forma segura sin cruzar sus datos, se proponen los dos enfoques líderes del ecosistema Laravel:
+            </p>
+
+            <div class="grid-options">
+                <!-- OPCIÓN A -->
+                <div class="option-box">
+                    <div class="option-title">
+                        <span>Base de Datos Única</span>
+                        <i class="bi bi-database-fill-gear text-primary"></i>
+                    </div>
+                    <p class="option-desc">
+                        Todos los inquilinos (instituciones) comparten la misma base de datos. La separación lógica se realiza en cada tabla mediante una clave foránea <code>id_institucion</code>.
+                    </p>
+                    <div class="pros-cons">
+                        <span class="pro"><i class="bi bi-check-circle-fill me-1"></i> <strong>Pro:</strong> Muy económico de alojar y fácil de mantener.</span>
+                        <span class="pro"><i class="bi bi-check-circle-fill me-1"></i> <strong>Pro:</strong> Reportes globales instantáneos.</span>
+                        <span class="con"><i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Contra:</strong> La seguridad depende estrictamente del software (Global Scopes).</span>
+                    </div>
+                </div>
+
+                <!-- OPCIÓN B -->
+                <div class="option-box accent">
+                    <div class="option-title">
+                        <span>Bases de Datos Separadas</span>
+                        <i class="bi bi-database-fill-lock text-purple" style="color: var(--accent);"></i>
+                    </div>
+                    <p class="option-desc">
+                        Cada organización posee su propia base de datos física. Una base central ("landlord") enruta dinámicamente las conexiones según el subdominio de acceso.
+                    </p>
+                    <div class="pros-cons">
+                        <span class="pro"><i class="bi bi-check-circle-fill me-1"></i> <strong>Pro:</strong> Máximo aislamiento físico y seguridad de datos.</span>
+                        <span class="pro"><i class="bi bi-check-circle-fill me-1"></i> <strong>Pro:</strong> Backups y esquemas independientes.</span>
+                        <span class="con"><i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Contra:</strong> Servidores más costosos y migraciones complejas.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: HELPDESK INTELIGENTE (IA) -->
+        <section class="section-card">
+            <h2 class="section-title">
+                <i class="bi bi-magic"></i> 2. Capacidades de Inteligencia Artificial (IA)
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Integrando modelos de lenguaje masivo (LLMs como Gemini) en segundo plano (Laravel Queues), dotamos a la mesa de despacho de automatizaciones predictivas de nivel superior:
+            </p>
+
+            <!-- IA ITEM 1 -->
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-diagram-3-fill"></i></div>
+                <div class="feature-content">
+                    <h4>Clasificación & Asignación Autónoma</h4>
+                    <p>La IA lee el asunto y la descripción técnica escrita por el cliente y automáticamente determina la Categoría, la Prioridad (evitando abusos de prioridad crítica) y selecciona al Técnico Especialista con la carga de trabajo óptima y mayor historial de éxito en dicha área.</p>
+                </div>
+            </div>
+
+            <!-- IA ITEM 2 -->
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-chat-left-heart-fill"></i></div>
+                <div class="feature-content">
+                    <h4>Análisis de Sentimiento & Alertas de SLA</h4>
+                    <p>Monitoreo constante del chat entre técnicos y clientes. Si los algoritmos de IA detectan enojo, frustración severa o lenguaje hostil del cliente, el ticket se escala automáticamente a prioridad crítica y se dispara una alerta sonora y visual al panel del Coordinador.</p>
+                </div>
+            </div>
+
+            <!-- IA ITEM 3 -->
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-journal-medical"></i></div>
+                <div class="feature-content">
+                    <h4>RAG y Sugerencias de Solución</h4>
+                    <p>Al abrir un ticket, el técnico visualiza un panel lateral con 3 posibles soluciones recomendadas. El sistema realiza una búsqueda semántica (vectorial) sobre el historial de soluciones exitosas del pasado y redacta una respuesta borrador adaptativa en un solo clic.</p>
+                </div>
+            </div>
+
+            <!-- IA ITEM 4 -->
+            <div class="feature-item">
+                <div class="feature-icon"><i class="bi bi-robot"></i></div>
+                <div class="feature-content">
+                    <h4>Agente Chatbot de Auto-Resolución</h4>
+                    <p>Integración de un bot interactivo de cara al cliente que extrae respuestas de la Base de Conocimientos técnica local. Resuelve preguntas sobre configuraciones y guías de TI antes de permitir la creación física de un ticket, reduciendo el volumen operativo en un 30%.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: PREPARACIÓN PASO A PASO -->
+        <section class="section-card">
+            <h2 class="section-title">
+                <i class="bi bi-rocket-takeoff-fill"></i> 3. ¿Cómo prepararlo en el Registro de Usuarios?
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Para que nuestro sistema admita esta escala global desde ya, el flujo de <strong>Registro de Usuarios y Autoregistro</strong> que implementaremos a continuación se estructurará con:
+            </p>
+            <ul style="list-style-type: none; padding-left: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                <li style="margin-bottom: 0.75rem;"><i class="bi bi-arrow-right-short text-primary"></i> <strong style="color: white;">Columna Tenant ID (id_institucion):</strong> Nacerá con esta columna opcional/nullable, la cual estará lista para el filtrado multi-inquilino.</li>
+                <li style="margin-bottom: 0.75rem;"><i class="bi bi-arrow-right-short text-primary"></i> <strong style="color: white;">Campos de Perfil Profesional:</strong> Registraremos las áreas de especialidad del personal técnico para que la futura IA de auto-asignación funcione con total precisión.</li>
+                <li style="margin-bottom: 0.75rem;"><i class="bi bi-arrow-right-short text-primary"></i> <strong style="color: white;">Estructura de Sedes/Sujeción:</strong> Un usuario pertenecerá de manera estricta a una Oficina y Organización madre, lo cual facilitará la segregación SaaS inmediata.</li>
+            </ul>
+        </section>
+
+        <!-- PANEL DE ACCIÓN -->
+        <div class="cta-panel">
+            <h3>¿Listo para dar el siguiente paso de desarrollo?</h3>
+            <p>Comenzaremos a diseñar e implementar el módulo premium de Registro de Usuarios y Autoregistro, dejando el sistema nativamente preparado para esta escalabilidad Multi-institucional.</p>
+            <button class="cta-btn" onclick="window.close()">
+                <i class="bi bi-check2-all"></i> Entendido, ¡Continuar Desarrollo!
+            </button>
+        </div>
+
+    </div>
+</body>
+</html>

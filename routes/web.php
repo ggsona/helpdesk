@@ -48,40 +48,38 @@ Route::middleware(['auth', 'role:usuario'])->group(function () {
     Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])->name('usuario.tickets.comentar');
 });
 
-// --- RUTAS DE GESTOR ---
-Route::middleware(['auth', 'role:gestor'])->prefix('gestor')->name('gestor.')->group(function () {
+// --- RUTAS DE ADMIN (ADMINISTRACIÓN GLOBAL DEL SISTEMA) ---
+Route::middleware(['auth', 'can:gestionar-roles'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
 });
 
-// --- RUTAS DE ADMIN ---
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
-
-// --- GESTIÓN COMPARTIDA (GESTIÓN DE TICKETS) ---
-// Agrupamos las rutas que ambos pueden ver usando el prefijo 'gestor' 
-// para que coincida con el nombre 'gestor.tickets.index' de tu sidebar
-Route::middleware(['auth', 'role:gestor|admin'])->prefix('gestor')->name('gestor.')->group(function () {
-    Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
-    Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
-    Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])->name('tickets.comentar');
-});
-
-// --- RUTAS DE TECNICO ---
-Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/tickets', [TicketTecnicoController::class, 'index'])->name('tickets.index');
-    Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])->name('tickets.show');
+// --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---
+Route::middleware(['auth', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
     
-    // Acción para mensajes (Igual que gestor)
-    Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])->name('tickets.comentar');
-    
-    // Acción para solucionar el caso
-    Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])->name('tickets.resolver');
-    Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('tickets.guardar-solucion');
-    Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('tickets.editar-solucion');
-    Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('tickets.actualizar-solucion');
+    // Vista de Dashboard de Soporte
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Subgrupo para Coordinación (Gestores / Administradores con permiso 'asignar-tickets')
+    Route::middleware('can:asignar-tickets')->group(function () {
+        Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
+        Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
+        Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])->name('tickets.show');
+        Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])->name('tickets.comentar');
+    });
+
+    // Subgrupo para Especialistas Técnicos (con permiso 'resolver-tickets')
+    Route::middleware('can:resolver-tickets')->prefix('tecnico')->name('tickets.tecnico.')->group(function () {
+        Route::get('/tickets', [TicketTecnicoController::class, 'index'])->name('index');
+        Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])->name('show');
+        Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])->name('comentar');
+        
+        // Acciones de resolución
+        Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])->name('resolver');
+        Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('guardar-solucion');
+        Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('editar-solucion');
+        Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('actualizar-solucion');
+    });
 });
 
 require __DIR__.'/auth.php';
