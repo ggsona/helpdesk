@@ -18,7 +18,7 @@
     @endif
 
     {{-- --- BLOQUE A: VISTA DE GESTOR / COORDINADOR --- --}}
-    @can('asignar-tickets')
+    @if(request()->routeIs('soporte.tickets.index'))
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold theme-text mb-1"><i class="bi bi-ticket-perforated-fill me-2 text-primary"></i>Mesa de Despacho</h2>
@@ -212,11 +212,10 @@
                 </div>
             </div>
         </div>
-    @endcan
+    @endif
 
     {{-- --- BLOQUE B: VISTA DE TÉCNICO ESPECIALISTA --- --}}
-    @cannot('asignar-tickets')
-        @can('resolver-tickets')
+    @if(request()->routeIs('soporte.tickets.tecnico.index'))
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="fw-bold theme-text mb-1"><i class="bi bi-tools me-2 text-primary"></i>Mi Bandeja Operativa</h2>
@@ -379,7 +378,6 @@
                     </div>
                 </div>
             </div>
-        @endcan
-    @endcannot
+    @endif
 </div>
 @endsection

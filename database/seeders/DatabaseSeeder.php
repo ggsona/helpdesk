@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Oficina;
+use App\Models\NivelJerarquico;
+use App\Models\UnidadAdministrativa;
 use App\Models\Prioridad;
 use App\Models\Categoria;
 use App\Models\TipoEquipo;
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $permResolverTickets   = Permission::updateOrCreate(['name' => 'resolver-tickets']);
         $permComentarInterno   = Permission::updateOrCreate(['name' => 'comentar-interno']);
         $permGestionarRoles    = Permission::updateOrCreate(['name' => 'gestionar-roles']);
+        $permVerConfig         = Permission::updateOrCreate(['name' => 'ver-configuraciones']);
 
         // --- 1.3 ASIGNACIÓN DE PERMISOS A ROLES ---
         // Rol Usuario
@@ -55,8 +57,28 @@ class DatabaseSeeder extends Seeder
         $roleAdmin->syncPermissions(Permission::all());
 
         // --- 2. CONFIGURACIÓN DE TABLAS MAESTRAS ---
-        Oficina::firstOrCreate(['nombre_oficina' => 'Sede Central']);
-        Oficina::firstOrCreate(['nombre_oficina' => 'Sucursal Norte']);
+        // 2.1 Niveles Jerárquicos (Amplio catálogo)
+        $nomenclaturas = [
+            'Sede', 'Complejo', 'División', 'Área', 'Departamento',
+            'Oficina', 'Sección', 'Grupo', 'Equipo', 'Unidad'
+        ];
+        
+        $nivelesList = [];
+        foreach ($nomenclaturas as $index => $nombre) {
+            $nivelesList[$nombre] = NivelJerarquico::firstOrCreate([
+                'nombre' => $nombre,
+                'nivel' => $index + 1,
+                // Activar solo los 3 primeros por defecto para no saturar al usuario
+                'is_active' => $index < 3 
+            ]);
+        }
+
+        // 2.2 Unidades Administrativas (Organigrama)
+        $sedeCentral = UnidadAdministrativa::firstOrCreate(['nombre' => 'Sede Central', 'id_nivel' => $nivelesList['Sede']->id]);
+        $sucursalNorte = UnidadAdministrativa::firstOrCreate(['nombre' => 'Sucursal Norte', 'id_nivel' => $nivelesList['Sede']->id]);
+        
+        $deptTech = UnidadAdministrativa::firstOrCreate(['nombre' => 'Departamento de Tecnología', 'id_nivel' => $nivelesList['División']->id, 'parent_id' => $sedeCentral->id]);
+        UnidadAdministrativa::firstOrCreate(['nombre' => 'Soporte Nivel 1', 'id_nivel' => $nivelesList['Área']->id, 'parent_id' => $deptTech->id]);
 
         Prioridad::firstOrCreate(['nombre_prioridad' => 'Baja']);
         Prioridad::firstOrCreate(['nombre_prioridad' => 'Media']);
@@ -74,22 +96,22 @@ class DatabaseSeeder extends Seeder
         // --- 3. CREACIÓN DE PERSONAS ---
         $personaAdmin = Persona::firstOrCreate(
             ['nombre' => 'Admin', 'apellido' => 'General'],
-            ['telefono' => '00000000', 'id_oficina' => 1]
+            ['telefono' => '00000000', 'id_unidad_administrativa' => $sedeCentral->id]
         );
 
         $personaGestor = Persona::firstOrCreate(
             ['nombre' => 'Gestor', 'apellido' => 'De Soporte'],
-            ['telefono' => '12345678', 'id_oficina' => 1]
+            ['telefono' => '12345678', 'id_unidad_administrativa' => $sedeCentral->id]
         );
 
         $personaTecnico = Persona::firstOrCreate(
             ['nombre' => 'Tecnico', 'apellido' => 'General'],
-            ['telefono' => '00000000', 'id_oficina' => 1]
+            ['telefono' => '00000000', 'id_unidad_administrativa' => $deptTech->id]
         );
 
         $personaUsuario = Persona::firstOrCreate(
             ['nombre' => 'usuario', 'apellido' => 'Final'],
-            ['telefono' => '00000000', 'id_oficina' => 2]
+            ['telefono' => '00000000', 'id_unidad_administrativa' => $sucursalNorte->id]
         );
 
         // --- 4. CREACIÓN DE USUARIOS Y ASIGNACIÓN DE ROLES ---

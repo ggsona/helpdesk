@@ -41,10 +41,22 @@ El sistema cuenta con un esquema de base de datos relacional robusto. A continua
 Estas tablas proveen los datos estáticos de parametrización para el sistema de soporte.
 
 ```php
-// database/migrations/2023_01_01_000001_create_oficinas_table.php
-Schema::create('oficinas', function (Blueprint $table) {
-    $table->id('id_oficina');
-    $table->string('nombre_oficina', 100);
+// database/migrations/2026_05_18_create_nivel_jerarquicos_table.php
+Schema::create('niveles_jerarquicos', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre')->unique(); // Ej: Sede, Departamento, Oficina
+    $table->integer('nivel'); // Ej: 1, 2, 3...
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// database/migrations/2026_05_18_create_unidad_administrativas_table.php
+Schema::create('unidades_administrativas', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre'); // Ej: Tecnología, Ventas
+    $table->foreignId('id_nivel')->constrained('niveles_jerarquicos')->cascadeOnDelete();
+    $table->foreignId('parent_id')->nullable()->constrained('unidades_administrativas')->cascadeOnDelete();
+    $table->boolean('is_active')->default(true);
     $table->timestamps();
 });
 
@@ -80,7 +92,8 @@ Schema::create('personas', function (Blueprint $table) {
     $table->string('nombre', 100);
     $table->string('apellido', 100);
     $table->string('telefono', 20)->nullable();
-    $table->foreignId('id_oficina')->constrained('oficinas', 'id_oficina');
+    $table->unsignedBigInteger('id_unidad_administrativa')->nullable();
+    $table->foreign('id_unidad_administrativa')->references('id')->on('unidades_administrativas')->nullOnDelete();
     $table->timestamps();
 });
 

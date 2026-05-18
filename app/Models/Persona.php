@@ -8,10 +8,10 @@ class Persona extends Model
 {
     protected $table = 'personas';
     protected $primaryKey = 'id_persona';
-    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_oficina'];
+    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_unidad_administrativa'];
 
-    public function oficina()
+    public function unidadAdministrativa()
     {
-        return $this->belongsTo(Oficina::class, 'id_oficina');
+        return $this->belongsTo(UnidadAdministrativa::class, 'id_unidad_administrativa');
     }
 }

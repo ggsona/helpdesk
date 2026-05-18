@@ -195,17 +195,21 @@
                     </li>
 
                     {{-- GESTIÓN DE TICKETS SEGÚN ROL --}}
-                    <li>
-                        @can('asignar-tickets')
+                    @can('asignar-tickets')
+                        <li>
                             <a href="{{ route('soporte.tickets.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.*') && !request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
                                 <i class="bi bi-ticket-detailed-fill me-3"></i>Mesa de Despacho
                             </a>
-                        @elsecan('resolver-tickets')
+                        </li>
+                    @endcan
+                    
+                    @can('resolver-tickets')
+                        <li>
                             <a href="{{ route('soporte.tickets.tecnico.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
                                 <i class="bi bi-ticket-perforated me-3"></i>Mis Tareas Activas
                             </a>
-                        @endcan
-                    </li>
+                        </li>
+                    @endcan
 
                     {{-- CONTROL DE ACCESOS (SÓLO ADMINISTRADORES) --}}
                     @can('gestionar-roles')
@@ -224,7 +228,7 @@
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
 
                         <li><a href="#" class="nav-link"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
-                        <li><a href="#" class="nav-link"><i class="bi bi-building-fill me-3"></i>Oficinas</a></li>
+                        <li><a href="{{ route('admin.estructura.index') }}" class="nav-link {{ request()->routeIs('admin.estructura.*') ? 'active' : '' }}"><i class="bi bi-diagram-3-fill me-3"></i>Organigrama</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-tags-fill me-3"></i>Categorías</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
@@ -248,6 +252,11 @@
                     </button>
                     <ul class="dropdown-menu shadow-lg border-0 mb-2">
                         <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
+                        
+                        @can('ver-configuraciones')
+                        <li><a class="dropdown-item py-2" href="{{ route('admin.configuraciones.index') }}"><i class="bi bi-gear-fill me-2 text-secondary"></i> Ajustes del Sistema</a></li>
+                        @endcan
+                        
                         <li><button class="dropdown-item py-2" onclick="toggleTheme()"><i class="bi bi-moon-stars me-2"></i> Cambiar Tema</button></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
