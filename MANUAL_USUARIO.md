@@ -138,8 +138,27 @@ Si posterior al cierre el técnico cometió un error de redacción en el reporte
 
 ---
 
+## 6. MANUAL DEL ADMINISTRADOR GLOBAL (SÚPER USUARIO)
+
+El Administrador tiene el control total sobre la seguridad, los accesos y la configuración del sistema.
+
+### A. Bandeja de Aprobaciones (Nuevos Registros)
+Por motivos de seguridad, cuando un colaborador nuevo se registra en el Helpdesk, su cuenta entra a una **Sala de Espera**. No podrá crear tickets ni ver el panel hasta que sea validado.
+1. Ingresa a la sección **Aprobación de Usuarios** en el menú lateral.
+2. Verás una lista de usuarios "Pendientes" con la ruta organizacional que declararon al registrarse (ej. Sede Central > División de Tecnología).
+3. Evalúa si los datos son legítimos y haz clic en **Aprobar Acceso**. En caso de un registro erróneo o fraudulento, puedes **Rechazar**.
+
+### B. Directorio Dinámico de Usuarios
+Desde la sección **Usuarios** (Bajo *Configuración y Activos*), puedes administrar a toda la plantilla del sistema.
+*   **Buscador Rápido**: Utiliza la barra de búsqueda superior para encontrar inmediatamente a un colaborador tecleando su nombre, correo o número de cédula. La tabla se filtrará instantáneamente.
+*   **Cambiar Roles (Privilegios)**: Al hacer clic en el botón de edición (el lápiz azul) junto al rol actual de un usuario, puedes ascenderlo o reasignarlo. *Ejemplo: Convertir a un 'usuario' en 'técnico'.*
+*   **Interruptor de Acceso (Activar/Desactivar)**: En la columna "Acceso", puedes apagar el interruptor azul para desactivar a un usuario instantáneamente (por ejemplo, por despido o suspensión). El sistema expulsará al usuario inmediatamente y no le permitirá iniciar sesión hasta que vuelvas a encender el interruptor.
+
+---
+
 > [!TIP]
 > **Recomendación para un Soporte de Alta Calidad**
 > *   **Clientes**: Utilicen siempre los borradores para verificar que la descripción sea clara. Esto ahorra tiempo valioso al técnico.
 > *   **Gestores**: Revisen la pestaña "Por Asignar" constantemente y aprovechen las notas de instrucción al asignar especialistas.
 > *   **Técnicos**: Utilicen las Notas Internas para debatir problemas con los gestores antes de dar una respuesta formal al cliente final.
+> *   **Administradores**: Revisen la bandeja de aprobaciones diariamente para no bloquear el flujo de trabajo de nuevos ingresos.

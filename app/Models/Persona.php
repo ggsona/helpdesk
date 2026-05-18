@@ -8,7 +8,15 @@ class Persona extends Model
 {
     protected $table = 'personas';
     protected $primaryKey = 'id_persona';
-    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_unidad_administrativa'];
+    protected $fillable = [
+        'nombre', 
+        'segundo_nombre',
+        'apellido', 
+        'segundo_apellido',
+        'cedula', 
+        'telefono', 
+        'id_unidad_administrativa'
+    ];
 
     public function unidadAdministrativa()
     {

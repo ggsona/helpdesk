@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         $permComentarInterno   = Permission::updateOrCreate(['name' => 'comentar-interno']);
         $permGestionarRoles    = Permission::updateOrCreate(['name' => 'gestionar-roles']);
         $permVerConfig         = Permission::updateOrCreate(['name' => 'ver-configuraciones']);
+        $permGestionarUsuarios = Permission::updateOrCreate(['name' => 'gestionar-usuarios']);
 
         // --- 1.3 ASIGNACIÓN DE PERMISOS A ROLES ---
         // Rol Usuario
@@ -65,12 +66,14 @@ class DatabaseSeeder extends Seeder
         
         $nivelesList = [];
         foreach ($nomenclaturas as $index => $nombre) {
-            $nivelesList[$nombre] = NivelJerarquico::firstOrCreate([
-                'nombre' => $nombre,
-                'nivel' => $index + 1,
-                // Activar solo los 3 primeros por defecto para no saturar al usuario
-                'is_active' => $index < 3 
-            ]);
+            $nivelesList[$nombre] = NivelJerarquico::firstOrCreate(
+                ['nombre' => $nombre],
+                [
+                    'nivel' => $index + 1,
+                    // Activar solo los 3 primeros por defecto para no saturar al usuario
+                    'is_active' => $index < 3 
+                ]
+            );
         }
 
         // 2.2 Unidades Administrativas (Organigrama)
@@ -124,6 +127,7 @@ class DatabaseSeeder extends Seeder
                 'role' => '1',
                 'password' => Hash::make('admin123'),
                 'id_persona' => $personaAdmin->id_persona,
+                'is_approved' => true,
             ]
         );
         $admin->assignRole($roleAdmin);
@@ -136,6 +140,7 @@ class DatabaseSeeder extends Seeder
                 'role' => '2',
                 'password' => Hash::make('gestor123'),
                 'id_persona' => $personaGestor->id_persona,
+                'is_approved' => true,
             ]
         );
         $gestor->assignRole($roleGestor);
@@ -148,6 +153,7 @@ class DatabaseSeeder extends Seeder
                 'role' => '3',
                 'password' => Hash::make('tecnico123'),
                 'id_persona' => $personaTecnico->id_persona,
+                'is_approved' => true,
             ]
         );
         $tecnico->assignRole($roleTecnico);
@@ -160,6 +166,7 @@ class DatabaseSeeder extends Seeder
                 'role' => '4',
                 'password' => Hash::make('usuario123'),
                 'id_persona' => $personaUsuario->id_persona,
+                'is_approved' => true,
             ]
         );
         $usuarioFinal->assignRole($roleUsuario);

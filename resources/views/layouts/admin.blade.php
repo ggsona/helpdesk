@@ -212,27 +212,56 @@
                     @endcan
 
                     {{-- CONTROL DE ACCESOS (SÓLO ADMINISTRADORES) --}}
-                    @can('gestionar-roles')
+                    @if(auth()->user()->can('gestionar-roles') || auth()->user()->can('gestionar-usuarios'))
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Control de Accesos</small>
+                        
+                        @can('gestionar-roles')
                         <li>
                             <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
                                 <i class="bi bi-shield-lock-fill me-3"></i>Roles y Permisos
                             </a>
                         </li>
-                    @endcan
+                        @endcan
+                        
+                        @can('gestionar-usuarios')
+                        <li>
+                            @php
+                                $pendientesCount = \App\Models\User::where('is_approved', false)->count();
+                            @endphp
+                            <a href="{{ route('admin.usuarios.pendientes') }}" class="nav-link {{ request()->routeIs('admin.usuarios.pendientes') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+                                <span>
+                                    <i class="bi bi-person-fill-gear me-3"></i>Aprobación de Usuarios
+                                </span>
+                                @if($pendientesCount > 0)
+                                    <span class="badge bg-warning text-dark rounded-pill fw-bold" style="font-size: 0.7rem; padding: 0.25em 0.6em;">
+                                        {{ $pendientesCount }}
+                                    </span>
+                                @endif
+                            </a>
+                        </li>
+                        @endcan
+                    @endif
 
-                    {{-- CONFIGURACIÓN Y ACTIVOS (COORDINADORES Y GESTORES) --}}
-                    @can('asignar-tickets')
+                    {{-- CONFIGURACIÓN Y ACTIVOS --}}
+                    @if(auth()->user()->can('gestionar-usuarios') || auth()->user()->can('ver-configuraciones') || auth()->user()->can('asignar-tickets'))
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
 
-                        <li><a href="#" class="nav-link"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
+                        @can('gestionar-usuarios')
+                        <li><a href="{{ route('admin.usuarios.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios.index') ? 'active' : '' }}"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
+                        @endcan
+
+                        @can('ver-configuraciones')
                         <li><a href="{{ route('admin.estructura.index') }}" class="nav-link {{ request()->routeIs('admin.estructura.*') ? 'active' : '' }}"><i class="bi bi-diagram-3-fill me-3"></i>Organigrama</a></li>
+                        @endcan
+                        
+                        @can('asignar-tickets')
                         <li><a href="#" class="nav-link"><i class="bi bi-tags-fill me-3"></i>Categorías</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
-                    @endcan
+                        @endcan
+                    @endif
                 </ul>
             </div>
 

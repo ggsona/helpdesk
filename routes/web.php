@@ -18,18 +18,26 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Endpoint público para cascada AJAX del registro
+Route::get('/unidades-hijas/{parentId}', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'getChildrenUnidades'])->name('unidades.hijas');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'approved'])
     ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+// Sala de Espera (Aprobación Pendiente)
+Route::get('/espera', function () {
+    return view('auth.awaiting-approval');
+})->middleware('auth')->name('awaiting-approval');
+
+Route::middleware(['auth', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // --- RUTAS DE USUARIO ---
-Route::middleware(['auth', 'role:usuario'])->group(function () {
+Route::middleware(['auth', 'approved', 'role:usuario'])->group(function () {
     
     // Redirección interna para el usuario
     Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])->name('usuario.home');
@@ -49,18 +57,34 @@ Route::middleware(['auth', 'role:usuario'])->group(function () {
 });
 
 // --- RUTAS DE ADMIN (ADMINISTRACIÓN GLOBAL DEL SISTEMA) ---
-Route::middleware(['auth', 'can:gestionar-roles'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('can:ver-panel-operativo');
     
-    // --- Estructura Organizacional Dinámica ---
-    Route::get('/estructura', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'index'])->name('estructura.index');
-    Route::post('/estructura/unidades', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'storeUnidad'])->name('estructura.unidades.store');
-    Route::put('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'updateUnidad'])->name('estructura.unidades.update');
-    Route::delete('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'destroyUnidad'])->name('estructura.unidades.destroy');
-
-    // --- Configuraciones Generales ---
+    // --- Control de Roles y Permisos ---
+    Route::middleware('can:gestionar-roles')->group(function () {
+        Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    });
+    
+    // --- Gestión General de Usuarios y Aprobaciones ---
+    Route::middleware('can:gestionar-usuarios')->group(function () {
+        // Aprobaciones
+        Route::get('/usuarios/pendientes', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'index'])->name('usuarios.pendientes');
+        Route::post('/usuarios/pendientes/{id}/aprobar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'aprobar'])->name('usuarios.aprobar');
+        Route::delete('/usuarios/pendientes/{id}/rechazar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'rechazar'])->name('usuarios.rechazar');
+        
+        // Directorio de Usuarios
+        Route::get('/usuarios', [\App\Http\Controllers\Admin\UsuarioController::class, 'index'])->name('usuarios.index');
+        Route::post('/usuarios/{id}/update-role', [\App\Http\Controllers\Admin\UsuarioController::class, 'updateRole'])->name('usuarios.update-role');
+        Route::post('/usuarios/{id}/toggle', [\App\Http\Controllers\Admin\UsuarioController::class, 'toggleStatus'])->name('usuarios.toggle');
+    });
+    
+    // --- Estructura Organizacional y Configuraciones ---
     Route::middleware('can:ver-configuraciones')->group(function () {
+        Route::get('/estructura', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'index'])->name('estructura.index');
+        Route::post('/estructura/unidades', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'storeUnidad'])->name('estructura.unidades.store');
+        Route::put('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'updateUnidad'])->name('estructura.unidades.update');
+        Route::delete('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'destroyUnidad'])->name('estructura.unidades.destroy');
+
         Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuraciones.index');
         Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])->name('configuraciones.niveles.reorder');
         Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])->name('configuraciones.niveles.toggle');
@@ -69,7 +93,7 @@ Route::middleware(['auth', 'can:gestionar-roles'])->prefix('admin')->name('admin
 });
 
 // --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---
-Route::middleware(['auth', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
+Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
     
     // Vista de Dashboard de Soporte
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

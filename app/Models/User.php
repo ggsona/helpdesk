@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'id_persona', // Asegúrate de que este campo esté en tu tabla 'users'
+        'is_approved',
     ];
 
     /**

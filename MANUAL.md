@@ -14,7 +14,8 @@ El objetivo de este manual es servir como documentación del sistema actual y pr
 5. [Capa de Controladores e Hilos de Trabajo](#5-capa-de-controladores-e-hilos-de-trabajo)
 6. [Sistema de Enrutamiento y Middleware](#6-sistema-de-enrutamiento-y-middleware)
 7. [Interfaz Gráfica (Layouts y Vistas Blade)](#7-interfaz-gráfica-layouts-y-vistas-blade)
-8. [Pasos para Recrear el Proyecto desde Cero](#8-pasos-para-recrear-el-proyecto-desde-cero)
+8. [Módulo de Seguridad y Directorio de Usuarios](#8-módulo-de-seguridad-y-directorio-de-usuarios)
+9. [Pasos para Recrear el Proyecto desde Cero](#9-pasos-para-recrear-el-proyecto-desde-cero)
 
 ---
 
@@ -1256,7 +1257,29 @@ class UsuarioLayout extends Component
 
 ---
 
-## 8. PASOS PARA RECREAR EL PROYECTO DESDE CERO
+## 8. MÓDULO DE SEGURIDAD Y DIRECTORIO DE USUARIOS
+
+El sistema integra un módulo avanzado de administración, protegido íntegramente por permisos granulares (Spatie), diseñado para gestionar el ciclo de vida, los accesos y la aprobación de nuevos integrantes.
+
+### 8.1 Bandeja de Aprobaciones (Sala de Espera)
+Por seguridad, los nuevos registros entran por defecto en estado inactivo (`is_approved = false`) y son retenidos en una Sala de Espera.
+*   **Middleware (`CheckUserApproval`)**: Intercepta automáticamente cualquier petición de un usuario inactivo y lo redirige a la pantalla de espera o destruye su sesión, bloqueando instantáneamente el acceso a funcionalidades protegidas.
+*   **Aprobación/Rechazo**: A través del `UsuarioAprobacionController`, los Administradores pueden revisar la jerarquía del solicitante (Sede > Complejo > División) y otorgar el acceso o rechazar la cuenta.
+
+### 8.2 Directorio Activo de Gestión
+La vista administrativa de usuarios (`admin/usuarios/index.blade.php`) implementa un diseño de vanguardia y altamente reactivo:
+*   **Filtro Asíncrono (Fuzzy Search)**: Búsqueda dinámica en el frontend (JavaScript Vanilla) por nombre, correo electrónico o número de cédula, sin necesidad de recargas de página ni llamadas pesadas a la base de datos.
+*   **Gestor Dinámico de Roles**: Permite actualizar en caliente el rol operativo (Admin, Gestor, Técnico, Usuario) mediante un modal superpuesto elegante.
+*   **Interruptor de Acceso (AJAX)**: Activación y desactivación inmediata de las cuentas a través de un switch estilo Toggle que se comunica asíncronamente (vía `fetch` API) con el backend (`UsuarioController@toggleStatus`). Una cuenta desactivada expulsa de inmediato al usuario en su siguiente petición de red.
+
+### 8.3 Permiso Estricto (`gestionar-usuarios`)
+Toda la lógica de Aprobación y Directorio está contenida en un subgrupo de rutas en `routes/web.php` amparado por un middleware que exige explícitamente el permiso `gestionar-usuarios`.
+*   Esto disocia el poder de "gestionar roles" del de "gestionar cuentas", permitiendo una delegación de responsabilidades más fina en el futuro.
+*   La UI del menú lateral de administrador evalúa este permiso dinámicamente antes de renderizar los enlaces.
+
+---
+
+## 9. PASOS PARA RECREAR EL PROYECTO DESDE CERO
 
 Sigue esta secuencia exacta de comandos y código para reconstruir y desplegar el sistema Helpdesk GDC en un nuevo entorno.
 

@@ -1,6 +1,25 @@
 @extends('layouts.admin')
 
 @section('content')
+<style>
+    /* Estilos Premium para el Arrastre y Soltado (Drag & Drop) */
+    .sortable-ghost {
+        opacity: 0.35 !important;
+        border: 2px dashed rgba(37, 99, 235, 0.5) !important;
+        background-color: rgba(37, 99, 235, 0.05) !important;
+        box-shadow: none !important;
+        transform: scale(0.98);
+    }
+    .sortable-drag {
+        opacity: 0.9 !important;
+        transform: scale(1.03);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25) !important;
+        cursor: grabbing !important;
+    }
+    .cursor-grab:active {
+        cursor: grabbing !important;
+    }
+</style>
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -20,8 +39,8 @@
 
     <div class="row g-4">
         {{-- CONFIGURACIÓN DE NIVELES (DRAG & DROP) --}}
-        <div class="col-lg-6">
-            <div class="card card-premium shadow-sm border-0 h-100">
+        <div class="col-12">
+            <div class="card card-premium shadow-sm border-0">
                 <div class="card-header bg-transparent border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold theme-text mb-1"><i class="bi bi-layers-fill text-accent me-2"></i> Nomenclatura Estructural</h5>
@@ -49,20 +68,27 @@
                         </div>
                     @endif
 
-                    <div class="list-group {{ $existenUnidades ? '' : 'sortable-list' }} gap-2 px-1" id="niveles-list">
+                    <div class="row g-3 {{ $existenUnidades ? '' : 'sortable-list' }}" id="niveles-list">
                         @foreach($niveles as $nivel)
-                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 rounded-4 shadow-sm py-3 px-4 mb-2 bg-body" data-id="{{ $nivel->id }}" style="transition: all 0.2s ease;">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-grid-3x3-gap-fill text-muted me-3 {{ $existenUnidades ? 'opacity-25' : 'cursor-grab handle' }} fs-5" style="{{ $existenUnidades ? '' : 'cursor: grab;' }}"></i>
-                                    <div>
-                                        <span class="fw-bold theme-text d-block fs-6 mb-1">{{ $nivel->nombre }}</span>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-2" style="font-size: 0.7rem;">
-                                            Posición <i class="bi bi-arrow-right-short"></i> {{ $nivel->nivel }}
-                                        </span>
+                            <div class="col-12 col-md-6 col-lg-4" data-id="{{ $nivel->id }}">
+                                <div class="card border-0 rounded-4 shadow-sm bg-body h-100 hover-shadow transition-all" style="transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0.05) !important;">
+                                    <div class="card-body p-3.5 d-flex flex-column justify-content-between" style="min-height: 120px;">
+                                        <!-- Fila Superior: Nivel y Switch -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1.5 fw-semibold" style="font-size: 0.75rem;">
+                                                Posición {{ $nivel->nivel }}
+                                            </span>
+                                            <div class="form-check form-switch mb-0 flex-shrink-0">
+                                                <input class="form-check-input toggle-nivel-btn cursor-pointer m-0" type="checkbox" role="switch" data-id="{{ $nivel->id }}" {{ $nivel->is_active ? 'checked' : '' }} {{ $existenUnidades ? 'disabled' : '' }} style="width: 2.5rem; height: 1.25rem;">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Fila Inferior: Handle de arrastre y Nombre -->
+                                        <div class="d-flex align-items-center mt-auto">
+                                            <i class="bi bi-grid-3x3-gap-fill text-muted me-3 {{ $existenUnidades ? 'opacity-25' : 'cursor-grab handle' }} fs-4" style="{{ $existenUnidades ? '' : 'cursor: grab;' }}"></i>
+                                            <span class="fw-bold theme-text fs-5" style="word-break: break-word; line-height: 1.3;">{{ $nivel->nombre }}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-check form-switch ms-auto">
-                                    <input class="form-check-input toggle-nivel-btn cursor-pointer" type="checkbox" role="switch" data-id="{{ $nivel->id }}" {{ $nivel->is_active ? 'checked' : '' }} {{ $existenUnidades ? 'disabled' : '' }} style="width: 2.5rem; height: 1.25rem;">
                                 </div>
                             </div>
                         @endforeach
@@ -72,13 +98,13 @@
         </div>
 
         {{-- PROXIMAS CONFIGURACIONES --}}
-        <div class="col-lg-6">
-            <div class="card card-premium shadow-sm border-0 h-100">
+        <div class="col-12">
+            <div class="card card-premium shadow-sm border-0">
                 <div class="card-header bg-transparent border-0 pt-4 pb-0">
                     <h5 class="fw-bold theme-text mb-1"><i class="bi bi-shield-lock-fill text-danger me-2"></i> Active Directory / Login</h5>
                     <p class="small text-muted mb-0">Configuraciones de acceso a la plataforma.</p>
                 </div>
-                <div class="card-body d-flex align-items-center justify-content-center">
+                <div class="card-body d-flex align-items-center justify-content-center py-5">
                     <div class="text-center opacity-50">
                         <i class="bi bi-cone-striped fs-1 mb-3 d-block text-warning"></i>
                         <h5 class="fw-bold theme-text">Próximamente</h5>
@@ -123,14 +149,27 @@ document.addEventListener('DOMContentLoaded', function () {
     var el = document.getElementById('niveles-list');
     var sortable = Sortable.create(el, {
         handle: '.handle', 
-        animation: 150,
-        ghostClass: 'bg-primary',
+        animation: 200,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
         onEnd: function (evt) {
-            let ordenIds = [];
-            document.querySelectorAll('#niveles-list li').forEach(function(li) {
-                ordenIds.push(li.getAttribute('data-id'));
+            // 1. Recalcular y actualizar visualmente las etiquetas "Posición X" instantáneamente
+            let index = 1;
+            document.querySelectorAll('#niveles-list > div').forEach(function(item) {
+                let badge = item.querySelector('.badge');
+                if (badge) {
+                    badge.innerHTML = 'Posición ' + index;
+                }
+                index++;
             });
 
+            // 2. Extraer el nuevo orden de los IDs
+            let ordenIds = [];
+            document.querySelectorAll('#niveles-list > div').forEach(function(item) {
+                ordenIds.push(item.getAttribute('data-id'));
+            });
+
+            // 3. Guardar en la base de datos de forma silenciosa por AJAX (Sin recargar!)
             fetch("{{ route('admin.configuraciones.niveles.reorder') }}", {
                 method: "POST",
                 headers: {
@@ -141,13 +180,14 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message);
+                if(!data.success) {
+                    alert('Error al guardar el orden: ' + data.message);
                 }
             })
-            .catch(error => console.error("Error reordenando niveles:", error));
+            .catch(error => {
+                console.error("Error reordenando niveles:", error);
+                alert("Hubo un error de red al intentar guardar la posición.");
+            });
         }
     });
 });

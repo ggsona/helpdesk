@@ -260,7 +260,8 @@
 <li class="menu-item-h2"><a href="#7-interfaz-grfica-layouts-y-vistas-blade" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>7. INTERFAZ GRÁFICA (LAYOUTS Y VISTAS BLADE)</a></li>
 <li class="menu-item-h1">sidebar {</li>
 <li class="menu-item-h1">content { flex-grow: 1; padding: 2.5rem; }</li>
-<li class="menu-item-h2"><a href="#8-pasos-para-recrear-el-proyecto-desde-cero" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>8. PASOS PARA RECREAR EL PROYECTO DESDE CERO</a></li>
+<li class="menu-item-h2"><a href="#8-mdulo-de-seguridad-y-directorio-de-usuarios" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>8. MÓDULO DE SEGURIDAD Y DIRECTORIO DE USUARIOS</a></li>
+<li class="menu-item-h2"><a href="#9-pasos-para-recrear-el-proyecto-desde-cero" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>9. PASOS PARA RECREAR EL PROYECTO DESDE CERO</a></li>
 <li class="menu-item-h1">1. Crear nuevo proyecto en Laravel 10</li>
 <li class="menu-item-h1">2. Instalar el paquete de Roles y Permisos de Spatie</li>
 <li class="menu-item-h1">3. Instalar la suite de autenticación base (Laravel Breeze con blade)</li>
@@ -298,7 +299,8 @@
 <p class="lead-body my-3">5. <a href="#5-capa-de-controladores-e-hilos-de-trabajo" target="_blank">Capa de Controladores e Hilos de Trabajo</a></p>
 <p class="lead-body my-3">6. <a href="#6-sistema-de-enrutamiento-y-middleware" target="_blank">Sistema de Enrutamiento y Middleware</a></p>
 <p class="lead-body my-3">7. <a href="#7-interfaz-gráfica-layouts-y-vistas-blade" target="_blank">Interfaz Gráfica (Layouts y Vistas Blade)</a></p>
-<p class="lead-body my-3">8. <a href="#8-pasos-para-recrear-el-proyecto-desde-cero" target="_blank">Pasos para Recrear el Proyecto desde Cero</a></p>
+<p class="lead-body my-3">8. <a href="#8-módulo-de-seguridad-y-directorio-de-usuarios" target="_blank">Módulo de Seguridad y Directorio de Usuarios</a></p>
+<p class="lead-body my-3">9. <a href="#9-pasos-para-recrear-el-proyecto-desde-cero" target="_blank">Pasos para Recrear el Proyecto desde Cero</a></p>
 <p class="lead-body my-3">---</p>
 <h2 id="1-arquitectura-general" class="fw-bold mt-5 mb-3 text-secondary heading-section">1. ARQUITECTURA GENERAL</h2>
 <p class="lead-body my-3">La aplicación sigue el patrón arquitectónico <strong>Modelo-Vista-Controlador (MVC)</strong> característico de Laravel, enriquecido con un sistema de roles para segmentar los privilegios de los usuarios.</p>
@@ -316,10 +318,22 @@
 <h3 id="cdigo-completo-de-migraciones" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Código Completo de Migraciones</h3>
 <h4 id="a-tablas-maestras" class="fw-bold mt-3 mb-2 heading-section">A. Tablas Maestras</h4>
 <p class="lead-body my-3">Estas tablas proveen los datos estáticos de parametrización para el sistema de soporte.</p>
-<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2023_01_01_000001_create_oficinas_table.php
-Schema::create('oficinas', function (Blueprint $table) {
-    $table-&gt;id('id_oficina');
-    $table-&gt;string('nombre_oficina', 100);
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_18_create_nivel_jerarquicos_table.php
+Schema::create('niveles_jerarquicos', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;string('nombre')-&gt;unique(); // Ej: Sede, Departamento, Oficina
+    $table-&gt;integer('nivel'); // Ej: 1, 2, 3...
+    $table-&gt;boolean('is_active')-&gt;default(true);
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2026_05_18_create_unidad_administrativas_table.php
+Schema::create('unidades_administrativas', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;string('nombre'); // Ej: Tecnología, Ventas
+    $table-&gt;foreignId('id_nivel')-&gt;constrained('niveles_jerarquicos')-&gt;cascadeOnDelete();
+    $table-&gt;foreignId('parent_id')-&gt;nullable()-&gt;constrained('unidades_administrativas')-&gt;cascadeOnDelete();
+    $table-&gt;boolean('is_active')-&gt;default(true);
     $table-&gt;timestamps();
 });
 
@@ -352,7 +366,8 @@ Schema::create('personas', function (Blueprint $table) {
     $table-&gt;string('nombre', 100);
     $table-&gt;string('apellido', 100);
     $table-&gt;string('telefono', 20)-&gt;nullable();
-    $table-&gt;foreignId('id_oficina')-&gt;constrained('oficinas', 'id_oficina');
+    $table-&gt;unsignedBigInteger('id_unidad_administrativa')-&gt;nullable();
+    $table-&gt;foreign('id_unidad_administrativa')-&gt;references('id')-&gt;on('unidades_administrativas')-&gt;nullOnDelete();
     $table-&gt;timestamps();
 });
 
@@ -1454,7 +1469,29 @@ class UsuarioLayout extends Component
 }
 </code></pre></div>
 <p class="lead-body my-3">---</p>
-<h2 id="8-pasos-para-recrear-el-proyecto-desde-cero" class="fw-bold mt-5 mb-3 text-secondary heading-section">8. PASOS PARA RECREAR EL PROYECTO DESDE CERO</h2>
+<h2 id="8-mdulo-de-seguridad-y-directorio-de-usuarios" class="fw-bold mt-5 mb-3 text-secondary heading-section">8. MÓDULO DE SEGURIDAD Y DIRECTORIO DE USUARIOS</h2>
+<p class="lead-body my-3">El sistema integra un módulo avanzado de administración, protegido íntegramente por permisos granulares (Spatie), diseñado para gestionar el ciclo de vida, los accesos y la aprobación de nuevos integrantes.</p>
+<h3 id="81-bandeja-de-aprobaciones-sala-de-espera" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.1 Bandeja de Aprobaciones (Sala de Espera)</h3>
+<p class="lead-body my-3">Por seguridad, los nuevos registros entran por defecto en estado inactivo (<code>is_approved = false</code>) y son retenidos en una Sala de Espera.</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Middleware (<code>CheckUserApproval</code>)</strong>: Intercepta automáticamente cualquier petición de un usuario inactivo y lo redirige a la pantalla de espera o destruye su sesión, bloqueando instantáneamente el acceso a funcionalidades protegidas.</li>
+<li>  <strong>Aprobación/Rechazo</strong>: A través del <code>UsuarioAprobacionController</code>, los Administradores pueden revisar la jerarquía del solicitante (Sede &gt; Complejo &gt; División) y otorgar el acceso o rechazar la cuenta.</li>
+</ul>
+<h3 id="82-directorio-activo-de-gestin" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.2 Directorio Activo de Gestión</h3>
+<p class="lead-body my-3">La vista administrativa de usuarios (<code>admin/usuarios/index.blade.php</code>) implementa un diseño de vanguardia y altamente reactivo:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Filtro Asíncrono (Fuzzy Search)</strong>: Búsqueda dinámica en el frontend (JavaScript Vanilla) por nombre, correo electrónico o número de cédula, sin necesidad de recargas de página ni llamadas pesadas a la base de datos.</li>
+<li>  <strong>Gestor Dinámico de Roles</strong>: Permite actualizar en caliente el rol operativo (Admin, Gestor, Técnico, Usuario) mediante un modal superpuesto elegante.</li>
+<li>  <strong>Interruptor de Acceso (AJAX)</strong>: Activación y desactivación inmediata de las cuentas a través de un switch estilo Toggle que se comunica asíncronamente (vía <code>fetch</code> API) con el backend (<code>UsuarioController@toggleStatus</code>). Una cuenta desactivada expulsa de inmediato al usuario en su siguiente petición de red.</li>
+</ul>
+<h3 id="83-permiso-estricto-gestionar-usuarios" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.3 Permiso Estricto (`gestionar-usuarios`)</h3>
+<p class="lead-body my-3">Toda la lógica de Aprobación y Directorio está contenida en un subgrupo de rutas en <code>routes/web.php</code> amparado por un middleware que exige explícitamente el permiso <code>gestionar-usuarios</code>.</p>
+<ul class="list-custom mb-3">
+<li>  Esto disocia el poder de "gestionar roles" del de "gestionar cuentas", permitiendo una delegación de responsabilidades más fina en el futuro.</li>
+<li>  La UI del menú lateral de administrador evalúa este permiso dinámicamente antes de renderizar los enlaces.</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h2 id="9-pasos-para-recrear-el-proyecto-desde-cero" class="fw-bold mt-5 mb-3 text-secondary heading-section">9. PASOS PARA RECREAR EL PROYECTO DESDE CERO</h2>
 <p class="lead-body my-3">Sigue esta secuencia exacta de comandos y código para reconstruir y desplegar el sistema Helpdesk GDC en un nuevo entorno.</p>
 <h3 id="paso-1-instalacin-de-dependencias" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">Paso 1: Instalación de Dependencias</h3>
 <p class="lead-body my-3">Asegúrate de tener PHP 8.1+ y Composer instalados en tu sistema.</p>

@@ -60,6 +60,12 @@
                                 } elseif(str_contains($permiso->name, 'panel')) {
                                     $color = 'secondary'; $icon = 'bi-layout-text-sidebar-reverse';
                                     $desc = 'Permite el acceso al panel operativo y bandeja del staff.';
+                                } elseif(str_contains($permiso->name, 'usuarios')) {
+                                    $color = 'primary'; $icon = 'bi-people-fill';
+                                    $desc = 'Permite gestionar el directorio de usuarios, asignar accesos y aprobar nuevos registros.';
+                                } elseif(str_contains($permiso->name, 'configuraciones')) {
+                                    $color = 'primary'; $icon = 'bi-sliders';
+                                    $desc = 'Permite configurar la estructura organizacional y jerarquías del sistema.';
                                 }
                             @endphp
                             <div class="col-md-6">
