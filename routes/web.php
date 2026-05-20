@@ -88,6 +88,9 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
         Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuraciones.index');
         Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])->name('configuraciones.niveles.reorder');
         Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])->name('configuraciones.niveles.toggle');
+        Route::post('/configuraciones/ad', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateAd'])->name('configuraciones.ad.update');
+        Route::post('/configuraciones/ad/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleAd'])->name('configuraciones.ad.toggle');
+        Route::post('/configuraciones/ad/test', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'testAd'])->name('configuraciones.ad.test');
         Route::post('/configuraciones/niveles', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'storeNivel'])->name('configuraciones.niveles.store');
     });
 });

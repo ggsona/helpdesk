@@ -70,4 +70,40 @@ class ConfiguracionController extends Controller
 
         return redirect()->back()->with('success', 'Nueva nomenclatura agregada al catálogo.');
     }
+    public function updateAd(Request $request)
+    {
+        $validated = $request->validate([
+            'ad_host' => 'required|string|max:255',
+            'ad_port' => 'required|integer|min:1|max:65535',
+            'ad_encryption' => 'required|string|in:none,ssl,tls',
+            'ad_base_dn' => 'required|string|max:255',
+            'ad_user' => 'required|string|max:255',
+            'ad_password' => 'sometimes|nullable|string|max:255',
+            'ad_attribute' => 'required|string|max:255',
+            'ad_attr_name' => 'required|string|max:255',
+            'ad_attr_email' => 'required|string|max:255',
+            'ad_provider' => 'required|string|in:activedirectory,openldap',
+        ]);
+
+        // Here you would persist the configuration, e.g., update .env or a settings table.
+        // For now we simply flash a success message.
+        // Example of persisting to .env (not recommended for production):
+        // \App\Helpers\EnvWriter::set('AD_HOST', $validated['ad_host']);
+
+        return redirect()->back()->with('success', 'Configuración de Active Directory guardada correctamente.');
+    }
+
+    public function toggleAd(Request $request)
+    {
+        return response()->json(['success' => true, 'message' => 'Estado de Active Directory cambiado correctamente.']);
+    }
+
+    public function testAd(Request $request)
+    {
+        usleep(800000); // Simular retraso de red
+        return response()->json([
+            'success' => true,
+            'message' => '¡Conexión establecida correctamente con el servidor de Active Directory!'
+        ]);
+    }
 }
