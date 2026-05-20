@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
             <h2 class="fw-bold mb-1 theme-text">
                 <i class="bi bi-diagram-3-fill text-primary me-2"></i> Gestión del Organigrama

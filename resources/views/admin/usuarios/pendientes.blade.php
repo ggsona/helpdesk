@@ -14,7 +14,7 @@
 <div class="container-fluid py-4">
     
     <!-- Cabecera de la Página -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
             <h2 class="fw-bold mb-1 theme-text">
                 <i class="bi bi-person-check-fill text-primary me-2"></i> Bandeja de Aprobaciones
@@ -116,7 +116,7 @@
                                     </td>
                                     <!-- Acciones de Aprobación -->
                                     <td class="py-3 text-center">
-                                        <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                                             
                                             <!-- Formulario de Aprobación -->
                                             <form action="{{ route('admin.usuarios.aprobar', $user->id) }}" method="POST" class="d-flex align-items-center gap-2 m-0">

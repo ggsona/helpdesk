@@ -1490,6 +1490,32 @@ class UsuarioLayout extends Component
 <li>  Esto disocia el poder de "gestionar roles" del de "gestionar cuentas", permitiendo una delegación de responsabilidades más fina en el futuro.</li>
 <li>  La UI del menú lateral de administrador evalúa este permiso dinámicamente antes de renderizar los enlaces.</li>
 </ul>
+
+<h3 id="84-integracion-de-directorio-de-identidades-active-directory-openldap" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.4 Integración de Directorio de Identidades (Active Directory & OpenLDAP)</h3>
+<p class="lead-body my-3">El sistema cuenta con un panel avanzado de integración con directorios LDAP en la sección de configuraciones. Para dar soporte multi-institucional, se diseñó una interfaz con pestañas dinámicas que se adapta a dos proveedores principales:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Windows Active Directory</strong>:
+  <ul>
+    <li>Usuario Bind (sAMAccountName / DN): DN completo de la cuenta de lectura (ej: <code>CN=Admin,CN=Users,DC=dominio,DC=local</code>).</li>
+    <li>Atributo de Validación: <code>sAMAccountName</code> (usuario corto clásico como <code>tito.castro</code>) o <code>userPrincipalName</code> (UPN estilo correo como <code>tito.castro@empresa.com</code>).</li>
+    <li>Mapeo de Atributos: Nombre real extraído mediante <code>displayName</code> o <code>cn</code>.</li>
+  </ul>
+</li>
+<li>  <strong>OpenLDAP / Linux LDAP</strong>:
+  <ul>
+    <li>Usuario Bind: DN completo (ej: <code>cn=admin,dc=empresa,dc=com</code>).</li>
+    <li>Atributo de Búsqueda / Validación: <code>uid</code> (identificador único LDAP estándar de Linux) o <code>cn</code> (nombre común).</li>
+    <li>Mapeo de Atributos: Nombre real mapeado por defecto mediante <code>cn</code>.</li>
+  </ul>
+</li>
+</ul>
+
+<h4 class="fw-semibold mt-3 mb-2">Características Técnicas e Interacciones:</h4>
+<ul class="list-custom mb-3">
+<li>  <strong>Interruptor General (Switch Toggle)</strong>: Habilita o deshabilita la integración de identidades globalmente de manera instantánea vía AJAX, realizando un <code>POST</code> asíncrono hacia la ruta <code>admin.configuraciones.ad.toggle</code>.</li>
+<li>  <strong>Probar Conexión (LDAP Test)</strong>: Un botón con spinner de carga que realiza una prueba simulada de conexión y enlace contra el host LDAP indicado, llamando al endpoint <code>/admin/configuraciones/ad/test</code> para comprobar la viabilidad de la red antes de guardar cambios definitivos.</li>
+<li>  <strong>Persistencia</strong>: Se almacena en la estructura de configuración global y se lee a través del archivo de configuración <code>config/ad.php</code>.</li>
+</ul>
 <p class="lead-body my-3">---</p>
 <h2 id="9-pasos-para-recrear-el-proyecto-desde-cero" class="fw-bold mt-5 mb-3 text-secondary heading-section">9. PASOS PARA RECREAR EL PROYECTO DESDE CERO</h2>
 <p class="lead-body my-3">Sigue esta secuencia exacta de comandos y código para reconstruir y desplegar el sistema Helpdesk GDC en un nuevo entorno.</p>

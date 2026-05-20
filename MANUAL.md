@@ -1277,6 +1277,22 @@ Toda la lógica de Aprobación y Directorio está contenida en un subgrupo de ru
 *   Esto disocia el poder de "gestionar roles" del de "gestionar cuentas", permitiendo una delegación de responsabilidades más fina en el futuro.
 *   La UI del menú lateral de administrador evalúa este permiso dinámicamente antes de renderizar los enlaces.
 
+### 8.4 Integración de Directorio de Identidades (Active Directory & OpenLDAP)
+El sistema cuenta con un panel avanzado de integración con directorios LDAP en la sección de configuraciones. Para dar soporte multi-institucional, se diseñó una interfaz con pestañas dinámicas que se adapta a dos proveedores principales:
+1. **Windows Active Directory**:
+   * **Usuario Bind (sAMAccountName / DN)**: DN completo de la cuenta de lectura (ej: `CN=Admin,CN=Users,DC=dominio,DC=local`).
+   * **Atributo de Validación**: `sAMAccountName` (usuario corto clásico como `tito.castro`) o `userPrincipalName` (UPN estilo correo como `tito.castro@empresa.com`).
+   * **Mapeo de Atributos**: Nombre real extraído mediante `displayName` o `cn`.
+2. **OpenLDAP / Linux LDAP**:
+   * **Usuario Bind**: DN completo (ej: `cn=admin,dc=empresa,dc=com`).
+   * **Atributo de Búsqueda / Validación**: `uid` (identificador único LDAP estándar de Linux) o `cn` (nombre común).
+   * **Mapeo de Atributos**: Nombre real mapeado por defecto mediante `cn`.
+
+#### Características Técnicas e Interacciones:
+* **Interruptor General (Switch Toggle)**: Habilita o deshabilita la integración de identidades globalmente de manera instantánea vía AJAX, realizando un `POST` asíncrono hacia la ruta `admin.configuraciones.ad.toggle`.
+* **Probar Conexión (LDAP Test)**: Un botón con spinner de carga que realiza una prueba simulada de conexión y enlace contra el host LDAP indicado, llamando al endpoint `/admin/configuraciones/ad/test` para comprobar la viabilidad de la red antes de guardar cambios definitivos.
+* **Persistencia**: Se almacena en la estructura de configuración global y se lee a través del archivo de configuración `config/ad.php`.
+
 ---
 
 ## 9. PASOS PARA RECREAR EL PROYECTO DESDE CERO

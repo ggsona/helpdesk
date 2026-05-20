@@ -152,6 +152,63 @@
             }
         }
 
+        /* Responsive Sidebar y Mobile Header */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                position: fixed !important;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1045 !important;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            }
+            #sidebar.show {
+                transform: translateX(0);
+            }
+            #content {
+                padding: 1.5rem !important;
+                width: 100%;
+            }
+            /* Backdrop al abrir el sidebar */
+            .sidebar-backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.45);
+                backdrop-filter: blur(4px);
+                z-index: 1040;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+            .sidebar-backdrop.show {
+                opacity: 1;
+                visibility: visible;
+            }
+            /* Header móvil visible únicamente en pantallas pequeñas */
+            .mobile-header {
+                display: flex !important;
+                align-items: center;
+                background: var(--sb-bg);
+                border-bottom: 1px solid var(--bs-border-color);
+                padding: 0.8rem 1.5rem;
+                position: sticky;
+                top: 0;
+                z-index: 1030;
+                width: 100%;
+                transition: background-color 0.3s ease;
+            }
+        }
+        @media (min-width: 992px) {
+            .mobile-header {
+                display: none !important;
+            }
+        }
+
         /* Footer de Usuario fijo abajo */
         .user-footer {
             margin-top: auto; /* Empuja hacia abajo */
@@ -343,6 +400,15 @@
         </nav>
 
         <main id="content">
+            <!-- Header Móvil para pantallas táctiles/pequeñas -->
+            <div class="mobile-header d-none justify-content-between align-items-center mb-3 rounded-3 shadow-sm border border-secondary border-opacity-10">
+                <button class="btn btn-outline-secondary border-0 p-1 shadow-none" id="btn-toggle-sidebar">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-headset me-2"></i>Helpdesk GDC</h6>
+                <div style="width: 32px;"></div> <!-- Nivelador óptico -->
+            </div>
+
             <div class="container-fluid">
                 @yield('content')
                 @if(isset($slot))
@@ -351,6 +417,9 @@
             </div>
         </main>
     </div>
+
+    <!-- Backdrop para cerrar menú táctil en móviles al pulsar fuera -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -362,6 +431,25 @@
         }
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-bs-theme', savedTheme);
+
+        // Control del sidebar responsivo
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnToggle = document.getElementById('btn-toggle-sidebar');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            
+            if (btnToggle && sidebar && backdrop) {
+                btnToggle.addEventListener('click', function() {
+                    sidebar.classList.add('show');
+                    backdrop.classList.add('show');
+                });
+                
+                backdrop.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                    backdrop.classList.remove('show');
+                });
+            }
+        });
     </script>
 </body>
 </html>
