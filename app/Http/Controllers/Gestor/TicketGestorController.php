@@ -108,7 +108,7 @@ class TicketGestorController extends Controller
 
     public function show($id)
     {
-        $ticket = Ticket::with(['usuario.persona.oficina', 'asignacion.tecnico'])->findOrFail($id);
+        $ticket = Ticket::with(['usuario.persona.unidadAdministrativa', 'asignacion.tecnico'])->findOrFail($id);
         $tecnicos = User::role('tecnico')->get();
         $prioridades = \App\Models\Prioridad::all();
 

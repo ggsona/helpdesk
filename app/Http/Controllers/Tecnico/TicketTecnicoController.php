@@ -28,7 +28,7 @@ class TicketTecnicoController extends Controller
         $usuarioId = Auth::id();
 
         // 1. Tickets asignados (se mantiene igual por ahora)
-        $queryAsignados = Ticket::with(['prioridad', 'usuario.persona.oficina'])
+        $queryAsignados = Ticket::with(['prioridad', 'usuario.persona.unidadAdministrativa'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
             })
@@ -40,7 +40,7 @@ class TicketTecnicoController extends Controller
         $ticketsBajos    = (clone $queryAsignados)->where('id_prioridad', 1)->latest()->get();
 
         // 2. ACTUALIZACIÓN AQUÍ: Agregamos 'solucion' a la carga
-        $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.oficina', 'solucion'])
+        $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.unidadAdministrativa', 'solucion'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
             })
@@ -64,7 +64,7 @@ class TicketTecnicoController extends Controller
     {
         $usuarioId = Auth::id();
 
-        $ticket = Ticket::with(['usuario.persona.oficina', 'asignacion.tecnico', 'comentarios.usuario', 'prioridad'])
+        $ticket = Ticket::with(['usuario.persona.unidadAdministrativa', 'asignacion.tecnico', 'comentarios.usuario', 'prioridad'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
             })

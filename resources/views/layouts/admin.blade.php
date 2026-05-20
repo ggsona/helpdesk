@@ -108,7 +108,48 @@
 
         [data-bs-theme="dark"] .card-premium {
             background: #1a1c1e;
-            
+        }
+        
+        /* Anular bordes de focus nativos del navegador */
+        .card-premium:focus, .card-premium:active, .card-premium:focus-visible {
+            outline: none !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        /* Prevenir que el contenido desborde las tarjetas en cualquier pantalla */
+        .card-premium {
+            overflow: hidden;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        /* Asegurar que las columnas del grid respeten sus límites */
+        .row > [class*="col-"] {
+            min-width: 0;
+        }
+
+        /* Truncar texto de una línea sin romper el layout */
+        .text-truncate-safe {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+            display: block;
+        }
+
+        /* Fechas y textos sin espacios: romper con overflow-wrap */
+        .text-overflow-wrap {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+        }
+
+        /* En pantallas menores a 768px, las columnas siempre ocupan el ancho completo */
+        @media (max-width: 767.98px) {
+            .col-md-4, .col-md-8 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
         }
 
         /* Footer de Usuario fijo abajo */

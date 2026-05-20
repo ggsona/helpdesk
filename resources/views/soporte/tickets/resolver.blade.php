@@ -53,7 +53,16 @@
                         <div class="p-3 rounded-3 mb-4 bg-light theme-bg-dark border border-secondary border-opacity-10">
                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Usuario Afectado</small>
                             <span class="theme-text fw-semibold d-block"><i class="bi bi-person me-1"></i>{{ $ticket->usuario->name }}</span>
-                            <span class="theme-text text-muted small d-block">{{ $ticket->usuario->persona->oficina->nombre_oficina ?? 'Sin Sede' }}</span>
+                            @if($ticket->usuario->persona->unidadAdministrativa)
+                                <span class="theme-text text-muted small d-block">
+                                    {{ $ticket->usuario->persona->unidadAdministrativa->nombre }}
+                                    @if($ticket->usuario->persona->unidadAdministrativa->trashed())
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-1 fw-bold" style="font-size: 0.65rem;">(Archivada el {{ date('d/m/Y', strtotime($ticket->usuario->persona->unidadAdministrativa->deleted_at)) }})</span>
+                                    @endif
+                                </span>
+                            @else
+                                <span class="theme-text text-muted small d-block">Sin Sede</span>
+                            @endif
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 shadow-sm mb-2 fw-bold">

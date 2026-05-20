@@ -37,9 +37,7 @@
                         <div class="d-flex justify-content-between">
                             <h5 class="fw-bold mb-3 text-body">Asunto: {{ $ticket->asunto }}</h5>
                         </div>
-                        <p class=" border-start border-4 border-primary ps-3 py-2 bg-body rounded-end">
-                            {{ $ticket->descripcion_problema ?? 'Sin descripción proporcionada.' }}
-                        </p>
+                        <p class=" border-start border-4 border-primary ps-3 py-2 bg-body rounded-end" style="white-space: pre-line;">{{ $ticket->descripcion_problema ?? 'Sin descripción proporcionada.' }}</p>
                     </div>
                 </div>
 
@@ -106,7 +104,7 @@
                                                 {{ $comentario->created_at->format('H:i | d/m/y') }}
                                             </small>
                                         </div>
-                                        <p class="mb-0" style="font-size: 0.9rem; line-height: 1.4;">{{ $comentario->mensaje }}</p>
+                                        <p class="mb-0" style="font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap;">{{ $comentario->mensaje }}</p>
                                     </div>
                                 </div>
                             @endforeach

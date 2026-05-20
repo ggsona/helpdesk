@@ -20,6 +20,6 @@ class Persona extends Model
 
     public function unidadAdministrativa()
     {
-        return $this->belongsTo(UnidadAdministrativa::class, 'id_unidad_administrativa');
+        return $this->belongsTo(UnidadAdministrativa::class, 'id_unidad_administrativa')->withTrashed();
     }
 }

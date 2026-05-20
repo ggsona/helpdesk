@@ -14,7 +14,7 @@
             </a>
         @endcan
 
-        <div class="p-4 card-premium border-start border-primary border-5 d-flex flex-wrap justify-content-between align-items-center shadow-sm">
+        <div class="p-4 card-premium d-flex flex-wrap justify-content-between align-items-center shadow-sm">
             <div class="mb-3 mb-md-0">
                 <h2 class="fw-bold mb-1 theme-text">Ticket #{{ $ticket->id_ticket }}</h2>
                 <p class="text-secondary small mb-0">
@@ -56,13 +56,11 @@
         {{-- Columna Principal: Detalle y Chat --}}
         <div class="col-lg-8">
             {{-- Detalle del Problema --}}
-            <div class="card-premium mb-4 border-start border-primary border-5 shadow-sm">
+            <div class="card-premium mb-4 shadow-sm">
                 <div class="card-body p-4">
                     <h5 class="fw-bold text-primary mb-3">{{ $ticket->asunto }}</h5>
                     <div class="bg-secondary bg-opacity-10 p-3 rounded-3 theme-bg-dark">
-                        <p class="mb-0 theme-text" style="white-space: pre-line; line-height: 1.6;">
-                            {{ $ticket->descripcion_problema ?? 'Sin descripción técnica detallada.' }}
-                        </p>
+                        <p class="mb-0 theme-text" style="white-space: pre-line; line-height: 1.6;">{{ $ticket->descripcion_problema ?? 'Sin descripción técnica detallada.' }}</p>
                     </div>
                 </div>
             </div>
@@ -194,67 +192,77 @@
         {{-- Sidebar Lateral: Ficha Informativa del Incidente --}}
         <div class="col-lg-4">
             {{-- Tarjeta del Cliente --}}
-            <div class="card-premium mb-4 shadow-sm text-center">
-                <div class="card-body p-4">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px;">
-                        <i class="bi bi-person-circle fs-1 text-primary"></i>
-                    </div>
-                    <h6 class="fw-bold mb-1 theme-text">{{ $ticket->usuario->name }}</h6>
-                    <p class="text-secondary small mb-2">{{ $ticket->usuario->email }}</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25">
-                            <i class="bi bi-building me-1"></i>{{ $ticket->usuario->persona->oficina->nombre_oficina ?? 'Sin Sede' }}
-                        </span>
+            <div class="card-premium mb-4 shadow-sm text-center p-3 p-lg-4" style="min-width: 0;">
+                <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; flex-shrink: 0;">
+                    <i class="bi bi-person-circle fs-2 text-secondary opacity-75"></i>
+                </div>
+                <h6 class="fw-bold mb-1 theme-text text-truncate" title="{{ $ticket->usuario->name }}">{{ $ticket->usuario->name }}</h6>
+                <p class="text-secondary small mb-3 text-truncate" title="{{ $ticket->usuario->email }}">{{ $ticket->usuario->email }}</p>
+                <div class="d-flex align-items-start gap-2 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-3 p-2 text-start" style="font-size: 0.8rem; min-width: 0;">
+                    <i class="bi bi-building opacity-60 flex-shrink-0 mt-1"></i>
+                    <div style="min-width: 0; flex: 1;">
+                        @if($ticket->usuario->persona->unidadAdministrativa)
+                            <span class="fw-semibold text-secondary d-block" style="word-break: break-word;">{{ $ticket->usuario->persona->unidadAdministrativa->nombre }}</span>
+                            @if($ticket->usuario->persona->unidadAdministrativa->trashed())
+                                <span class="text-danger d-block mt-1" style="font-size: 0.7rem; word-break: break-word;">
+                                    <i class="bi bi-archive-fill me-1"></i>Archivada el {{ date('d/m/Y', strtotime($ticket->usuario->persona->unidadAdministrativa->deleted_at)) }}
+                                </span>
+                            @endif
+                        @else
+                            <span class="text-secondary">Sin Sede registrada</span>
+                        @endif
                     </div>
                 </div>
             </div>
 
             {{-- Ficha de Control Técnico --}}
-            <div class="card card-premium shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold mb-4 border-bottom border-secondary border-opacity-25 pb-2 text-uppercase small text-secondary" style="letter-spacing: 0.5px;">Detalles Técnicos</h6>
-                    
-                    <div class="mb-3">
-                        <label class="text-secondary small d-block mb-1">Categoría General</label>
-                        <span class="fw-bold theme-text"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria->nombre_categoria ?? 'S/C' }}</span>
-                    </div>
+            <div class="card-premium shadow-sm mb-4 p-3 p-lg-4" style="min-width: 0;">
+                <h6 class="fw-bold mb-4 border-bottom border-secondary border-opacity-25 pb-2 text-secondary text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Detalles Técnicos</h6>
+                
+                <div class="mb-3">
+                    <label class="text-secondary small d-block mb-1">Categoría General</label>
+                    <span class="fw-bold theme-text"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria->nombre_categoria ?? 'S/C' }}</span>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="text-secondary small d-block mb-1">Dispositivo Relacionado</label>
-                        <span class="fw-bold theme-text"><i class="bi bi-laptop me-2 text-primary"></i>{{ $ticket->tipoEquipo->nombre_tipo_equipo ?? 'No definido' }}</span>
-                    </div>
+                <div class="mb-3">
+                    <label class="text-secondary small d-block mb-1">Dispositivo Relacionado</label>
+                    <span class="fw-bold theme-text"><i class="bi bi-laptop me-2 text-primary"></i>{{ $ticket->tipoEquipo->nombre_tipo_equipo ?? 'No definido' }}</span>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="text-secondary small d-block mb-1">Estado de Urgencia</label>
-                        @php
-                            $prioridad = $ticket->prioridad->nombre_prioridad ?? 'N/A';
-                            $textClass = match($prioridad) {
-                                'Crítica', 'Critica' => 'text-danger',
-                                'Alta' => 'text-warning',
-                                'Media' => 'text-info',
-                                'Baja' => 'text-success',
-                                default => 'text-secondary'
-                            };
-                        @endphp
-                        <span class="fw-bold {{ $textClass }}">
-                            <i class="bi bi-lightning-fill me-2"></i>{{ $prioridad }}
-                        </span>
-                    </div>
+                <div class="mb-3">
+                    <label class="text-secondary small d-block mb-1">Estado de Urgencia</label>
+                    @php
+                        $prioridad = $ticket->prioridad->nombre_prioridad ?? 'N/A';
+                        $textClass = match($prioridad) {
+                            'Crítica', 'Critica' => 'text-danger',
+                            'Alta' => 'text-warning',
+                            'Media' => 'text-info',
+                            'Baja' => 'text-success',
+                            default => 'text-secondary'
+                        };
+                    @endphp
+                    <span class="fw-bold {{ $textClass }}">
+                        <i class="bi bi-lightning-fill me-2"></i>{{ $prioridad }}
+                    </span>
+                </div>
 
-                    <div class="mb-0 text-center pt-4 border-top border-secondary border-opacity-25 mt-4">
-                        <label class="text-secondary small d-block mb-2 fw-semibold">Especialista Asignado</label>
-                        @if($ticket->asignacion)
-                            <div class="p-3 bg-success bg-opacity-10 rounded border border-success border-opacity-25 shadow-sm">
-                                <span class="fw-bold text-success" style="font-size: 0.95rem;">
-                                    <i class="bi bi-person-check-fill me-1"></i> {{ $ticket->asignacion->tecnico->name }}
-                                </span>
-                            </div>
-                        @else
-                            <div class="p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 shadow-sm">
-                                <span class="text-warning fw-bold small"><i class="bi bi-person-fill-dash me-1"></i> SIN TÉCNICO ASIGNADO</span>
-                            </div>
-                        @endif
-                    </div>
+                <div class="mb-0 pt-4 border-top border-secondary border-opacity-25 mt-4" style="min-width: 0;">
+                    <label class="text-secondary small d-block mb-2 fw-semibold">Especialista Asignado</label>
+                    @if($ticket->asignacion)
+                        <div class="p-2 bg-success bg-opacity-10 rounded border border-success border-opacity-25 shadow-sm">
+                            <span class="fw-bold text-success small d-flex align-items-center gap-1" style="word-break: break-word;">
+                                <i class="bi bi-person-check-fill flex-shrink-0"></i>
+                                <span>{{ $ticket->asignacion->tecnico->name }}</span>
+                            </span>
+                        </div>
+                    @else
+                        <div class="p-2 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 shadow-sm">
+                            <span class="text-warning fw-bold small d-flex align-items-center gap-1">
+                                <i class="bi bi-person-fill-dash flex-shrink-0"></i>
+                                <span>Sin técnico asignado</span>
+                            </span>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
