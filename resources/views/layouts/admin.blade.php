@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
+    @stack("styles") {{-- Para CSS de vistas específicas --}}
+
     <style>
         :root { 
             --sb-width: 270px;
@@ -20,14 +22,14 @@
             --sb-bg: #111214;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main) !important;
+        body {
+            font-family: "Inter", sans-serif; 
+            background-color: var(--bg-main) !important; 
             transition: all 0.3s ease;
         }
         
         /* Sidebar Fijo y Estructurado */
-        #sidebar { 
+        #sidebar {
             width: var(--sb-width); 
             min-width: var(--sb-width); 
             height: 100vh;
@@ -47,7 +49,7 @@
             overflow-y: auto;
             scrollbar-width: thin;
         }
-        .sidebar-scrollable::-webkit-scrollbar {
+        .sidebar-scrollable::-webkit-scrollbar{ 
             width: 4px;
         }
         .sidebar-scrollable::-webkit-scrollbar-track {
@@ -81,7 +83,7 @@
             background-color: #1e293b !important;
         }
 
-        .nav-link { 
+        .nav-link {
             color: var(--bs-body-color) !important; 
             font-size: 0.88rem; 
             font-weight: 500;
@@ -90,11 +92,17 @@
             margin: 2px 10px;
         }
 
-        .nav-link:hover { background: var(--bs-secondary-bg); }
-        .nav-link.active { background: #0d6efd !important; color: #fff !important; }
+        .nav-link:hover {
+            background: var(--bs-secondary-bg);
+        }
+        .nav-link.active {
+            background: #0d6efd !important; color: #fff !important;
+        }
 
         /* Contenedor de Contenido */
-        #content { flex-grow: 1; padding: 2.5rem; }
+        #content {
+            flex-grow: 1; padding: 2.5rem;
+        }
 
         /* Tarjeta Premium que reacciona al tema */
         .card-premium {
@@ -184,8 +192,8 @@
                 opacity: 0;
                 visibility: hidden;
                 transition: opacity 0.3s ease, visibility 0.3s ease;
-            }
-            .sidebar-backdrop.show {
+            }{
+            .sidebar-backdrop.show 
                 opacity: 1;
                 visibility: visible;
             }
@@ -287,47 +295,47 @@
                 <ul class="nav nav-pills flex-column">
                     {{-- DASHBOARD COMPARTIDO --}}
                     <li>
-                        <a href="{{ route('soporte.dashboard') }}" class="nav-link {{ request()->routeIs('soporte.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route("soporte.dashboard") }}" class="nav-link {{ request()->routeIs("soporte.dashboard") ? "active" : "" }}">
                             <i class="bi bi-grid-1x2-fill me-3"></i>Dashboard
                         </a>
                     </li>
 
                     {{-- GESTIÓN DE TICKETS SEGÚN ROL --}}
-                    @can('asignar-tickets')
+                    @can("asignar-tickets")
                         <li>
-                            <a href="{{ route('soporte.tickets.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.*') && !request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
+                            <a href="{{ route("soporte.tickets.index") }}" class="nav-link {{ request()->routeIs("soporte.tickets.*") && !request()->routeIs("soporte.tickets.tecnico.*") ? "active" : "" }}">
                                 <i class="bi bi-ticket-detailed-fill me-3"></i>Mesa de Despacho
                             </a>
                         </li>
                     @endcan
                     
-                    @can('resolver-tickets')
+                    @can("resolver-tickets")
                         <li>
-                            <a href="{{ route('soporte.tickets.tecnico.index') }}" class="nav-link {{ request()->routeIs('soporte.tickets.tecnico.*') ? 'active' : '' }}">
+                            <a href="{{ route("soporte.tickets.tecnico.index") }}" class="nav-link {{ request()->routeIs("soporte.tickets.tecnico.*") ? "active" : "" }}">
                                 <i class="bi bi-ticket-perforated me-3"></i>Mis Tareas Activas
                             </a>
                         </li>
                     @endcan
 
                     {{-- CONTROL DE ACCESOS (SÓLO ADMINISTRADORES) --}}
-                    @if(auth()->user()->can('gestionar-roles') || auth()->user()->can('gestionar-usuarios'))
+                    @if(auth()->user()->can("gestionar-roles") || auth()->user()->can("gestionar-usuarios"))
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Control de Accesos</small>
                         
-                        @can('gestionar-roles')
+                        @can("gestionar-roles")
                         <li>
-                            <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                            <a href="{{ route("admin.roles.index") }}" class="nav-link {{ request()->routeIs("admin.roles.*") ? "active" : "" }}">
                                 <i class="bi bi-shield-lock-fill me-3"></i>Roles y Permisos
                             </a>
                         </li>
                         @endcan
                         
-                        @can('gestionar-usuarios')
+                        @can("gestionar-usuarios")
                         <li>
                             @php
-                                $pendientesCount = \App\Models\User::where('is_approved', false)->count();
+                                $pendientesCount = \App\Models\User::where("is_approved", false)->count();
                             @endphp
-                            <a href="{{ route('admin.usuarios.pendientes') }}" class="nav-link {{ request()->routeIs('admin.usuarios.pendientes') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+                            <a href="{{ route("admin.usuarios.pendientes") }}" class="nav-link {{ request()->routeIs("admin.usuarios.pendientes") ? "active" : "" }} d-flex justify-content-between align-items-center">
                                 <span>
                                     <i class="bi bi-person-fill-gear me-3"></i>Aprobación de Usuarios
                                 </span>
@@ -342,23 +350,27 @@
                     @endif
 
                     {{-- CONFIGURACIÓN Y ACTIVOS --}}
-                    @if(auth()->user()->can('gestionar-usuarios') || auth()->user()->can('ver-configuraciones') || auth()->user()->can('asignar-tickets'))
+                    @if(auth()->user()->can("gestionar-usuarios") || auth()->user()->can("ver-configuraciones") || auth()->user()->can("asignar-tickets") || auth()->user()->can("gestionar-categorias"))
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
 
-                        @can('gestionar-usuarios')
-                        <li><a href="{{ route('admin.usuarios.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios.index') ? 'active' : '' }}"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
+                        @can("gestionar-usuarios")
+                        <li><a href="{{ route("admin.usuarios.index") }}" class="nav-link {{ request()->routeIs("admin.usuarios.index") ? "active" : "" }}"><i class="bi bi-people-fill me-3"></i>Usuarios</a></li>
                         @endcan
 
-                        @can('ver-configuraciones')
-                        <li><a href="{{ route('admin.estructura.index') }}" class="nav-link {{ request()->routeIs('admin.estructura.*') ? 'active' : '' }}"><i class="bi bi-diagram-3-fill me-3"></i>Organigrama</a></li>
+                        @can("ver-configuraciones")
+                        <li><a href="{{ route("admin.estructura.index") }}" class="nav-link {{ request()->routeIs("admin.estructura.*") ? "active" : "" }}"><i class="bi bi-diagram-3-fill me-3"></i>Organigrama</a></li>
                         @endcan
                         
-                        @can('asignar-tickets')
-                        <li><a href="#" class="nav-link"><i class="bi bi-tags-fill me-3"></i>Categorías</a></li>
+                        @can("gestionar-categorias")
+                         <li>
+                            <a href="{{ route("admin.categorias.index") }}" class="nav-link {{ request()->routeIs("admin.categorias.*") ? "active" : "" }}">
+                                <i class="bi bi-tags-fill me-3"></i>Categorías
+                            </a>
+                        </li>
+                        @endcan
                         <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
                         <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
-                        @endcan
                     @endif
                 </ul>
             </div>
@@ -372,22 +384,22 @@
                         <div class="ms-3 text-start">
                             <p class="mb-0 fw-bold small text-truncate" style="max-width: 120px;">{{ Auth::user()->name }}</p>
                             <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.6rem; letter-spacing: 0.3px;">
-                                {{ Auth::user()->roles->pluck('name')->implode(', ') ?: 'Soporte' }}
+                                {{ Auth::user()->roles->pluck("name")->implode(", ") ?: "Soporte" }}
                             </small>
                         </div>
                         <i class="bi bi-chevron-up ms-auto text-muted small"></i>
                     </button>
                     <ul class="dropdown-menu shadow-lg border-0 mb-2">
-                        <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
+                        <li><a class="dropdown-item py-2" href="{{ route("profile.edit") }}"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
                         
-                        @can('ver-configuraciones')
-                        <li><a class="dropdown-item py-2" href="{{ route('admin.configuraciones.index') }}"><i class="bi bi-gear-fill me-2 text-secondary"></i> Ajustes del Sistema</a></li>
+                        @can("ver-configuraciones")
+                        <li><a class="dropdown-item py-2" href="{{ route("admin.configuraciones.index") }}"><i class="bi bi-gear-fill me-2 text-secondary"></i> Ajustes del Sistema</a></li>
                         @endcan
                         
                         <li><button class="dropdown-item py-2" onclick="toggleTheme()"><i class="bi bi-moon-stars me-2"></i> Cambiar Tema</button></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route("logout") }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item py-2 text-danger">
                                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
@@ -410,7 +422,7 @@
             </div>
 
             <div class="container-fluid">
-                @yield('content')
+                @yield("content")
                 @if(isset($slot))
                     {{ $slot }} {{-- Para la vista de perfil que usa x-dynamic-component --}}
                 @endif
@@ -421,35 +433,37 @@
     <!-- Backdrop para cerrar menú táctil en móviles al pulsar fuera -->
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> {{-- Añadir jQuery --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function toggleTheme() {
             const html = document.documentElement;
-            const target = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-bs-theme', target);
-            localStorage.setItem('theme', target);
+            const target = html.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+            html.setAttribute("data-bs-theme", target);
+            localStorage.setItem("theme", target);
         }
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-bs-theme", savedTheme);
 
         // Control del sidebar responsivo
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnToggle = document.getElementById('btn-toggle-sidebar');
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
+        document.addEventListener("DOMContentLoaded", function() {
+            const btnToggle = document.getElementById("btn-toggle-sidebar");
+            const sidebar = document.getElementById("sidebar");
+            const backdrop = document.getElementById("sidebar-backdrop");
             
             if (btnToggle && sidebar && backdrop) {
-                btnToggle.addEventListener('click', function() {
-                    sidebar.classList.add('show');
-                    backdrop.classList.add('show');
+                btnToggle.addEventListener("click", function() {
+                    sidebar.classList.add("show");
+                    backdrop.classList.add("show");
                 });
                 
-                backdrop.addEventListener('click', function() {
-                    sidebar.classList.remove('show');
-                    backdrop.classList.remove('show');
+                backdrop.addEventListener("click", function() {
+                    sidebar.classList.remove("show");
+                    backdrop.classList.remove("show");
                 });
             }
         });
     </script>
+    @stack("scripts") {{-- Para JS de vistas específicas --}}
 </body>
 </html>

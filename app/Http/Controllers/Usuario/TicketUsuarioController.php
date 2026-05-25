@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Usuario; // <-- Actualizado a Usuario
+namespace App\Http\Controllers\Usuario;
 
-use App\Http\Controllers\Controller; // <-- IMPORTANTE: Debes importar el controlador base
+use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\TicketAdjunto;
 use Illuminate\Support\Facades\Storage;
@@ -13,186 +13,170 @@ use App\Models\Prioridad;
 use App\Models\TipoEquipo;
 use App\Models\TicketComentario;
 
-class TicketUsuarioController extends Controller // <-- Actualizado a Usuario
+class TicketUsuarioController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::where('id_usuario', Auth::id())->latest()->get();
-        return view('usuario.tickets.index', compact('tickets')); // Cambio a vista usuario
+        $tickets = Ticket::where("id_usuario", Auth::id())->latest()->get();
+        return view("usuario.tickets.index", compact("tickets"));
     }
 
     public function home()
     {
-        return view('usuario.home'); // Esta es la vista que me acabas de mostrar
+        return view("usuario.home");
     }
 
     public function create()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::where("estado", true)->get(); // Solo categorías activas
         $prioridades = Prioridad::all();
         $tiposEquipo = TipoEquipo::all();
         
-        return view('usuario.tickets.create', compact('categorias', 'prioridades', 'tiposEquipo')); // Cambio a vista usuario
+        return view("usuario.tickets.create", compact("categorias", "prioridades", "tiposEquipo"));
     }
 
     public function store(Request $request)
     {
         // 1. Validar los datos
         $request->validate([
-            'asunto' => 'required|string|max:200',
-            'descripcion_problema' => 'required|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria',
-            'id_tipo_equipo' => 'required|exists:tipos_equipo,id_tipo_equipo',
-            'adjuntos.*' => 'nullable|file|max:10240',
+            "asunto" => "required|string|max:200",
+            "descripcion_problema" => "required|string",
+            "id_categoria" => "required|exists:categorias,id_categoria",
+            "id_tipo_equipo" => "required|exists:tipos_equipo,id_tipo_equipo",
+            "adjuntos.*" => "nullable|file|max:10240",
         ]);
 
         // 2. Crear el Ticket como BORRADOR
         $ticket = Ticket::create([
-            'id_usuario' => auth()->id(),
-            'asunto' => $request->asunto,
-            'id_categoria' => $request->id_categoria,
-            'id_tipo_equipo' => $request->id_tipo_equipo,
-            'descripcion_problema' => $request->descripcion_problema,
-            'id_prioridad' => null, // Opcional en borrador
-            'estatus' => 0, // <--- CAMBIO: 0 ahora significa "Borrador"
+            "id_usuario" => auth()->id(),
+            "asunto" => $request->asunto,
+            "id_categoria" => $request->id_categoria,
+            "id_tipo_equipo" => $request->id_tipo_equipo,
+            "descripcion_problema" => $request->descripcion_problema,
+            "id_prioridad" => null,
+            "estatus" => 0,
         ]);
 
         // 3. Procesar Adjuntos
-        if ($request->hasFile('adjuntos')) {
-            foreach ($request->file('adjuntos') as $archivo) {
-                $ruta = $archivo->store('tickets/' . $ticket->id_ticket, 'public');
+        if ($request->hasFile("adjuntos")) {
+            foreach ($request->file("adjuntos") as $archivo) {
+                $ruta = $archivo->store("tickets/". $ticket->id_ticket, "public");
 
                 TicketAdjunto::create([
-                    'id_ticket' => $ticket->id_ticket,
-                    'ruta_archivo' => $ruta,
-                    'nombre_original' => $archivo->getClientOriginalName(),
-                    'tipo_mimo' => $archivo->getMimeType(),
-                    'tamano' => $archivo->getSize(),
+                    "id_ticket" => $ticket->id_ticket,
+                    "ruta_archivo" => $ruta,
+                    "nombre_original" => $archivo->getClientOriginalName(),
+                    "tipo_mimo" => $archivo->getMimeType(),
+                    "tamano" => $archivo->getSize(),
                 ]);
             }
         }
 
-        // Retornamos a la lista con un mensaje que aclare que es un borrador
-        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
-            ->with('success', 'Ticket guardado como borrador. Puedes revisarlo antes de enviarlo.');
+        return redirect()->route("usuario.tickets.index")
+            ->with("success", "Ticket guardado como borrador. Puedes revisarlo antes de enviarlo.");
     }
 
-    public function enviar(Ticket $ticket) 
+    public function enviar(Ticket $ticket)
     {
-        // Verificamos que el ticket pertenezca al usuario para evitar que alguien envíe tickets ajenos
         if ($ticket->id_usuario !== auth()->id()) {
             abort(403);
         }
 
-        $ticket->update(['estatus' => 1]); // Pasa de Borrador (0) a Abierto (1)
+        $ticket->update(["estatus" => 1]);
 
-        return back()->with('success', '¡Ticket enviado con éxito al equipo de soporte!');
+        return back()->with("success", "¡Ticket enviado con éxito al equipo de soporte!");
     }
 
     public function show($id)
     {
-        // Usamos 'with' para traer los comentarios y sus autores en una sola consulta (Eager Loading)
         $ticket = Ticket::with([
-            'categoria', 
-            'tecnico', 
-            'prioridad', 
-            'adjuntos', 
-            'comentarios.usuario' // <--- Importante: cargar el chat y el nombre del que escribió
+            "categoria", 
+            "tecnico", 
+            "prioridad", 
+            "adjuntos", 
+            "comentarios.usuario"
         ])
-        ->where('id_usuario', auth()->id())
+        ->where("id_usuario", auth()->id())
         ->findOrFail($id);
 
-        return view('usuario.tickets.show', compact('ticket')); // Cambio a vista usuario
+        return view("usuario.tickets.show", compact("ticket"));
     }
 
     public function edit($id)
     {
-        // Solo permitimos editar si es borrador (estatus 0)
-        $ticket = Ticket::where('id_usuario', auth()->id())
-                        ->where('estatus', 0)
+        $ticket = Ticket::where("id_usuario", auth()->id())
+                        ->where("estatus", 0)
                         ->findOrFail($id);
                         
-        $categorias = Categoria::all();
-        return view('usuario.tickets.edit', compact('ticket', 'categorias')); // Cambio a vista usuario
+        $categorias = Categoria::where("estado", true)->get(); // Solo categorías activas
+        return view("usuario.tickets.edit", compact("ticket", "categorias"));
     }
 
     public function destroy($id)
     {
-        $ticket = Ticket::where('id_usuario', auth()->id())
-                        ->where('estatus', 0)
+        $ticket = Ticket::where("id_usuario", auth()->id())
+                        ->where("estatus", 0)
                         ->findOrFail($id);
         
-        // Opcional: Eliminar archivos físicos antes de borrar el registro
         $ticket->delete();
 
-        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
-                        ->with('success', 'Ticket eliminado correctamente.');
+        return redirect()->route("usuario.tickets.index")
+                        ->with("success", "Ticket eliminado correctamente.");
     }
 
     public function update(Request $request, $id)
     {
-        // 1. Validar que el ticket pertenezca al usuario y sea borrador
-        $ticket = Ticket::where('id_usuario', auth()->id())
-                        ->where('estatus', 0)
+        $ticket = Ticket::where("id_usuario", auth()->id())
+                        ->where("estatus", 0)
                         ->findOrFail($id);
 
-        // 2. Validar los datos de entrada
         $request->validate([
-            'asunto' => 'required|string|max:255',
-            'descripcion_problema' => 'nullable|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria',
-            'archivos.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+            "asunto" => "required|string|max:255",
+            "descripcion_problema" => "nullable|string",
+            "id_categoria" => "required|exists:categorias,id_categoria",
+            "archivos.*" => "nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048",
         ]);
 
-        // 3. Actualizar datos básicos
         $ticket->update([
-            'asunto' => $request->asunto,
-            'descripcion_problema' => $request->descripcion_problema,
-            'id_categoria' => $request->id_categoria,
+            "asunto" => $request->asunto,
+            "descripcion_problema" => $request->descripcion_problema,
+            "id_categoria" => $request->id_categoria,
         ]);
 
-        // 4. Manejar nuevos archivos adjuntos (si existen)
-        if ($request->hasFile('archivos')) {
-            foreach ($request->file('archivos') as $file) {
-                $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-                $ruta = $file->storeAs('adjuntos_tickets', $nombreArchivo, 'public');
+        if ($request->hasFile("archivos")) {
+            foreach ($request->file("archivos") as $file) {
+                $nombreArchivo = time() . "_". $file->getClientOriginalName();
+                $ruta = $file->storeAs("adjuntos_tickets", $nombreArchivo, "public");
 
-                // CAMBIA ESTA LÍNEA:
-                TicketAdjunto::create([ // <--- Antes decía ArchivoTicket
-                    'id_ticket' => $ticket->id_ticket,
-                    'ruta_archivo' => $ruta,
-                    'nombre_original' => $file->getClientOriginalName(),
-                    // Nota: En tu método 'store' usas también tipo_mimo y tamano
-                    // Si tu migración los requiere, agrégalos aquí también:
-                    'tipo_mimo' => $file->getMimeType(),
-                    'tamano' => $file->getSize(),
+                TicketAdjunto::create([
+                    "id_ticket" => $ticket->id_ticket,
+                    "ruta_archivo" => $ruta,
+                    "nombre_original" => $file->getClientOriginalName(),
+                    "tipo_mimo" => $file->getMimeType(),
+                    "tamano" => $file->getSize(),
                 ]);
             }
         }
 
-        return redirect()->route('usuario.tickets.index') // Cambio a ruta usuario
-                        ->with('success', 'Borrador actualizado correctamente.');
+        return redirect()->route("usuario.tickets.index")
+                        ->with("success", "Borrador actualizado correctamente.");
     }
 
     public function storeComentario(Request $request, $id)
     {
-        // 1. Validar que el mensaje no esté vacío
         $request->validate([
-            'mensaje' => 'required|string|max:1000',
+            "mensaje" => "required|string|max:1000",
         ]);
 
-        // 2. Verificar que el ticket pertenezca al usuario (Seguridad)
-        $ticket = Ticket::where('id_usuario', auth()->id())->findOrFail($id);
+        $ticket = Ticket::where("id_usuario", auth()->id())->findOrFail($id);
 
-        // 3. Crear el comentario
         TicketComentario::create([
-            'id_ticket'  => $ticket->id_ticket,
-            'id_usuario' => auth()->id(),
-            'mensaje'    => $request->mensaje,
-            'es_interno' => false, // Los comentarios del cliente NUNCA son internos
+            "id_ticket"  => $ticket->id_ticket,
+            "id_usuario" => auth()->id(),
+            "mensaje"    => $request->mensaje,
+            "es_interno" => false,
         ]);
 
-        // 4. Redirigir atrás con un mensaje de éxito
-        return back()->with('success', 'Mensaje enviado correctamente.');
+        return back()->with("success", "Mensaje enviado correctamente.");
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Usuario\TicketUsuarioController; 
 use App\Http\Controllers\Gestor\TicketGestorController;
 use App\Http\Controllers\Tecnico\TicketTecnicoController;
+use App\Http\Controllers\Admin\CategoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,12 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
     // --- Control de Roles y Permisos ---
     Route::middleware('can:gestionar-roles')->group(function () {
         Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    });
+
+    // --- Gestión de Categorías ---
+    Route::middleware('can:gestionar-categorias')->group(function () {
+        Route::resource('categorias', CategoriaController::class);
+        Route::post('categorias/{categoria}/activate', [CategoriaController::class, 'activate'])->name('categorias.activate');
     });
     
     // --- Gestión General de Usuarios y Aprobaciones ---

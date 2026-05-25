@@ -1,7 +1,7 @@
 <x-usuario-layout>
     <div class="container-fluid py-4">
         <div class="mb-4">
-            <a href="{{ route('usuario.tickets.index') }}" class="text-decoration-none small text-muted hover-primary">
+            <a href="{{ route("usuario.tickets.index") }}" class="text-decoration-none small text-muted hover-primary">
                 <i class="bi bi-arrow-left me-1"></i> Volver a la lista de tickets
             </a>
             <h2 class="fw-bold theme-text mt-3">Crear Nueva Solicitud</h2>
@@ -11,27 +11,28 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="card-premium shadow-sm p-4 mb-4">
-                    <form action="{{ route('usuario.tickets.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route("usuario.tickets.store") }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label fw-bold theme-text">Asunto del Ticket</label>
                                 <input type="text" name="asunto" 
-                                       class="form-control form-control-premium @error('asunto') is-invalid @enderror" 
+                                       class="form-control form-control-premium @error("asunto") is-invalid @enderror" 
                                        placeholder="Resumen corto del problema..." 
-                                       value="{{ old('asunto') }}" required>
-                                @error('asunto') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                       value="{{ old("asunto") }}" required>
+                                @error("asunto") <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold theme-text">Categoría</label>
-                                <select name="id_categoria" class="form-select form-control-premium shadow-none" required>
+                                <select name="id_categoria" id="categoria-select" class="form-select form-control-premium shadow-none @error("id_categoria") is-invalid @enderror" required>
                                     <option value="" selected disabled>Selecciona una opción</option>
                                     @foreach($categorias as $cat)
-                                        <option value="{{ $cat->id_categoria }}">{{ $cat->nombre_categoria }}</option>
+                                        <option value="{{ $cat->id_categoria }}" {{ old("id_categoria") == $cat->id_categoria ? "selected" : "" }}>{{ $cat->nombre_categoria }}</option>
                                     @endforeach
                                 </select>
+                                @error("id_categoria") <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
@@ -47,9 +48,9 @@
                             <div class="col-12">
                                 <label class="form-label fw-bold theme-text">Descripción del problema</label>
                                 <textarea name="descripcion_problema" rows="5" 
-                                          class="form-control form-control-premium @error('descripcion_problema') is-invalid @enderror" 
-                                          placeholder="Cuéntanos más detalles sobre el fallo..." required>{{ old('descripcion_problema') }}</textarea>
-                                @error('descripcion_problema') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                          class="form-control form-control-premium @error("descripcion_problema") is-invalid @enderror" 
+                                          placeholder="Cuéntanos más detalles sobre el fallo..." required>{{ old("descripcion_problema") }}</textarea>
+                                @error("descripcion_problema") <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-12">
@@ -91,4 +92,15 @@
             </div>
         </div>
     </div>
+@push("scripts")
+<script>
+    $(document).ready(function() {
+        $("#categoria-select").select2({
+            theme: "bootstrap-5",
+            width: $(this).data("width") ? $(this).data("width") : $(this).hasClass("w-100") ? "100%" : "style",
+            placeholder: $(this).data("placeholder"),
+        });
+    });
+</script>
+@endpush
 </x-usuario-layout>
