@@ -36,9 +36,22 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-bold theme-text">Equipo afectado</label>
-                                <select name="id_tipo_equipo" class="form-select form-control-premium shadow-none" required>
-                                    <option value="" selected disabled>Selecciona el equipo</option>
+                                <label class="form-label fw-bold theme-text">Dispositivo con Fallo (Mi Inventario)</label>
+                                <select name="id_equipo" id="equipo-select" class="form-select form-control-premium shadow-none @error("id_equipo") is-invalid @enderror">
+                                    <option value="" selected>-- Ninguno / Otro (Especificar abajo) --</option>
+                                    @foreach($equiposAsignados as $eq)
+                                        <option value="{{ $eq->id_equipo }}" data-tipo="{{ $eq->id_tipo_equipo }}" {{ old("id_equipo") == $eq->id_equipo ? "selected" : "" }}>
+                                            {{ $eq->nombre }} {{ $eq->numero_bien ? '[' . $eq->numero_bien . ']' : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error("id_equipo") <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold theme-text">Tipo de Equipo</label>
+                                <select name="id_tipo_equipo" id="tipo-equipo-select" class="form-select form-control-premium shadow-none" required>
+                                    <option value="" selected disabled>Selecciona el tipo</option>
                                     @foreach($tiposEquipo as $tipo)
                                         <option value="{{ $tipo->id_tipo_equipo }}">{{ $tipo->nombre_tipo_equipo }}</option>
                                     @endforeach
@@ -99,6 +112,14 @@
             theme: "bootstrap-5",
             width: $(this).data("width") ? $(this).data("width") : $(this).hasClass("w-100") ? "100%" : "style",
             placeholder: $(this).data("placeholder"),
+        });
+
+        $('#equipo-select').on('change', function() {
+            let selectedOption = $(this).find('option:selected');
+            let tipoId = selectedOption.data('tipo');
+            if (tipoId) {
+                $('#tipo-equipo-select').val(tipoId);
+            }
         });
     });
 </script>

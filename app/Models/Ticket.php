@@ -15,9 +15,10 @@ class Ticket extends Model {
     protected $primaryKey = 'id_ticket';
 
     protected $fillable = [
-        'asunto', // <-- AGREGA ESTO AQUÍ
+        'asunto',
         'id_usuario', 
         'id_tipo_equipo', 
+        'id_equipo',
         'id_prioridad', 
         'id_categoria', 
         'descripcion_problema', 
@@ -48,6 +49,8 @@ class Ticket extends Model {
     public function categoria() { return $this->belongsTo(Categoria::class, 'id_categoria'); }
 
     public function tipoEquipo() { return $this->belongsTo(TipoEquipo::class, 'id_tipo_equipo'); }
+    
+    public function equipo() { return $this->belongsTo(Equipo::class, 'id_equipo'); }
     
     public function adjuntos() { 
         return $this->hasMany(TicketAdjunto::class, 'id_ticket'); 

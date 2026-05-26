@@ -34,7 +34,7 @@
                                 <div class="d-flex flex-column">
                                     <span class="fw-bold theme-text">{{ $ticket->asunto }}</span>
                                     <small class="theme-muted text-uppercase" style="font-size: 0.7rem;">
-                                        <i class="bi bi-tag me-1 text-primary"></i>{{ $ticket->categoria->nombre_categoria ?? 'General' }}
+                                        <i class="bi bi-tag me-1 text-primary"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'General' }}
                                     </small>
                                 </div>
                             </td>

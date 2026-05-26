@@ -31,8 +31,9 @@ class TicketUsuarioController extends Controller
         $categorias = Categoria::where("estado", true)->get(); // Solo categorías activas
         $prioridades = Prioridad::all();
         $tiposEquipo = TipoEquipo::all();
+        $equiposAsignados = Auth::user()->equipos()->with('tipoEquipo')->where('estado', true)->get();
         
-        return view("usuario.tickets.create", compact("categorias", "prioridades", "tiposEquipo"));
+        return view("usuario.tickets.create", compact("categorias", "prioridades", "tiposEquipo", "equiposAsignados"));
     }
 
     public function store(Request $request)
@@ -43,15 +44,19 @@ class TicketUsuarioController extends Controller
             "descripcion_problema" => "required|string",
             "id_categoria" => "required|exists:categorias,id_categoria",
             "id_tipo_equipo" => "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_equipo" => "nullable|exists:equipos,id_equipo",
             "adjuntos.*" => "nullable|file|max:10240",
         ]);
 
         // 2. Crear el Ticket como BORRADOR
+        $categoria = Categoria::find($request->id_categoria);
         $ticket = Ticket::create([
             "id_usuario" => auth()->id(),
             "asunto" => $request->asunto,
             "id_categoria" => $request->id_categoria,
+            "categoria_nombre_historico" => $categoria ? $categoria->nombre_categoria : null,
             "id_tipo_equipo" => $request->id_tipo_equipo,
+            "id_equipo" => $request->id_equipo,
             "descripcion_problema" => $request->descripcion_problema,
             "id_prioridad" => null,
             "estatus" => 0,
@@ -137,10 +142,12 @@ class TicketUsuarioController extends Controller
             "archivos.*" => "nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048",
         ]);
 
+        $categoria = Categoria::find($request->id_categoria);
         $ticket->update([
             "asunto" => $request->asunto,
             "descripcion_problema" => $request->descripcion_problema,
             "id_categoria" => $request->id_categoria,
+            "categoria_nombre_historico" => $categoria ? $categoria->nombre_categoria : null,
         ]);
 
         if ($request->hasFile("archivos")) {

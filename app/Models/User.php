@@ -39,6 +39,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relación con los equipos asignados al usuario.
+     */
+    public function equipos()
+    {
+        return $this->hasMany(Equipo::class, 'id_usuario_asignado', 'id');
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>

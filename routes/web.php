@@ -71,6 +71,24 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
         Route::resource('categorias', CategoriaController::class);
         Route::post('categorias/{categoria}/activate', [CategoriaController::class, 'activate'])->name('categorias.activate');
     });
+
+    // --- Gestión de Equipos y Catálogos ---
+    Route::middleware('can:gestionar-equipos')->group(function () {
+        Route::resource('equipos', \App\Http\Controllers\Admin\EquipoController::class);
+        
+        // Catálogo Unificado (Tipos, Marcas, Modelos)
+        Route::get('equipos-catalogos', [\App\Http\Controllers\Admin\TipoEquipoController::class, 'index'])->name('equipos.catalogos.index');
+        Route::post('equipos-catalogos/tipos', [\App\Http\Controllers\Admin\TipoEquipoController::class, 'store'])->name('equipos.catalogos.tipos.store');
+        Route::delete('equipos-catalogos/tipos/{id}', [\App\Http\Controllers\Admin\TipoEquipoController::class, 'destroy'])->name('equipos.catalogos.tipos.destroy');
+        
+        // Marcas y Modelos vinculados a Equipos
+        Route::post('marcas', [\App\Http\Controllers\Admin\MarcaController::class, 'store'])->name('marcas.store');
+        Route::delete('marcas/{id}', [\App\Http\Controllers\Admin\MarcaController::class, 'destroy'])->name('marcas.destroy');
+        Route::post('modelos', [\App\Http\Controllers\Admin\ModeloController::class, 'store'])->name('modelos.store');
+        Route::delete('modelos/{id}', [\App\Http\Controllers\Admin\ModeloController::class, 'destroy'])->name('modelos.destroy');
+        Route::get('marcas/{id}/modelos', [\App\Http\Controllers\Admin\MarcaController::class, 'getModelos'])->name('marcas.modelos');
+        Route::get('marcas/por-tipo/{id_tipo_equipo}', [\App\Http\Controllers\Admin\MarcaController::class, 'getMarcasPorTipo'])->name('marcas.por-tipo');
+    });
     
     // --- Gestión General de Usuarios y Aprobaciones ---
     Route::middleware('can:gestionar-usuarios')->group(function () {
@@ -100,6 +118,14 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
         Route::post('/configuraciones/ad/test', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'testAd'])->name('configuraciones.ad.test');
         Route::post('/configuraciones/niveles', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'storeNivel'])->name('configuraciones.niveles.store');
     });
+
+    // --- Rendimiento Técnico ---
+    Route::get('/rendimiento', [\App\Http\Controllers\Admin\RendimientoTecnicoController::class, 'index'])->name('rendimiento.index');
+
+    // --- Bitácora de Auditoría ---
+    Route::get('/auditorias', [\App\Http\Controllers\Admin\AuditController::class, 'index'])->name('auditorias.index');
+    Route::get('/auditorias/exportar', [\App\Http\Controllers\Admin\AuditController::class, 'export'])->name('auditorias.export');
+    Route::get('/auditorias/exportar-pdf', [\App\Http\Controllers\Admin\AuditController::class, 'exportPdf'])->name('auditorias.pdf');
 });
 
 // --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---

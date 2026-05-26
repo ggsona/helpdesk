@@ -287,7 +287,7 @@
                                                         </td>
                                                         <td>
                                                             <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 mb-1" style="font-size: 0.7rem;">
-                                                                <i class="bi bi-tag-fill me-1"></i>{{ $ticket->categoria->nombre_categoria ?? 'S/C' }}
+                                                                <i class="bi bi-tag-fill me-1"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'S/C' }}
                                                             </span>
                                                             <div class="small text-muted fs-7">{{ $ticket->tipoEquipo->nombre_tipo_equipo ?? 'Genérico' }}</div>
                                                         </td>

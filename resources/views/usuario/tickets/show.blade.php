@@ -168,7 +168,7 @@
 
                         <div class="mb-3">
                             <label class="small d-block">Categoría</label>
-                            <span class="fw-bold text-body"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria->nombre_categoria ?? 'Sin categoría' }}</span>
+                            <span class="fw-bold text-body"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'Sin categoría' }}</span>
                         </div>
                         
                         <div class="mb-3">

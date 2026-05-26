@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
+use App\Models\Marca;
+use App\Models\Modelo;
 use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
@@ -32,11 +34,16 @@ class CategoriaController extends Controller
 
         $categorias = $query->with(['creator', 'updater'])->paginate(10); // Paginación de 10 categorías por página
 
-        if ($request->ajax()) {
+        // Cargar marcas y modelos
+        $marcas = Marca::with('tipoEquipo')->orderBy('nombre_marca', 'asc')->get();
+        $modelos = Modelo::with('marca')->orderBy('nombre_modelo', 'asc')->paginate(10, ['*'], 'modelos_page');
+        $tiposEquipo = \App\Models\TipoEquipo::orderBy('nombre_tipo_equipo', 'asc')->get();
+
+        if ($request->ajax() && !$request->has('modelos_page')) {
             return view("admin.categorias._categorias_table", compact("categorias"))->render();
         }
 
-        return view("admin.categorias.index", compact("categorias"));
+        return view("admin.categorias.index", compact("categorias", "marcas", "modelos", "tiposEquipo"));
     }
 
     public function create()
@@ -68,8 +75,13 @@ class CategoriaController extends Controller
     public function update(Request $request, Categoria $categoria)
     {
         $request->validate([
-            "nombre_categoria" => "required|string|max:100|unique:categorias,nombre_categoria,". $categoria->id_categoria .",id_categoria",
-            "estado" => "boolean",
+            "nombre_categoria" => [
+                "required",
+                "string",
+                "max:100",
+                \Illuminate\Validation\Rule::unique('categorias', 'nombre_categoria')->ignore($categoria->id_categoria, 'id_categoria')
+            ],
+            "estado" => "required|in:0,1",
         ]);
 
         $categoria->update(array_merge($request->all(), ["updated_by" => auth()->id()]));

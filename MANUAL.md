@@ -75,6 +75,20 @@ Schema::create('categorias', function (Blueprint $table) {
     $table->timestamps();
 });
 
+// database/migrations/2026_05_25_003849_add_estado_to_categorias_table.php (Extensión del Estado)
+Schema::table('categorias', function (Blueprint $table) {
+    $table->boolean('estado')->default(true)->after('nombre_categoria');
+});
+
+// database/migrations/2026_05_25_031207_add_audit_fields_to_categorias_table.php (Auditoría de Creador/Editor)
+Schema::table("categorias", function (Blueprint $table) {
+    $table->unsignedBigInteger("created_by")->nullable()->after("updated_at");
+    $table->foreign("created_by")->references("id")->on("users")->onDelete("set null");
+    
+    $table->unsignedBigInteger("updated_by")->nullable()->after("created_by");
+    $table->foreign("updated_by")->references("id")->on("users")->onDelete("set null");
+});
+
 // database/migrations/2023_01_01_000004_create_tipos_equipo_table.php
 Schema::create('tipos_equipo', function (Blueprint $table) {
     $table->id('id_tipo_equipo');
@@ -426,17 +440,108 @@ class User extends Authenticatable
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Persona extends Model
 {
     protected $table = 'personas';
     protected $primaryKey = 'id_persona';
-    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_oficina'];
+    protected $fillable = [
+        'nombre', 
+        'segundo_nombre',
+        'apellido', 
+        'segundo_apellido',
+        'cedula', 
+        'telefono', 
+        'id_unidad_administrativa'
+    ];
 
-    public function oficina(): BelongsTo
+    public function unidadAdministrativa()
     {
-        return $this->belongsTo(Oficina::class, 'id_oficina');
+        return $this->belongsTo(UnidadAdministrativa::class, 'id_unidad_administrativa')->withTrashed();
+    }
+}
+```
+
+#### D. Unidades Administrativas (`UnidadAdministrativa.php`)
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class UnidadAdministrativa extends Model
+{
+    use SoftDeletes;
+    protected $table = 'unidades_administrativas';
+    protected $fillable = ['nombre', 'id_nivel', 'parent_id', 'is_active'];
+
+    public function nivel()
+    {
+        return $this->belongsTo(NivelJerarquico::class, 'id_nivel');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(UnidadAdministrativa::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(UnidadAdministrativa::class, 'parent_id');
+    }
+
+    public function personas()
+    {
+        return $this->hasMany(Persona::class, 'id_unidad_administrativa');
+    }
+}
+```
+
+#### E. Niveles Jerárquicos (`NivelJerarquico.php`)
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class NivelJerarquico extends Model
+{
+    protected $table = 'niveles_jerarquicos';
+    protected $fillable = ['nombre', 'nivel', 'is_active'];
+
+    public function unidades()
+    {
+        return $this->hasMany(UnidadAdministrativa::class, 'id_nivel');
+    }
+}
+```
+
+#### F. Modelo de Categoría (`Categoria.php`)
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Categoria extends Model {
+
+    protected $table = 'categorias';
+    protected $primaryKey = 'id_categoria';
+    protected $fillable = ['nombre_categoria', 'estado', 'created_by', 'updated_by'];
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }
 ```
@@ -860,15 +965,119 @@ class TicketTecnicoController extends Controller
         return redirect()->route('tecnico.tickets.index')->with('success', 'Solución técnica actualizada.');
     }
 }
+
+### E. Módulo de Gestión de Categorías (Administrador)
+```php
+// app/Http/Controllers/Admin/CategoriaController.php
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Categoria;
+use Illuminate\Http\Request;
+
+class CategoriaController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware("can:gestionar-categorias");
+    }
+
+    public function index(Request $request)
+    {
+        $query = Categoria::query();
+
+        if ($request->filled("search")) {
+            $query->where("nombre_categoria", "like", "%". $request->search ."%");
+        }
+
+        if ($request->filled("estado")) {
+            $query->where("estado", $request->estado == "activo" ? true : false);
+        } else {
+            $query->where("estado", true);
+        }
+
+        $categorias = $query->with(['creator', 'updater'])->paginate(10);
+
+        if ($request->ajax()) {
+            return view("admin.categorias._categorias_table", compact("categorias"))->render();
+        }
+
+        return view("admin.categorias.index", compact("categorias"));
+    }
+
+    public function create()
+    {
+        return view("admin.categorias.create");
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            "nombre_categoria" => "required|string|max:100|unique:categorias",
+        ]);
+
+        $categoria = Categoria::create(array_merge($request->all(), ['created_by' => auth()->id()]));
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Categoría creada exitosamente.']);
+        }
+
+        return redirect()->route("admin.categorias.index")->with("success", "Categoría creada exitosamente.");
+    }
+
+    public function edit(Categoria $categoria)
+    {
+        return view("admin.categorias.edit", compact("categoria"));
+    }
+
+    public function update(Request $request, Categoria $categoria)
+    {
+        $request->validate([
+            "nombre_categoria" => "required|string|max:100|unique:categorias,nombre_categoria,". $categoria->id_categoria .",id_categoria",
+            "estado" => "boolean",
+        ]);
+
+        $categoria->update(array_merge($request->all(), ["updated_by" => auth()->id()]));
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Categoría actualizada exitosamente.']);
+        }
+
+        return redirect()->route("admin.categorias.index")->with("success", "Categoría actualizada exitosamente.");
+    }
+
+    public function destroy(Request $request, Categoria $categoria)
+    {
+        try {
+            $categoria->update(["estado" => false, "updated_by" => auth()->id()]);
+            if ($request->ajax()) {
+                return response()->json(['success' => 'Categoría desactivada exitosamente.']);
+            }
+            return redirect()->route("admin.categorias.index")->with("success", "Categoría desactivada exitosamente.");
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            }
+            return redirect()->route("admin.categorias.index")->with("error", "Error: " . $e->getMessage());
+        }
+    }
+
+    public function activate(Categoria $categoria)
+    {
+        $categoria->update(["estado" => true, "updated_by" => auth()->id()]);
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Categoría activada exitosamente.']);
+        }
+        return redirect()->route("admin.categorias.index")->with("success", "Categoría activada exitosamente.");
+    }
+}
+```
 ```
 
 ---
 
 ## 6. SISTEMA DE ENRUTAMIENTO Y MIDDLEWARE
 
-El archivo `routes/web.php` establece las rutas agrupadas y protegidas por autenticación y asignación de roles.
-
-```php
 <?php
 
 use App\Http\Controllers\ProfileController;
@@ -877,67 +1086,104 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Usuario\TicketUsuarioController; 
 use App\Http\Controllers\Gestor\TicketGestorController;
 use App\Http\Controllers\Tecnico\TicketTecnicoController;
+use App\Http\Controllers\Admin\CategoriaController;
 
-// Página de bienvenida pública
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Enrutador inteligente de ingreso
+Route::get('/unidades-hijas/{parentId}', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'getChildrenUnidades'])->name('unidades.hijas');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'approved'])
     ->name('dashboard');
 
-// Rutas de Perfil (Compartidas para usuarios logueados)
-Route::middleware('auth')->group(function () {
+Route::get('/espera', function () {
+    return view('auth.awaiting-approval');
+})->middleware('auth')->name('awaiting-approval');
+
+Route::middleware(['auth', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // --- RUTAS DE USUARIO CLIENTE (Rol: usuario) ---
-Route::middleware(['auth', 'role:usuario'])->group(function () {
+Route::middleware(['auth', 'approved', 'role:usuario'])->group(function () {
     Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])->name('usuario.home');
-    
-    // CRUD y Acciones de Ticket del Cliente
     Route::get('/mis-tickets', [TicketUsuarioController::class, 'index'])->name('usuario.tickets.index');
     Route::get('/mis-tickets/nuevo', [TicketUsuarioController::class, 'create'])->name('usuario.tickets.create');
     Route::post('/mis-tickets', [TicketUsuarioController::class, 'store'])->name('usuario.tickets.store');
     Route::get('/mis-tickets/{ticket}', [TicketUsuarioController::class, 'show'])->name('usuario.tickets.show');
     Route::get('/mis-tickets/{ticket}/editar', [TicketUsuarioController::class, 'edit'])->name('usuario.tickets.edit');
+    
+    Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])->name('usuario.tickets.enviar');
     Route::put('/tickets/{id}', [TicketUsuarioController::class, 'update'])->name('usuario.tickets.update');
     Route::delete('/tickets/{id}', [TicketUsuarioController::class, 'destroy'])->name('usuario.tickets.destroy');
-    
-    // Enviar borrador a soporte y chatear
-    Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])->name('usuario.tickets.enviar');
     Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])->name('usuario.tickets.comentar');
 });
 
-// --- RUTAS DE GESTOR Y ADMIN (Acceso Operativo Compartido) ---
-Route::middleware(['auth', 'role:gestor|admin'])->prefix('gestor')->name('gestor.')->group(function () {
-    Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
-    Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
-    Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])->name('tickets.comentar');
-});
-
-// --- RUTAS DE TECNICO ESPECIALISTA (Rol: tecnico) ---
-Route::middleware(['auth', 'role:tecnico'])->prefix('tecnico')->name('tecnico.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/tickets', [TicketTecnicoController::class, 'index'])->name('tickets.index');
-    Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])->name('tickets.comentar');
+// --- RUTAS ADMINISTRATIVAS GLOBALES (Bajo prefijo admin) ---
+Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('can:ver-panel-operativo');
     
-    // Resolver y gestionar soluciones
-    Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])->name('tickets.resolver');
-    Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('tickets.guardar-solucion');
-    Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('tickets.editar-solucion');
-    Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('tickets.actualizar-solucion');
+    Route::middleware('can:gestionar-roles')->group(function () {
+        Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    });
+
+    Route::middleware('can:gestionar-categorias')->group(function () {
+        Route::resource('categorias', CategoriaController::class);
+        Route::post('categorias/{categoria}/activate', [CategoriaController::class, 'activate'])->name('categorias.activate');
+    });
+    
+    Route::middleware('can:gestionar-usuarios')->group(function () {
+        Route::get('/usuarios/pendientes', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'index'])->name('usuarios.pendientes');
+        Route::post('/usuarios/pendientes/{id}/aprobar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'aprobar'])->name('usuarios.aprobar');
+        Route::delete('/usuarios/pendientes/{id}/rechazar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'rechazar'])->name('usuarios.rechazar');
+        Route::get('/usuarios', [\App\Http\Controllers\Admin\UsuarioController::class, 'index'])->name('usuarios.index');
+        Route::post('/usuarios/{id}/update-role', [\App\Http\Controllers\Admin\UsuarioController::class, 'updateRole'])->name('usuarios.update-role');
+        Route::post('/usuarios/{id}/toggle', [\App\Http\Controllers\Admin\UsuarioController::class, 'toggleStatus'])->name('usuarios.toggle');
+    });
+    
+    Route::middleware('can:ver-configuraciones')->group(function () {
+        Route::get('/estructura', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'index'])->name('estructura.index');
+        Route::post('/estructura/unidades', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'storeUnidad'])->name('estructura.unidades.store');
+        Route::put('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'updateUnidad'])->name('estructura.unidades.update');
+        Route::delete('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'destroyUnidad'])->name('estructura.unidades.destroy');
+
+        Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuraciones.index');
+        Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])->name('configuraciones.niveles.reorder');
+        Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])->name('configuraciones.niveles.toggle');
+        Route::post('/configuraciones/ad', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateAd'])->name('configuraciones.ad.update');
+        Route::post('/configuraciones/ad/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleAd'])->name('configuraciones.ad.toggle');
+        Route::post('/configuraciones/ad/test', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'testAd'])->name('configuraciones.ad.test');
+        Route::post('/configuraciones/niveles', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'storeNivel'])->name('configuraciones.niveles.store');
+    });
 });
 
-// Rutas de autenticación por defecto (Laravel Breeze)
+// --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---
+Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::middleware('can:asignar-tickets')->group(function () {
+        Route::get('/tickets', [TicketGestorController::class, 'index'])->name('tickets.index');
+        Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])->name('tickets.asignar');
+        Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])->name('tickets.show');
+        Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])->name('tickets.comentar');
+    });
+
+    Route::middleware('can:resolver-tickets')->prefix('tecnico')->name('tickets.tecnico.')->group(function () {
+        Route::get('/tickets', [TicketTecnicoController::class, 'index'])->name('index');
+        Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])->name('show');
+        Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])->name('comentar');
+        Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])->name('resolver');
+        Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('guardar-solucion');
+        Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('editar-solucion');
+        Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('actualizar-solucion');
+    });
+});
+
 require __DIR__.'/auth.php';
-```
 
 ---
 
@@ -1255,6 +1501,107 @@ class UsuarioLayout extends Component
 }
 ```
 
+### D. Estructura y Vistas de Categorías (CRUD y AJAX)
+Las vistas del módulo de categorías implementan una interacción asíncrona reactiva sin refrescar la página.
+
+#### 1. Listado Principal (`admin/categorias/index.blade.php`)
+```html
+@extends("layouts.admin")
+
+@section("content")
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Gestión de Categorías</h1>
+
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{{ route("admin.categorias.create") }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Nueva Categoría
+            </a>
+        </div>
+
+        <div id="ajax-messages" class="mb-4">
+            @if (session("success"))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session("success") }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+        </div>
+
+        <div class="card shadow mb-4 card-premium">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Listado de Categorías</h6>
+            </div>
+            <div class="card-body">
+                <form id="filter-form" action="{{ route("admin.categorias.index") }}" method="GET" class="mb-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control" placeholder="Buscar por nombre..." value="{{ request("search") }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="estado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                <option value="activo" {{ request("estado") == "activo" ? "selected" : "" }}>Activas</option>
+                                <option value="inactivo" {{ request("estado") == "inactivo" ? "selected" : "" }}>Inactivas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-info">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="categorias-list">
+                    @include("admin.categorias._categorias_table", ["categorias" => $categorias])
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+```
+
+#### 2. Tabla Parcial de Recarga AJAX (`_categorias_table.blade.php`)
+```html
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>Creado Por</th>
+                <th>Última Actualización</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($categorias as $cat)
+                <tr>
+                    <td>{{ $cat->id_categoria }}</td>
+                    <td>{{ $cat->nombre_categoria }}</td>
+                    <td>
+                        <span class="badge {{ $cat->estado ? 'bg-success' : 'bg-danger' }}">
+                            {{ $cat->estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td>{{ $cat->creator->name ?? 'N/A' }}</td>
+                    <td>{{ $cat->updater->name ?? 'N/A' }}</td>
+                    <td>
+                        <a href="{{ route('admin.categorias.edit', $cat->id_categoria) }}" class="btn btn-sm btn-warning">Editar</a>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+{{ $categorias->links() }}
+```
+
+### E. Mejoras de Responsividad (Mobile First y Adaptación CSS)
+Para asegurar el soporte al 100% de dispositivos móviles en la administración:
+1. **Sidebar Off-Canvas**: Se modificó `layouts/admin.blade.php` con clases `transform: translateX(-100%)` y media-queries `@media (max-width: 991.98px)`.
+2. **Backdrop**: Un elemento de fondo `.sidebar-backdrop` con filtro difuminado permite cerrar el menú al hacer clic en el exterior.
+3. **Mobile Header**: Cabecera compacta visible únicamente en pantallas pequeñas con el botón para desplegar la barra de navegación lateral.
+
 ---
 
 ## 8. MÓDULO DE SEGURIDAD Y DIRECTORIO DE USUARIOS
@@ -1292,6 +1639,377 @@ El sistema cuenta con un panel avanzado de integración con directorios LDAP en 
 * **Interruptor General (Switch Toggle)**: Habilita o deshabilita la integración de identidades globalmente de manera instantánea vía AJAX, realizando un `POST` asíncrono hacia la ruta `admin.configuraciones.ad.toggle`.
 * **Probar Conexión (LDAP Test)**: Un botón con spinner de carga que realiza una prueba simulada de conexión y enlace contra el host LDAP indicado, llamando al endpoint `/admin/configuraciones/ad/test` para comprobar la viabilidad de la red antes de guardar cambios definitivos.
 * **Persistencia**: Se almacena en la estructura de configuración global y se lee a través del archivo de configuración `config/ad.php`.
+
+---
+
+### 8.5 Módulo de Asignación y Control de Equipos (Inventario de Activos)
+
+Este módulo gestiona el inventario físico e intangible de la institución, permitiendo relacionar los activos directamente con los usuarios de la plataforma y tipificando de manera fluida los problemas de soporte.
+
+#### A. Estructura de Datos y Migraciones
+
+La base de datos contiene la tabla `equipos` con columnas dinámicas según el tipo de elemento, manteniendo la constante de un número de bien institucional.
+
+```php
+// database/migrations/2026_05_26_000001_create_equipos_table.php
+Schema::create('equipos', function (Blueprint $table) {
+    $table->id('id_equipo');
+    $table->string('nombre');
+    $table->string('marca')->nullable();
+    $table->string('modelo')->nullable();
+    $table->string('numero_bien')->nullable()->unique();
+    $table->string('ip_address')->nullable();
+    $table->string('mac_address')->nullable();
+    
+    // Relación con tipo de equipo
+    $table->unsignedBigInteger('id_tipo_equipo');
+    $table->foreign('id_tipo_equipo')
+          ->references('id_tipo_equipo')
+          ->on('tipos_equipo')
+          ->onDelete('restrict');
+    
+    // Relación con usuario asignado
+    $table->unsignedBigInteger('id_usuario_asignado')->nullable();
+    $table->foreign('id_usuario_asignado')
+          ->references('id')
+          ->on('users')
+          ->onDelete('set null');
+          
+    $table->boolean('estado')->default(true);
+    $table->timestamps();
+});
+```
+
+Se agrega una columna `id_equipo` a la tabla `tickets` para rastrear de forma exacta el activo afectado en las solicitudes:
+
+```php
+// database/migrations/2026_05_26_000003_add_id_equipo_to_tickets_table.php
+Schema::table('tickets', function (Blueprint $table) {
+    $table->unsignedBigInteger('id_equipo')->nullable()->after('id_tipo_equipo');
+    $table->foreign('id_equipo')
+          ->references('id_equipo')
+          ->on('equipos')
+          ->onDelete('set null');
+});
+```
+
+#### B. Modelo de Equipos (`Equipo.php`)
+
+```php
+// app/Models/Equipo.php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Equipo extends Model
+{
+    use HasFactory;
+
+    protected $table = 'equipos';
+    protected $primaryKey = 'id_equipo';
+
+    protected $fillable = [
+        'nombre', 'marca', 'modelo', 'numero_bien',
+        'ip_address', 'mac_address', 'id_tipo_equipo',
+        'id_usuario_asignado', 'estado'
+    ];
+
+    protected $casts = [
+        'estado' => 'boolean',
+    ];
+
+    public function tipoEquipo()
+    {
+        return $this->belongsTo(TipoEquipo::class, 'id_tipo_equipo', 'id_tipo_equipo');
+    }
+
+    public function usuarioAsignado()
+    {
+        return $this->belongsTo(User::class, 'id_usuario_asignado', 'id');
+    }
+}
+```
+
+#### C. Controlador Administrativo (`EquipoController.php`)
+
+```php
+// app/Http/Controllers/Admin/EquipoController.php
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Equipo;
+use App\Models\TipoEquipo;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class EquipoController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware("can:gestionar-equipos");
+    }
+
+    public function index(Request $request)
+    {
+        $query = Equipo::query();
+
+        if ($request->filled("search")) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where("nombre", "like", "%" . $search . "%")
+                  ->orWhere("numero_bien", "like", "%" . $search . "%")
+                  ->orWhere("marca", "like", "%" . $search . "%")
+                  ->orWhere("modelo", "like", "%" . $search . "%");
+            });
+        }
+
+        if ($request->filled("id_tipo_equipo")) {
+            $query->where("id_tipo_equipo", $request->id_tipo_equipo);
+        }
+
+        if ($request->filled("estado")) {
+            $query->where("estado", $request->estado == "activo" ? true : false);
+        }
+
+        $equipos = $query->with(['tipoEquipo', 'usuarioAsignado'])->paginate(10);
+        $tipos = TipoEquipo::all();
+
+        if ($request->ajax()) {
+            return view("admin.equipos._equipos_table", compact("equipos"))->render();
+        }
+
+        return view("admin.equipos.index", compact("equipos", "tipos"));
+    }
+
+    public function create()
+    {
+        $tipos = TipoEquipo::all();
+        $usuarios = User::where('is_approved', true)->with('persona')->get();
+        return view("admin.equipos.create", compact("tipos", "usuarios"));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            "nombre" => "required|string|max:150",
+            "marca" => "nullable|string|max:100",
+            "modelo" => "nullable|string|max:100",
+            "numero_bien" => "nullable|string|max:100|unique:equipos,numero_bien",
+            "ip_address" => "nullable|ip",
+            "mac_address" => "nullable|string|max:50",
+            "id_tipo_equipo" => "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_usuario_asignado" => "nullable|exists:users,id",
+            "estado" => "required|boolean",
+        ]);
+
+        Equipo::create($request->all());
+
+        return redirect()->route("admin.equipos.index")->with("success", "Equipo registrado exitosamente.");
+    }
+
+    public function edit(Equipo $equipo)
+    {
+        $tipos = TipoEquipo::all();
+        $usuarios = User::where('is_approved', true)->with('persona')->get();
+        return view("admin.equipos.edit", compact("equipo", "tipos", "usuarios"));
+    }
+
+    public function update(Request $request, Equipo $equipo)
+    {
+        $request->validate([
+            "nombre" => "required|string|max:150",
+            "marca" => "nullable|string|max:100",
+            "modelo" => "nullable|string|max:100",
+            "numero_bien" => "nullable|string|max:100|unique:equipos,numero_bien," . $equipo->id_equipo . ",id_equipo",
+            "ip_address" => "nullable|ip",
+            "mac_address" => "nullable|string|max:50",
+            "id_tipo_equipo" => "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_usuario_asignado" => "nullable|exists:users,id",
+            "estado" => "required|boolean",
+        ]);
+
+        $equipo->update($request->all());
+
+        return redirect()->route("admin.equipos.index")->with("success", "Equipo actualizado exitosamente.");
+    }
+
+    public function destroy(Equipo $equipo)
+    {
+        try {
+            $equipo->delete();
+            return redirect()->route("admin.equipos.index")->with("success", "Equipo eliminado del inventario.");
+        } catch (\Exception $e) {
+            return redirect()->route("admin.equipos.index")->with("error", "No se puede eliminar el equipo porque está asociado a registros históricos.");
+        }
+    }
+}
+```
+
+#### D. Integración en el Panel de Usuario Final
+* **Mis Equipos**: Se añade una vista de tarjetas al Dashboard del usuario (`home.blade.php`) donde se le listan detalladamente todos los dispositivos asignados a su cuenta para mayor visibilidad.
+* **Auto-selección Inteligente en Tickets**: Al abrir un nuevo ticket (`usuario/tickets/create.blade.php`), se provee el listado de sus equipos personales. Mediante Javascript reactivo, si el usuario selecciona uno de sus equipos, el campo "Tipo de Equipo" se sincroniza automáticamente con el tipo correspondiente:
+
+```javascript
+$('#equipo-select').on('change', function() {
+    let selectedOption = $(this).find('option:selected');
+    let tipoId = selectedOption.data('tipo');
+    if (tipoId) {
+        $('#tipo-equipo-select').val(tipoId);
+    }
+});
+```
+
+---
+
+### 8.6 Módulo de Marcas y Modelos Relacionales (Selects AJAX Dinámicos)
+
+Para simplificar la categorización de activos y habilitar relaciones jerárquicas en el inventario (ej. que los modelos dependan directamente del fabricante), se refactorizó la especificación de texto libre a tablas dedicadas (`marcas` y `modelos`).
+
+#### A. Base de Datos e Integración Relacional
+
+```php
+// database/migrations/2026_05_26_000004_create_marcas_table.php
+Schema::create('marcas', function (Blueprint $table) {
+    $table->id('id_marca');
+    $table->string('nombre_marca')->unique();
+    $table->timestamps();
+});
+
+// database/migrations/2026_05_26_000005_create_modelos_table.php
+Schema::create('modelos', function (Blueprint $table) {
+    $table->id('id_modelo');
+    $table->string('nombre_modelo');
+    $table->unsignedBigInteger('id_marca');
+    $table->foreign('id_marca')->references('id_marca')->on('marcas')->onDelete('cascade');
+    $table->timestamps();
+    $table->unique(['nombre_modelo', 'id_marca']);
+});
+```
+
+#### B. Modelos Eloquent Vinculados
+
+El modelo `Equipo.php` se actualizó para admitir relaciones de objetos en lugar de campos planos:
+
+```php
+public function marca()
+{
+    return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
+}
+
+public function modelo()
+{
+    return $this->belongsTo(Modelo::class, 'id_modelo', 'id_modelo');
+}
+```
+
+#### C. Lógica AJAX de Carga Dependiente
+
+Cuando el administrador cambia la marca seleccionada en los formularios de registro o edición, una llamada AJAX asíncrona consulta la ruta de la API `/admin/marcas/{id}/modelos` para repoblar al instante el combo de modelos con los dispositivos compatibles de ese fabricante.
+
+```javascript
+$('#id_marca').on('change', function() {
+    let marcaId = $(this).val();
+    let modeloSelect = $('#id_modelo');
+    modeloSelect.empty().append('<option value="">-- Cargando modelos... --</option>');
+    
+    if (marcaId) {
+        $.ajax({
+            url: `/admin/marcas/${marcaId}/modelos`,
+            type: 'GET',
+            success: function(data) {
+                modeloSelect.empty().append('<option value="">-- Seleccionar Modelo --</option>');
+                data.forEach(function(modelo) {
+                    modeloSelect.append(`<option value="${modelo.id_modelo}">${modelo.nombre_modelo}</option>`);
+                });
+            }
+        });
+    }
+});
+```
+
+### 8.7 Módulo de Auditoría Integral y Rendimiento Técnico
+
+Para habilitar un seguimiento preciso y auditar qué usuarios realizan cambios en el catálogo, además de monitorear el desempeño de los técnicos de soporte, se implementaron soluciones avanzadas a nivel de base de datos, backend y visualización.
+
+#### A. Nuevas Estructuras de Base de Datos
+
+Se crearon e implementaron tres migraciones para normalizar y auditar datos:
+
+```php
+// database/migrations/2026_05_26_140211_deduplicate_and_add_unique_to_categorias_table.php
+Schema::table('categorias', function (Blueprint $table) {
+    $table->string('nombre_categoria', 100)->unique()->change();
+});
+
+// database/migrations/2026_05_26_140228_add_categoria_nombre_historico_to_tickets_table.php
+Schema::table('tickets', function (Blueprint $table) {
+    $table->string('categoria_nombre_historico')->nullable()->after('id_categoria');
+});
+
+// database/migrations/2026_05_26_140241_create_audit_logs_table.php
+Schema::create('audit_logs', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id')->nullable();
+    $table->string('auditable_type');
+    $table->unsignedBigInteger('auditable_id');
+    $table->string('action'); // create, update, delete
+    $table->json('old_values')->nullable();
+    $table->json('new_values')->nullable();
+    $table->string('ip_address', 45)->nullable();
+    $table->text('user_agent')->nullable();
+    $table->timestamp('created_at')->nullable();
+    
+    $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+});
+```
+
+#### B. Trait `Auditable` para Seguimiento Automatizado
+
+Se creó el trait `App\Traits\Auditable.php` para registrar cambios en los modelos `Categoria`, `Marca`, `Modelo` y `TipoEquipo` conectándose a los eventos del ciclo de vida de Eloquent (`created`, `updated`, `deleted`):
+
+```php
+namespace App\Traits;
+
+use App\Models\AuditLog;
+use Illuminate\Support\Facades\Auth;
+
+trait Auditable
+{
+    public static function bootAuditable()
+    {
+        static::created(function ($model) {
+            $model->logAudit('create', null, $model->getDirtyForAudit());
+        });
+
+        static::updated(function ($model) {
+            $dirty = $model->getDirtyForAudit();
+            if (!empty($dirty)) {
+                $old = [];
+                foreach ($dirty as $key => $value) {
+                    $old[$key] = $model->getOriginal($key);
+                }
+                $model->logAudit('update', $old, $dirty);
+            }
+        });
+
+        static::deleted(function ($model) {
+            $model->logAudit('delete', $model->getAttributes(), null);
+        });
+    }
+}
+```
+
+#### C. Controladores de Auditoría y Rendimiento
+
+1.  **`AuditController.php`**: Permite la visualización filtrada por acción, tipo de componente y responsable autor de la acción, con paginación avanzada. También incluye los métodos `export` (para reportes CSV) y `exportPdf` (para reportes en PDF formal y llamativo en modo horizontal) de manera dinámica y respetando los filtros activos de búsqueda del usuario.
+2.  **`RendimientoTecnicoController.php`**: Agrupa y procesa métricas clave de cada técnico especialista, computando dinámicamente la velocidad promedio de resolución de incidentes calculando la brecha temporal entre la asignación del ticket y la fecha del reporte de cierre.
+
+#### D. Nuevos Permisos de Seguridad (Spatie)
+
+Se añadieron permisos de control RBAC granular:
+*   `ver-auditorias`: Habilita el acceso de lectura a la bitácora histórica de auditorías.
+*   `ver-rendimiento-tecnico`: Permite revisar el tablero de analíticas y productividad del equipo técnico de soporte.
 
 ---
 

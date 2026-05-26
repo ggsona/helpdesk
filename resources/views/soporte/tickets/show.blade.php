@@ -221,7 +221,7 @@
                 
                 <div class="mb-3">
                     <label class="text-secondary small d-block mb-1">Categoría General</label>
-                    <span class="fw-bold theme-text"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria->nombre_categoria ?? 'S/C' }}</span>
+                    <span class="fw-bold theme-text"><i class="bi bi-tag-fill me-2 text-primary"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'S/C' }}</span>
                 </div>
 
                 <div class="mb-3">

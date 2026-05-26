@@ -351,6 +351,20 @@ Schema::create('categorias', function (Blueprint $table) {
     $table-&gt;timestamps();
 });
 
+// database/migrations/2026_05_25_003849_add_estado_to_categorias_table.php (Extensión del Estado)
+Schema::table('categorias', function (Blueprint $table) {
+    $table-&gt;boolean('estado')-&gt;default(true)-&gt;after('nombre_categoria');
+});
+
+// database/migrations/2026_05_25_031207_add_audit_fields_to_categorias_table.php (Auditoría de Creador/Editor)
+Schema::table("categorias", function (Blueprint $table) {
+    $table-&gt;unsignedBigInteger("created_by")-&gt;nullable()-&gt;after("updated_at");
+    $table-&gt;foreign("created_by")-&gt;references("id")-&gt;on("users")-&gt;onDelete("set null");
+    
+    $table-&gt;unsignedBigInteger("updated_by")-&gt;nullable()-&gt;after("created_by");
+    $table-&gt;foreign("updated_by")-&gt;references("id")-&gt;on("users")-&gt;onDelete("set null");
+});
+
 // database/migrations/2023_01_01_000004_create_tipos_equipo_table.php
 Schema::create('tipos_equipo', function (Blueprint $table) {
     $table-&gt;id('id_tipo_equipo');
@@ -672,17 +686,102 @@ class User extends Authenticatable
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Persona extends Model
 {
     protected $table = 'personas';
     protected $primaryKey = 'id_persona';
-    protected $fillable = ['nombre', 'apellido', 'telefono', 'id_oficina'];
+    protected $fillable = [
+        'nombre', 
+        'segundo_nombre',
+        'apellido', 
+        'segundo_apellido',
+        'cedula', 
+        'telefono', 
+        'id_unidad_administrativa'
+    ];
 
-    public function oficina(): BelongsTo
+    public function unidadAdministrativa()
     {
-        return $this-&gt;belongsTo(Oficina::class, 'id_oficina');
+        return $this-&gt;belongsTo(UnidadAdministrativa::class, 'id_unidad_administrativa')-&gt;withTrashed();
+    }
+}
+</code></pre></div>
+<h4 id="d-unidades-administrativas-unidadadministrativaphp" class="fw-bold mt-3 mb-2 heading-section">D. Unidades Administrativas (`UnidadAdministrativa.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class UnidadAdministrativa extends Model
+{
+    use SoftDeletes;
+    protected $table = 'unidades_administrativas';
+    protected $fillable = ['nombre', 'id_nivel', 'parent_id', 'is_active'];
+
+    public function nivel()
+    {
+        return $this-&gt;belongsTo(NivelJerarquico::class, 'id_nivel');
+    }
+
+    public function parent()
+    {
+        return $this-&gt;belongsTo(UnidadAdministrativa::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this-&gt;hasMany(UnidadAdministrativa::class, 'parent_id');
+    }
+
+    public function personas()
+    {
+        return $this-&gt;hasMany(Persona::class, 'id_unidad_administrativa');
+    }
+}
+</code></pre></div>
+<h4 id="e-niveles-jerrquicos-niveljerarquicophp" class="fw-bold mt-3 mb-2 heading-section">E. Niveles Jerárquicos (`NivelJerarquico.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class NivelJerarquico extends Model
+{
+    protected $table = 'niveles_jerarquicos';
+    protected $fillable = ['nombre', 'nivel', 'is_active'];
+
+    public function unidades()
+    {
+        return $this-&gt;hasMany(UnidadAdministrativa::class, 'id_nivel');
+    }
+}
+</code></pre></div>
+<h4 id="f-modelo-de-categora-categoriaphp" class="fw-bold mt-3 mb-2 heading-section">F. Modelo de Categoría (`Categoria.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Categoria extends Model {
+
+    protected $table = 'categorias';
+    protected $primaryKey = 'id_categoria';
+    protected $fillable = ['nombre_categoria', 'estado', 'created_by', 'updated_by'];
+
+    public function creator(): BelongsTo
+    {
+        return $this-&gt;belongsTo(User::class, 'created_by');
+    }
+
+    public function updater(): BelongsTo
+    {
+        return $this-&gt;belongsTo(User::class, 'updated_by');
     }
 }
 </code></pre></div>
@@ -1091,79 +1190,183 @@ class TicketTecnicoController extends Controller
         return redirect()-&gt;route('tecnico.tickets.index')-&gt;with('success', 'Solución técnica actualizada.');
     }
 }
+
+### E. Módulo de Gestión de Categorías (Administrador)
 </code></pre></div>
+<p class="lead-body my-3">// app/Http/Controllers/Admin/CategoriaController.php</p>
+<p class="lead-body my-3">namespace App\Http\Controllers\Admin;</p>
+<p class="lead-body my-3">use App\Http\Controllers\Controller;</p>
+<p class="lead-body my-3">use App\Models\Categoria;</p>
+<p class="lead-body my-3">use Illuminate\Http\Request;</p>
+<p class="lead-body my-3">class CategoriaController extends Controller</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">public function __construct()</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">$this-&gt;middleware("can:gestionar-categorias");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function index(Request $request)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">$query = Categoria::query();</p>
+<p class="lead-body my-3">if ($request-&gt;filled("search")) {</p>
+<p class="lead-body my-3">$query-&gt;where("nombre_categoria", "like", "%". $request-&gt;search ."%");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">if ($request-&gt;filled("estado")) {</p>
+<p class="lead-body my-3">$query-&gt;where("estado", $request-&gt;estado == "activo" ? true : false);</p>
+<p class="lead-body my-3">} else {</p>
+<p class="lead-body my-3">$query-&gt;where("estado", true);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">$categorias = $query-&gt;with(['creator', 'updater'])-&gt;paginate(10);</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return view("admin.categorias._categorias_table", compact("categorias"))-&gt;render();</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return view("admin.categorias.index", compact("categorias"));</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function create()</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">return view("admin.categorias.create");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function store(Request $request)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">$request-&gt;validate([</p>
+<p class="lead-body my-3">"nombre_categoria" =&gt; "required|string|max:100|unique:categorias",</p>
+<p class="lead-body my-3">]);</p>
+<p class="lead-body my-3">$categoria = Categoria::create(array_merge($request-&gt;all(), ['created_by' =&gt; auth()-&gt;id()]));</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return response()-&gt;json(['success' =&gt; 'Categoría creada exitosamente.']);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return redirect()-&gt;route("admin.categorias.index")-&gt;with("success", "Categoría creada exitosamente.");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function edit(Categoria $categoria)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">return view("admin.categorias.edit", compact("categoria"));</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function update(Request $request, Categoria $categoria)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">$request-&gt;validate([</p>
+<p class="lead-body my-3">"nombre_categoria" =&gt; "required|string|max:100|unique:categorias,nombre_categoria,". $categoria-&gt;id_categoria .",id_categoria",</p>
+<p class="lead-body my-3">"estado" =&gt; "boolean",</p>
+<p class="lead-body my-3">]);</p>
+<p class="lead-body my-3">$categoria-&gt;update(array_merge($request-&gt;all(), ["updated_by" =&gt; auth()-&gt;id()]));</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return response()-&gt;json(['success' =&gt; 'Categoría actualizada exitosamente.']);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return redirect()-&gt;route("admin.categorias.index")-&gt;with("success", "Categoría actualizada exitosamente.");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function destroy(Request $request, Categoria $categoria)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">try {</p>
+<p class="lead-body my-3">$categoria-&gt;update(["estado" =&gt; false, "updated_by" =&gt; auth()-&gt;id()]);</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return response()-&gt;json(['success' =&gt; 'Categoría desactivada exitosamente.']);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return redirect()-&gt;route("admin.categorias.index")-&gt;with("success", "Categoría desactivada exitosamente.");</p>
+<p class="lead-body my-3">} catch (\Exception $e) {</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return response()-&gt;json(['error' =&gt; 'Error: ' . $e-&gt;getMessage()], 500);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return redirect()-&gt;route("admin.categorias.index")-&gt;with("error", "Error: " . $e-&gt;getMessage());</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">public function activate(Categoria $categoria)</p>
+<p class="lead-body my-3">{</p>
+<p class="lead-body my-3">$categoria-&gt;update(["estado" =&gt; true, "updated_by" =&gt; auth()-&gt;id()]);</p>
+<p class="lead-body my-3">if ($request-&gt;ajax()) {</p>
+<p class="lead-body my-3">return response()-&gt;json(['success' =&gt; 'Categoría activada exitosamente.']);</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">return redirect()-&gt;route("admin.categorias.index")-&gt;with("success", "Categoría activada exitosamente.");</p>
+<p class="lead-body my-3">}</p>
+<p class="lead-body my-3">}</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PLAINTEXT</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-plaintext"></code></pre></div>
 <p class="lead-body my-3">---</p>
 <h2 id="6-sistema-de-enrutamiento-y-middleware" class="fw-bold mt-5 mb-3 text-secondary heading-section">6. SISTEMA DE ENRUTAMIENTO Y MIDDLEWARE</h2>
-<p class="lead-body my-3">El archivo <code>routes/web.php</code> establece las rutas agrupadas y protegidas por autenticación y asignación de roles.</p>
-<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">&lt;?php
-
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Usuario\TicketUsuarioController; 
-use App\Http\Controllers\Gestor\TicketGestorController;
-use App\Http\Controllers\Tecnico\TicketTecnicoController;
-
-// Página de bienvenida pública
-Route::get('/', function () {
-    return view('welcome');
-});
-
-// Enrutador inteligente de ingreso
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    -&gt;middleware(['auth', 'verified'])
-    -&gt;name('dashboard');
-
-// Rutas de Perfil (Compartidas para usuarios logueados)
-Route::middleware('auth')-&gt;group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])-&gt;name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])-&gt;name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])-&gt;name('profile.destroy');
-});
-
-// --- RUTAS DE USUARIO CLIENTE (Rol: usuario) ---
-Route::middleware(['auth', 'role:usuario'])-&gt;group(function () {
-    Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])-&gt;name('usuario.home');
-    
-    // CRUD y Acciones de Ticket del Cliente
-    Route::get('/mis-tickets', [TicketUsuarioController::class, 'index'])-&gt;name('usuario.tickets.index');
-    Route::get('/mis-tickets/nuevo', [TicketUsuarioController::class, 'create'])-&gt;name('usuario.tickets.create');
-    Route::post('/mis-tickets', [TicketUsuarioController::class, 'store'])-&gt;name('usuario.tickets.store');
-    Route::get('/mis-tickets/{ticket}', [TicketUsuarioController::class, 'show'])-&gt;name('usuario.tickets.show');
-    Route::get('/mis-tickets/{ticket}/editar', [TicketUsuarioController::class, 'edit'])-&gt;name('usuario.tickets.edit');
-    Route::put('/tickets/{id}', [TicketUsuarioController::class, 'update'])-&gt;name('usuario.tickets.update');
-    Route::delete('/tickets/{id}', [TicketUsuarioController::class, 'destroy'])-&gt;name('usuario.tickets.destroy');
-    
-    // Enviar borrador a soporte y chatear
-    Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])-&gt;name('usuario.tickets.enviar');
-    Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])-&gt;name('usuario.tickets.comentar');
-});
-
-// --- RUTAS DE GESTOR Y ADMIN (Acceso Operativo Compartido) ---
-Route::middleware(['auth', 'role:gestor|admin'])-&gt;prefix('gestor')-&gt;name('gestor.')-&gt;group(function () {
-    Route::get('/tickets', [TicketGestorController::class, 'index'])-&gt;name('tickets.index');
-    Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])-&gt;name('tickets.asignar');
-    Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])-&gt;name('tickets.show');
-    Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])-&gt;name('tickets.comentar');
-});
-
-// --- RUTAS DE TECNICO ESPECIALISTA (Rol: tecnico) ---
-Route::middleware(['auth', 'role:tecnico'])-&gt;prefix('tecnico')-&gt;name('tecnico.')-&gt;group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])-&gt;name('dashboard');
-    Route::get('/tickets', [TicketTecnicoController::class, 'index'])-&gt;name('tickets.index');
-    Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])-&gt;name('tickets.show');
-    Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])-&gt;name('tickets.comentar');
-    
-    // Resolver y gestionar soluciones
-    Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])-&gt;name('tickets.resolver');
-    Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])-&gt;name('tickets.guardar-solucion');
-    Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])-&gt;name('tickets.editar-solucion');
-    Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])-&gt;name('tickets.actualizar-solucion');
-});
-
-// Rutas de autenticación por defecto (Laravel Breeze)
-require __DIR__.'/auth.php';
-</code></pre></div>
+<p class="lead-body my-3">&lt;?php</p>
+<p class="lead-body my-3">use App\Http\Controllers\ProfileController;</p>
+<p class="lead-body my-3">use Illuminate\Support\Facades\Route;</p>
+<p class="lead-body my-3">use App\Http\Controllers\DashboardController;</p>
+<p class="lead-body my-3">use App\Http\Controllers\Usuario\TicketUsuarioController;</p>
+<p class="lead-body my-3">use App\Http\Controllers\Gestor\TicketGestorController;</p>
+<p class="lead-body my-3">use App\Http\Controllers\Tecnico\TicketTecnicoController;</p>
+<p class="lead-body my-3">use App\Http\Controllers\Admin\CategoriaController;</p>
+<p class="lead-body my-3">Route::get('/', function () {</p>
+<p class="lead-body my-3">return view('welcome');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">Route::get('/unidades-hijas/{parentId}', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'getChildrenUnidades'])-&gt;name('unidades.hijas');</p>
+<p class="lead-body my-3">Route::get('/dashboard', [DashboardController::class, 'index'])</p>
+<p class="lead-body my-3">-&gt;middleware(['auth', 'verified', 'approved'])</p>
+<p class="lead-body my-3">-&gt;name('dashboard');</p>
+<p class="lead-body my-3">Route::get('/espera', function () {</p>
+<p class="lead-body my-3">return view('auth.awaiting-approval');</p>
+<p class="lead-body my-3">})-&gt;middleware('auth')-&gt;name('awaiting-approval');</p>
+<p class="lead-body my-3">Route::middleware(['auth', 'approved'])-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/profile', [ProfileController::class, 'edit'])-&gt;name('profile.edit');</p>
+<p class="lead-body my-3">Route::patch('/profile', [ProfileController::class, 'update'])-&gt;name('profile.update');</p>
+<p class="lead-body my-3">Route::delete('/profile', [ProfileController::class, 'destroy'])-&gt;name('profile.destroy');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">// --- RUTAS DE USUARIO CLIENTE (Rol: usuario) ---</p>
+<p class="lead-body my-3">Route::middleware(['auth', 'approved', 'role:usuario'])-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])-&gt;name('usuario.home');</p>
+<p class="lead-body my-3">Route::get('/mis-tickets', [TicketUsuarioController::class, 'index'])-&gt;name('usuario.tickets.index');</p>
+<p class="lead-body my-3">Route::get('/mis-tickets/nuevo', [TicketUsuarioController::class, 'create'])-&gt;name('usuario.tickets.create');</p>
+<p class="lead-body my-3">Route::post('/mis-tickets', [TicketUsuarioController::class, 'store'])-&gt;name('usuario.tickets.store');</p>
+<p class="lead-body my-3">Route::get('/mis-tickets/{ticket}', [TicketUsuarioController::class, 'show'])-&gt;name('usuario.tickets.show');</p>
+<p class="lead-body my-3">Route::get('/mis-tickets/{ticket}/editar', [TicketUsuarioController::class, 'edit'])-&gt;name('usuario.tickets.edit');</p>
+<p class="lead-body my-3">Route::post('/mis-tickets/{ticket}/enviar', [TicketUsuarioController::class, 'enviar'])-&gt;name('usuario.tickets.enviar');</p>
+<p class="lead-body my-3">Route::put('/tickets/{id}', [TicketUsuarioController::class, 'update'])-&gt;name('usuario.tickets.update');</p>
+<p class="lead-body my-3">Route::delete('/tickets/{id}', [TicketUsuarioController::class, 'destroy'])-&gt;name('usuario.tickets.destroy');</p>
+<p class="lead-body my-3">Route::post('/tickets/{id}/comentar', [TicketUsuarioController::class, 'storeComentario'])-&gt;name('usuario.tickets.comentar');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">// --- RUTAS ADMINISTRATIVAS GLOBALES (Bajo prefijo admin) ---</p>
+<p class="lead-body my-3">Route::middleware(['auth', 'approved'])-&gt;prefix('admin')-&gt;name('admin.')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/dashboard', [DashboardController::class, 'index'])-&gt;name('dashboard')-&gt;middleware('can:ver-panel-operativo');</p>
+<p class="lead-body my-3">Route::middleware('can:gestionar-roles')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">Route::middleware('can:gestionar-categorias')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::resource('categorias', CategoriaController::class);</p>
+<p class="lead-body my-3">Route::post('categorias/{categoria}/activate', [CategoriaController::class, 'activate'])-&gt;name('categorias.activate');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">Route::middleware('can:gestionar-usuarios')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/usuarios/pendientes', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'index'])-&gt;name('usuarios.pendientes');</p>
+<p class="lead-body my-3">Route::post('/usuarios/pendientes/{id}/aprobar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'aprobar'])-&gt;name('usuarios.aprobar');</p>
+<p class="lead-body my-3">Route::delete('/usuarios/pendientes/{id}/rechazar', [\App\Http\Controllers\Admin\UsuarioAprobacionController::class, 'rechazar'])-&gt;name('usuarios.rechazar');</p>
+<p class="lead-body my-3">Route::get('/usuarios', [\App\Http\Controllers\Admin\UsuarioController::class, 'index'])-&gt;name('usuarios.index');</p>
+<p class="lead-body my-3">Route::post('/usuarios/{id}/update-role', [\App\Http\Controllers\Admin\UsuarioController::class, 'updateRole'])-&gt;name('usuarios.update-role');</p>
+<p class="lead-body my-3">Route::post('/usuarios/{id}/toggle', [\App\Http\Controllers\Admin\UsuarioController::class, 'toggleStatus'])-&gt;name('usuarios.toggle');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">Route::middleware('can:ver-configuraciones')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/estructura', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'index'])-&gt;name('estructura.index');</p>
+<p class="lead-body my-3">Route::post('/estructura/unidades', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'storeUnidad'])-&gt;name('estructura.unidades.store');</p>
+<p class="lead-body my-3">Route::put('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'updateUnidad'])-&gt;name('estructura.unidades.update');</p>
+<p class="lead-body my-3">Route::delete('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'destroyUnidad'])-&gt;name('estructura.unidades.destroy');</p>
+<p class="lead-body my-3">Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])-&gt;name('configuraciones.index');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])-&gt;name('configuraciones.niveles.reorder');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])-&gt;name('configuraciones.niveles.toggle');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/ad', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateAd'])-&gt;name('configuraciones.ad.update');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/ad/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleAd'])-&gt;name('configuraciones.ad.toggle');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/ad/test', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'testAd'])-&gt;name('configuraciones.ad.test');</p>
+<p class="lead-body my-3">Route::post('/configuraciones/niveles', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'storeNivel'])-&gt;name('configuraciones.niveles.store');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">// --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---</p>
+<p class="lead-body my-3">Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])-&gt;prefix('soporte')-&gt;name('soporte.')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/dashboard', [DashboardController::class, 'index'])-&gt;name('dashboard');</p>
+<p class="lead-body my-3">Route::middleware('can:asignar-tickets')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/tickets', [TicketGestorController::class, 'index'])-&gt;name('tickets.index');</p>
+<p class="lead-body my-3">Route::post('/tickets/{id}/asignar', [TicketGestorController::class, 'asignar'])-&gt;name('tickets.asignar');</p>
+<p class="lead-body my-3">Route::get('/tickets/{id}', [TicketGestorController::class, 'show'])-&gt;name('tickets.show');</p>
+<p class="lead-body my-3">Route::post('/tickets/{id}/comentar', [TicketGestorController::class, 'comentar'])-&gt;name('tickets.comentar');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">Route::middleware('can:resolver-tickets')-&gt;prefix('tecnico')-&gt;name('tickets.tecnico.')-&gt;group(function () {</p>
+<p class="lead-body my-3">Route::get('/tickets', [TicketTecnicoController::class, 'index'])-&gt;name('index');</p>
+<p class="lead-body my-3">Route::get('/tickets/{id}', [TicketTecnicoController::class, 'show'])-&gt;name('show');</p>
+<p class="lead-body my-3">Route::post('/tickets/{id}/comentar', [TicketTecnicoController::class, 'comentar'])-&gt;name('comentar');</p>
+<p class="lead-body my-3">Route::get('/tickets/{id}/resolver', [TicketTecnicoController::class, 'crearSolucion'])-&gt;name('resolver');</p>
+<p class="lead-body my-3">Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])-&gt;name('guardar-solucion');</p>
+<p class="lead-body my-3">Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])-&gt;name('editar-solucion');</p>
+<p class="lead-body my-3">Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])-&gt;name('actualizar-solucion');</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">});</p>
+<p class="lead-body my-3">require __DIR__.'/auth.php';</p>
 <p class="lead-body my-3">---</p>
 <h2 id="7-interfaz-grfica-layouts-y-vistas-blade" class="fw-bold mt-5 mb-3 text-secondary heading-section">7. INTERFAZ GRÁFICA (LAYOUTS Y VISTAS BLADE)</h2>
 <p class="lead-body my-3">El sistema cuenta con un frontend responsivo premium, implementado con <strong>Bootstrap 5.3.3</strong> e iconos vectoriales. Soporta cambiar dinámicamente entre el tema claro y oscuro de manera integrada.</p>
@@ -1468,6 +1671,101 @@ class UsuarioLayout extends Component
     }
 }
 </code></pre></div>
+<h3 id="d-estructura-y-vistas-de-categoras-crud-y-ajax" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">D. Estructura y Vistas de Categorías (CRUD y AJAX)</h3>
+<p class="lead-body my-3">Las vistas del módulo de categorías implementan una interacción asíncrona reactiva sin refrescar la página.</p>
+<h4 id="1-listado-principal-admincategoriasindexbladephp" class="fw-bold mt-3 mb-2 heading-section">1. Listado Principal (`admin/categorias/index.blade.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>HTML</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-html">@extends("layouts.admin")
+
+@section("content")
+    &lt;div class="container-fluid"&gt;
+        &lt;h1 class="h3 mb-4 text-gray-800"&gt;Gestión de Categorías&lt;/h1&gt;
+
+        &lt;div class="d-flex justify-content-between mb-4"&gt;
+            &lt;a href="{{ route("admin.categorias.create") }}" class="btn btn-primary"&gt;
+                &lt;i class="bi bi-plus-circle me-2"&gt;&lt;/i&gt; Nueva Categoría
+            &lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div id="ajax-messages" class="mb-4"&gt;
+            @if (session("success"))
+                &lt;div class="alert alert-success alert-dismissible fade show" role="alert"&gt;
+                    {{ session("success") }}
+                    &lt;button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"&gt;&lt;/button&gt;
+                &lt;/div&gt;
+            @endif
+        &lt;/div&gt;
+
+        &lt;div class="card shadow mb-4 card-premium"&gt;
+            &lt;div class="card-header py-3"&gt;
+                &lt;h6 class="m-0 font-weight-bold text-primary"&gt;Listado de Categorías&lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div class="card-body"&gt;
+                &lt;form id="filter-form" action="{{ route("admin.categorias.index") }}" method="GET" class="mb-4"&gt;
+                    &lt;div class="row g-3 align-items-center"&gt;
+                        &lt;div class="col-md-4"&gt;
+                            &lt;input type="text" name="search" class="form-control" placeholder="Buscar por nombre..." value="{{ request("search") }}"&gt;
+                        &lt;/div&gt;
+                        &lt;div class="col-md-3"&gt;
+                            &lt;select name="estado" class="form-select"&gt;
+                                &lt;option value=""&gt;Todos los estados&lt;/option&gt;
+                                &lt;option value="activo" {{ request("estado") == "activo" ? "selected" : "" }}&gt;Activas&lt;/option&gt;
+                                &lt;option value="inactivo" {{ request("estado") == "inactivo" ? "selected" : "" }}&gt;Inactivas&lt;/option&gt;
+                            &lt;/select&gt;
+                        &lt;/div&gt;
+                        &lt;div class="col-md-2"&gt;
+                            &lt;button type="submit" class="btn btn-info"&gt;Buscar&lt;/button&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/form&gt;
+
+                &lt;div id="categorias-list"&gt;
+                    @include("admin.categorias._categorias_table", ["categorias" =&gt; $categorias])
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+@endsection
+</code></pre></div>
+<h4 id="2-tabla-parcial-de-recarga-ajax-categoriastablebladephp" class="fw-bold mt-3 mb-2 heading-section">2. Tabla Parcial de Recarga AJAX (`_categorias_table.blade.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>HTML</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-html">&lt;div class="table-responsive"&gt;
+    &lt;table class="table table-bordered table-striped align-middle"&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;ID&lt;/th&gt;
+                &lt;th&gt;Nombre&lt;/th&gt;
+                &lt;th&gt;Estado&lt;/th&gt;
+                &lt;th&gt;Creado Por&lt;/th&gt;
+                &lt;th&gt;Última Actualización&lt;/th&gt;
+                &lt;th&gt;Acciones&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            @forelse ($categorias as $cat)
+                &lt;tr&gt;
+                    &lt;td&gt;{{ $cat-&gt;id_categoria }}&lt;/td&gt;
+                    &lt;td&gt;{{ $cat-&gt;nombre_categoria }}&lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;span class="badge {{ $cat-&gt;estado ? 'bg-success' : 'bg-danger' }}"&gt;
+                            {{ $cat-&gt;estado ? 'Activo' : 'Inactivo' }}
+                        &lt;/span&gt;
+                    &lt;/td&gt;
+                    &lt;td&gt;{{ $cat-&gt;creator-&gt;name ?? 'N/A' }}&lt;/td&gt;
+                    &lt;td&gt;{{ $cat-&gt;updater-&gt;name ?? 'N/A' }}&lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;a href="{{ route('admin.categorias.edit', $cat-&gt;id_categoria) }}" class="btn btn-sm btn-warning"&gt;Editar&lt;/a&gt;
+                    &lt;/td&gt;
+                &lt;/tr&gt;
+            @endforelse
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+{{ $categorias-&gt;links() }}
+</code></pre></div>
+<h3 id="e-mejoras-de-responsividad-mobile-first-y-adaptacin-css" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">E. Mejoras de Responsividad (Mobile First y Adaptación CSS)</h3>
+<p class="lead-body my-3">Para asegurar el soporte al 100% de dispositivos móviles en la administración:</p>
+<p class="lead-body my-3">1. <strong>Sidebar Off-Canvas</strong>: Se modificó <code>layouts/admin.blade.php</code> con clases <code>transform: translateX(-100%)</code> y media-queries <code>@media (max-width: 991.98px)</code>.</p>
+<p class="lead-body my-3">2. <strong>Backdrop</strong>: Un elemento de fondo <code>.sidebar-backdrop</code> con filtro difuminado permite cerrar el menú al hacer clic en el exterior.</p>
+<p class="lead-body my-3">3. <strong>Mobile Header</strong>: Cabecera compacta visible únicamente en pantallas pequeñas con el botón para desplegar la barra de navegación lateral.</p>
 <p class="lead-body my-3">---</p>
 <h2 id="8-mdulo-de-seguridad-y-directorio-de-usuarios" class="fw-bold mt-5 mb-3 text-secondary heading-section">8. MÓDULO DE SEGURIDAD Y DIRECTORIO DE USUARIOS</h2>
 <p class="lead-body my-3">El sistema integra un módulo avanzado de administración, protegido íntegramente por permisos granulares (Spatie), diseñado para gestionar el ciclo de vida, los accesos y la aprobación de nuevos integrantes.</p>
@@ -1490,31 +1788,353 @@ class UsuarioLayout extends Component
 <li>  Esto disocia el poder de "gestionar roles" del de "gestionar cuentas", permitiendo una delegación de responsabilidades más fina en el futuro.</li>
 <li>  La UI del menú lateral de administrador evalúa este permiso dinámicamente antes de renderizar los enlaces.</li>
 </ul>
-
-<h3 id="84-integracion-de-directorio-de-identidades-active-directory-openldap" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.4 Integración de Directorio de Identidades (Active Directory & OpenLDAP)</h3>
+<h3 id="84-integracin-de-directorio-de-identidades-active-directory--openldap" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.4 Integración de Directorio de Identidades (Active Directory & OpenLDAP)</h3>
 <p class="lead-body my-3">El sistema cuenta con un panel avanzado de integración con directorios LDAP en la sección de configuraciones. Para dar soporte multi-institucional, se diseñó una interfaz con pestañas dinámicas que se adapta a dos proveedores principales:</p>
+<p class="lead-body my-3">1. <strong>Windows Active Directory</strong>:</p>
 <ul class="list-custom mb-3">
-<li>  <strong>Windows Active Directory</strong>:
-  <ul>
-    <li>Usuario Bind (sAMAccountName / DN): DN completo de la cuenta de lectura (ej: <code>CN=Admin,CN=Users,DC=dominio,DC=local</code>).</li>
-    <li>Atributo de Validación: <code>sAMAccountName</code> (usuario corto clásico como <code>tito.castro</code>) o <code>userPrincipalName</code> (UPN estilo correo como <code>tito.castro@empresa.com</code>).</li>
-    <li>Mapeo de Atributos: Nombre real extraído mediante <code>displayName</code> o <code>cn</code>.</li>
-  </ul>
-</li>
-<li>  <strong>OpenLDAP / Linux LDAP</strong>:
-  <ul>
-    <li>Usuario Bind: DN completo (ej: <code>cn=admin,dc=empresa,dc=com</code>).</li>
-    <li>Atributo de Búsqueda / Validación: <code>uid</code> (identificador único LDAP estándar de Linux) o <code>cn</code> (nombre común).</li>
-    <li>Mapeo de Atributos: Nombre real mapeado por defecto mediante <code>cn</code>.</li>
-  </ul>
-</li>
+<li><strong>Usuario Bind (sAMAccountName / DN)</strong>: DN completo de la cuenta de lectura (ej: <code>CN=Admin,CN=Users,DC=dominio,DC=local</code>).</li>
+<li><strong>Atributo de Validación</strong>: <code>sAMAccountName</code> (usuario corto clásico como <code>tito.castro</code>) o <code>userPrincipalName</code> (UPN estilo correo como <code>tito.castro@empresa.com</code>).</li>
+<li><strong>Mapeo de Atributos</strong>: Nombre real extraído mediante <code>displayName</code> o <code>cn</code>.</li>
 </ul>
-
-<h4 class="fw-semibold mt-3 mb-2">Características Técnicas e Interacciones:</h4>
+<p class="lead-body my-3">2. <strong>OpenLDAP / Linux LDAP</strong>:</p>
 <ul class="list-custom mb-3">
-<li>  <strong>Interruptor General (Switch Toggle)</strong>: Habilita o deshabilita la integración de identidades globalmente de manera instantánea vía AJAX, realizando un <code>POST</code> asíncrono hacia la ruta <code>admin.configuraciones.ad.toggle</code>.</li>
-<li>  <strong>Probar Conexión (LDAP Test)</strong>: Un botón con spinner de carga que realiza una prueba simulada de conexión y enlace contra el host LDAP indicado, llamando al endpoint <code>/admin/configuraciones/ad/test</code> para comprobar la viabilidad de la red antes de guardar cambios definitivos.</li>
-<li>  <strong>Persistencia</strong>: Se almacena en la estructura de configuración global y se lee a través del archivo de configuración <code>config/ad.php</code>.</li>
+<li><strong>Usuario Bind</strong>: DN completo (ej: <code>cn=admin,dc=empresa,dc=com</code>).</li>
+<li><strong>Atributo de Búsqueda / Validación</strong>: <code>uid</code> (identificador único LDAP estándar de Linux) o <code>cn</code> (nombre común).</li>
+<li><strong>Mapeo de Atributos</strong>: Nombre real mapeado por defecto mediante <code>cn</code>.</li>
+</ul>
+<h4 id="caractersticas-tcnicas-e-interacciones" class="fw-bold mt-3 mb-2 heading-section">Características Técnicas e Interacciones:</h4>
+<ul class="list-custom mb-3">
+<li><strong>Interruptor General (Switch Toggle)</strong>: Habilita o deshabilita la integración de identidades globalmente de manera instantánea vía AJAX, realizando un <code>POST</code> asíncrono hacia la ruta <code>admin.configuraciones.ad.toggle</code>.</li>
+<li><strong>Probar Conexión (LDAP Test)</strong>: Un botón con spinner de carga que realiza una prueba simulada de conexión y enlace contra el host LDAP indicado, llamando al endpoint <code>/admin/configuraciones/ad/test</code> para comprobar la viabilidad de la red antes de guardar cambios definitivos.</li>
+<li><strong>Persistencia</strong>: Se almacena en la estructura de configuración global y se lee a través del archivo de configuración <code>config/ad.php</code>.</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h3 id="85-mdulo-de-asignacin-y-control-de-equipos-inventario-de-activos" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.5 Módulo de Asignación y Control de Equipos (Inventario de Activos)</h3>
+<p class="lead-body my-3">Este módulo gestiona el inventario físico e intangible de la institución, permitiendo relacionar los activos directamente con los usuarios de la plataforma y tipificando de manera fluida los problemas de soporte.</p>
+<h4 id="a-estructura-de-datos-y-migraciones" class="fw-bold mt-3 mb-2 heading-section">A. Estructura de Datos y Migraciones</h4>
+<p class="lead-body my-3">La base de datos contiene la tabla <code>equipos</code> con columnas dinámicas según el tipo de elemento, manteniendo la constante de un número de bien institucional.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_26_000001_create_equipos_table.php
+Schema::create('equipos', function (Blueprint $table) {
+    $table-&gt;id('id_equipo');
+    $table-&gt;string('nombre');
+    $table-&gt;string('marca')-&gt;nullable();
+    $table-&gt;string('modelo')-&gt;nullable();
+    $table-&gt;string('numero_bien')-&gt;nullable()-&gt;unique();
+    $table-&gt;string('ip_address')-&gt;nullable();
+    $table-&gt;string('mac_address')-&gt;nullable();
+    
+    // Relación con tipo de equipo
+    $table-&gt;unsignedBigInteger('id_tipo_equipo');
+    $table-&gt;foreign('id_tipo_equipo')
+          -&gt;references('id_tipo_equipo')
+          -&gt;on('tipos_equipo')
+          -&gt;onDelete('restrict');
+    
+    // Relación con usuario asignado
+    $table-&gt;unsignedBigInteger('id_usuario_asignado')-&gt;nullable();
+    $table-&gt;foreign('id_usuario_asignado')
+          -&gt;references('id')
+          -&gt;on('users')
+          -&gt;onDelete('set null');
+          
+    $table-&gt;boolean('estado')-&gt;default(true);
+    $table-&gt;timestamps();
+});
+</code></pre></div>
+<p class="lead-body my-3">Se agrega una columna <code>id_equipo</code> a la tabla <code>tickets</code> para rastrear de forma exacta el activo afectado en las solicitudes:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_26_000003_add_id_equipo_to_tickets_table.php
+Schema::table('tickets', function (Blueprint $table) {
+    $table-&gt;unsignedBigInteger('id_equipo')-&gt;nullable()-&gt;after('id_tipo_equipo');
+    $table-&gt;foreign('id_equipo')
+          -&gt;references('id_equipo')
+          -&gt;on('equipos')
+          -&gt;onDelete('set null');
+});
+</code></pre></div>
+<h4 id="b-modelo-de-equipos-equipophp" class="fw-bold mt-3 mb-2 heading-section">B. Modelo de Equipos (`Equipo.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Models/Equipo.php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Equipo extends Model
+{
+    use HasFactory;
+
+    protected $table = 'equipos';
+    protected $primaryKey = 'id_equipo';
+
+    protected $fillable = [
+        'nombre', 'marca', 'modelo', 'numero_bien',
+        'ip_address', 'mac_address', 'id_tipo_equipo',
+        'id_usuario_asignado', 'estado'
+    ];
+
+    protected $casts = [
+        'estado' =&gt; 'boolean',
+    ];
+
+    public function tipoEquipo()
+    {
+        return $this-&gt;belongsTo(TipoEquipo::class, 'id_tipo_equipo', 'id_tipo_equipo');
+    }
+
+    public function usuarioAsignado()
+    {
+        return $this-&gt;belongsTo(User::class, 'id_usuario_asignado', 'id');
+    }
+}
+</code></pre></div>
+<h4 id="c-controlador-administrativo-equipocontrollerphp" class="fw-bold mt-3 mb-2 heading-section">C. Controlador Administrativo (`EquipoController.php`)</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// app/Http/Controllers/Admin/EquipoController.php
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Equipo;
+use App\Models\TipoEquipo;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class EquipoController extends Controller
+{
+    public function __construct()
+    {
+        $this-&gt;middleware("can:gestionar-equipos");
+    }
+
+    public function index(Request $request)
+    {
+        $query = Equipo::query();
+
+        if ($request-&gt;filled("search")) {
+            $search = $request-&gt;search;
+            $query-&gt;where(function ($q) use ($search) {
+                $q-&gt;where("nombre", "like", "%" . $search . "%")
+                  -&gt;orWhere("numero_bien", "like", "%" . $search . "%")
+                  -&gt;orWhere("marca", "like", "%" . $search . "%")
+                  -&gt;orWhere("modelo", "like", "%" . $search . "%");
+            });
+        }
+
+        if ($request-&gt;filled("id_tipo_equipo")) {
+            $query-&gt;where("id_tipo_equipo", $request-&gt;id_tipo_equipo);
+        }
+
+        if ($request-&gt;filled("estado")) {
+            $query-&gt;where("estado", $request-&gt;estado == "activo" ? true : false);
+        }
+
+        $equipos = $query-&gt;with(['tipoEquipo', 'usuarioAsignado'])-&gt;paginate(10);
+        $tipos = TipoEquipo::all();
+
+        if ($request-&gt;ajax()) {
+            return view("admin.equipos._equipos_table", compact("equipos"))-&gt;render();
+        }
+
+        return view("admin.equipos.index", compact("equipos", "tipos"));
+    }
+
+    public function create()
+    {
+        $tipos = TipoEquipo::all();
+        $usuarios = User::where('is_approved', true)-&gt;with('persona')-&gt;get();
+        return view("admin.equipos.create", compact("tipos", "usuarios"));
+    }
+
+    public function store(Request $request)
+    {
+        $request-&gt;validate([
+            "nombre" =&gt; "required|string|max:150",
+            "marca" =&gt; "nullable|string|max:100",
+            "modelo" =&gt; "nullable|string|max:100",
+            "numero_bien" =&gt; "nullable|string|max:100|unique:equipos,numero_bien",
+            "ip_address" =&gt; "nullable|ip",
+            "mac_address" =&gt; "nullable|string|max:50",
+            "id_tipo_equipo" =&gt; "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_usuario_asignado" =&gt; "nullable|exists:users,id",
+            "estado" =&gt; "required|boolean",
+        ]);
+
+        Equipo::create($request-&gt;all());
+
+        return redirect()-&gt;route("admin.equipos.index")-&gt;with("success", "Equipo registrado exitosamente.");
+    }
+
+    public function edit(Equipo $equipo)
+    {
+        $tipos = TipoEquipo::all();
+        $usuarios = User::where('is_approved', true)-&gt;with('persona')-&gt;get();
+        return view("admin.equipos.edit", compact("equipo", "tipos", "usuarios"));
+    }
+
+    public function update(Request $request, Equipo $equipo)
+    {
+        $request-&gt;validate([
+            "nombre" =&gt; "required|string|max:150",
+            "marca" =&gt; "nullable|string|max:100",
+            "modelo" =&gt; "nullable|string|max:100",
+            "numero_bien" =&gt; "nullable|string|max:100|unique:equipos,numero_bien," . $equipo-&gt;id_equipo . ",id_equipo",
+            "ip_address" =&gt; "nullable|ip",
+            "mac_address" =&gt; "nullable|string|max:50",
+            "id_tipo_equipo" =&gt; "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_usuario_asignado" =&gt; "nullable|exists:users,id",
+            "estado" =&gt; "required|boolean",
+        ]);
+
+        $equipo-&gt;update($request-&gt;all());
+
+        return redirect()-&gt;route("admin.equipos.index")-&gt;with("success", "Equipo actualizado exitosamente.");
+    }
+
+    public function destroy(Equipo $equipo)
+    {
+        try {
+            $equipo-&gt;delete();
+            return redirect()-&gt;route("admin.equipos.index")-&gt;with("success", "Equipo eliminado del inventario.");
+        } catch (\Exception $e) {
+            return redirect()-&gt;route("admin.equipos.index")-&gt;with("error", "No se puede eliminar el equipo porque está asociado a registros históricos.");
+        }
+    }
+}
+</code></pre></div>
+<h4 id="d-integracin-en-el-panel-de-usuario-final" class="fw-bold mt-3 mb-2 heading-section">D. Integración en el Panel de Usuario Final</h4>
+<ul class="list-custom mb-3">
+<li><strong>Mis Equipos</strong>: Se añade una vista de tarjetas al Dashboard del usuario (<code>home.blade.php</code>) donde se le listan detalladamente todos los dispositivos asignados a su cuenta para mayor visibilidad.</li>
+<li><strong>Auto-selección Inteligente en Tickets</strong>: Al abrir un nuevo ticket (<code>usuario/tickets/create.blade.php</code>), se provee el listado de sus equipos personales. Mediante Javascript reactivo, si el usuario selecciona uno de sus equipos, el campo "Tipo de Equipo" se sincroniza automáticamente con el tipo correspondiente:</li>
+</ul>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>JAVASCRIPT</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-javascript">$('#equipo-select').on('change', function() {
+    let selectedOption = $(this).find('option:selected');
+    let tipoId = selectedOption.data('tipo');
+    if (tipoId) {
+        $('#tipo-equipo-select').val(tipoId);
+    }
+});
+</code></pre></div>
+<p class="lead-body my-3">---</p>
+<h3 id="86-mdulo-de-marcas-y-modelos-relacionales-selects-ajax-dinmicos" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.6 Módulo de Marcas y Modelos Relacionales (Selects AJAX Dinámicos)</h3>
+<p class="lead-body my-3">Para simplificar la categorización de activos y habilitar relaciones jerárquicas en el inventario (ej. que los modelos dependan directamente del fabricante), se refactorizó la especificación de texto libre a tablas dedicadas (<code>marcas</code> y <code>modelos</code>).</p>
+<h4 id="a-base-de-datos-e-integracin-relacional" class="fw-bold mt-3 mb-2 heading-section">A. Base de Datos e Integración Relacional</h4>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_26_000004_create_marcas_table.php
+Schema::create('marcas', function (Blueprint $table) {
+    $table-&gt;id('id_marca');
+    $table-&gt;string('nombre_marca')-&gt;unique();
+    $table-&gt;timestamps();
+});
+
+// database/migrations/2026_05_26_000005_create_modelos_table.php
+Schema::create('modelos', function (Blueprint $table) {
+    $table-&gt;id('id_modelo');
+    $table-&gt;string('nombre_modelo');
+    $table-&gt;unsignedBigInteger('id_marca');
+    $table-&gt;foreign('id_marca')-&gt;references('id_marca')-&gt;on('marcas')-&gt;onDelete('cascade');
+    $table-&gt;timestamps();
+    $table-&gt;unique(['nombre_modelo', 'id_marca']);
+});
+</code></pre></div>
+<h4 id="b-modelos-eloquent-vinculados" class="fw-bold mt-3 mb-2 heading-section">B. Modelos Eloquent Vinculados</h4>
+<p class="lead-body my-3">El modelo <code>Equipo.php</code> se actualizó para admitir relaciones de objetos en lugar de campos planos:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">public function marca()
+{
+    return $this-&gt;belongsTo(Marca::class, 'id_marca', 'id_marca');
+}
+
+public function modelo()
+{
+    return $this-&gt;belongsTo(Modelo::class, 'id_modelo', 'id_modelo');
+}
+</code></pre></div>
+<h4 id="c-lgica-ajax-de-carga-dependiente" class="fw-bold mt-3 mb-2 heading-section">C. Lógica AJAX de Carga Dependiente</h4>
+<p class="lead-body my-3">Cuando el administrador cambia la marca seleccionada en los formularios de registro o edición, una llamada AJAX asíncrona consulta la ruta de la API <code>/admin/marcas/{id}/modelos</code> para repoblar al instante el combo de modelos con los dispositivos compatibles de ese fabricante.</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>JAVASCRIPT</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-javascript">$('#id_marca').on('change', function() {
+    let marcaId = $(this).val();
+    let modeloSelect = $('#id_modelo');
+    modeloSelect.empty().append('&lt;option value=""&gt;-- Cargando modelos... --&lt;/option&gt;');
+    
+    if (marcaId) {
+        $.ajax({
+            url: `/admin/marcas/${marcaId}/modelos`,
+            type: 'GET',
+            success: function(data) {
+                modeloSelect.empty().append('&lt;option value=""&gt;-- Seleccionar Modelo --&lt;/option&gt;');
+                data.forEach(function(modelo) {
+                    modeloSelect.append(`&lt;option value="${modelo.id_modelo}"&gt;${modelo.nombre_modelo}&lt;/option&gt;`);
+                });
+            }
+        });
+    }
+});
+</code></pre></div>
+<h3 id="87-mdulo-de-auditora-integral-y-rendimiento-tcnico" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">8.7 Módulo de Auditoría Integral y Rendimiento Técnico</h3>
+<p class="lead-body my-3">Para habilitar un seguimiento preciso y auditar qué usuarios realizan cambios en el catálogo, además de monitorear el desempeño de los técnicos de soporte, se implementaron soluciones avanzadas a nivel de base de datos, backend y visualización.</p>
+<h4 id="a-nuevas-estructuras-de-base-de-datos" class="fw-bold mt-3 mb-2 heading-section">A. Nuevas Estructuras de Base de Datos</h4>
+<p class="lead-body my-3">Se crearon e implementaron tres migraciones para normalizar y auditar datos:</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">// database/migrations/2026_05_26_140211_deduplicate_and_add_unique_to_categorias_table.php
+Schema::table('categorias', function (Blueprint $table) {
+    $table-&gt;string('nombre_categoria', 100)-&gt;unique()-&gt;change();
+});
+
+// database/migrations/2026_05_26_140228_add_categoria_nombre_historico_to_tickets_table.php
+Schema::table('tickets', function (Blueprint $table) {
+    $table-&gt;string('categoria_nombre_historico')-&gt;nullable()-&gt;after('id_categoria');
+});
+
+// database/migrations/2026_05_26_140241_create_audit_logs_table.php
+Schema::create('audit_logs', function (Blueprint $table) {
+    $table-&gt;id();
+    $table-&gt;unsignedBigInteger('user_id')-&gt;nullable();
+    $table-&gt;string('auditable_type');
+    $table-&gt;unsignedBigInteger('auditable_id');
+    $table-&gt;string('action'); // create, update, delete
+    $table-&gt;json('old_values')-&gt;nullable();
+    $table-&gt;json('new_values')-&gt;nullable();
+    $table-&gt;string('ip_address', 45)-&gt;nullable();
+    $table-&gt;text('user_agent')-&gt;nullable();
+    $table-&gt;timestamp('created_at')-&gt;nullable();
+    
+    $table-&gt;foreign('user_id')-&gt;references('id')-&gt;on('users')-&gt;onDelete('set null');
+});
+</code></pre></div>
+<h4 id="b-trait-auditable-para-seguimiento-automatizado" class="fw-bold mt-3 mb-2 heading-section">B. Trait `Auditable` para Seguimiento Automatizado</h4>
+<p class="lead-body my-3">Se creó el trait <code>App\Traits\Auditable.php</code> para registrar cambios en los modelos <code>Categoria</code>, <code>Marca</code>, <code>Modelo</code> y <code>TipoEquipo</code> conectándose a los eventos del ciclo de vida de Eloquent (<code>created</code>, <code>updated</code>, <code>deleted</code>):</p>
+<div class="code-container my-4 shadow-sm position-relative"><div class="code-header d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white-50 border-bottom border-secondary border-opacity-25 rounded-top small"><span><i class="bi bi-code-slash me-2"></i>PHP</span><button class="btn btn-link text-white-50 btn-sm p-0 text-decoration-none btn-copy" onclick="copyCode(this)"><i class="bi bi-clipboard me-1"></i>Copiar</button></div><pre class="m-0 rounded-bottom"><code class="language-php">namespace App\Traits;
+
+use App\Models\AuditLog;
+use Illuminate\Support\Facades\Auth;
+
+trait Auditable
+{
+    public static function bootAuditable()
+    {
+        static::created(function ($model) {
+            $model-&gt;logAudit('create', null, $model-&gt;getDirtyForAudit());
+        });
+
+        static::updated(function ($model) {
+            $dirty = $model-&gt;getDirtyForAudit();
+            if (!empty($dirty)) {
+                $old = [];
+                foreach ($dirty as $key =&gt; $value) {
+                    $old[$key] = $model-&gt;getOriginal($key);
+                }
+                $model-&gt;logAudit('update', $old, $dirty);
+            }
+        });
+
+        static::deleted(function ($model) {
+            $model-&gt;logAudit('delete', $model-&gt;getAttributes(), null);
+        });
+    }
+}
+</code></pre></div>
+<h4 id="c-controladores-de-auditora-y-rendimiento" class="fw-bold mt-3 mb-2 heading-section">C. Controladores de Auditoría y Rendimiento</h4>
+<p class="lead-body my-3">1.  <strong><code>AuditController.php</code></strong>: Permite la visualización filtrada por acción, tipo de componente y responsable autor de la acción, con paginación avanzada. También incluye los métodos <code>export</code> (para reportes CSV) y <code>exportPdf</code> (para reportes en PDF formal y llamativo en modo horizontal) de manera dinámica y respetando los filtros activos de búsqueda del usuario.</p>
+<p class="lead-body my-3">2.  <strong><code>RendimientoTecnicoController.php</code></strong>: Agrupa y procesa métricas clave de cada técnico especialista, computando dinámicamente la velocidad promedio de resolución de incidentes calculando la brecha temporal entre la asignación del ticket y la fecha del reporte de cierre.</p>
+<h4 id="d-nuevos-permisos-de-seguridad-spatie" class="fw-bold mt-3 mb-2 heading-section">D. Nuevos Permisos de Seguridad (Spatie)</h4>
+<p class="lead-body my-3">Se añadieron permisos de control RBAC granular:</p>
+<ul class="list-custom mb-3">
+<li>  <code>ver-auditorias</code>: Habilita el acceso de lectura a la bitácora histórica de auditorías.</li>
+<li>  <code>ver-rendimiento-tecnico</code>: Permite revisar el tablero de analíticas y productividad del equipo técnico de soporte.</li>
 </ul>
 <p class="lead-body my-3">---</p>
 <h2 id="9-pasos-para-recrear-el-proyecto-desde-cero" class="fw-bold mt-5 mb-3 text-secondary heading-section">9. PASOS PARA RECREAR EL PROYECTO DESDE CERO</h2>

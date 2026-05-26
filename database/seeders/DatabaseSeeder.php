@@ -36,6 +36,10 @@ class DatabaseSeeder extends Seeder
         $permVerConfig         = Permission::updateOrCreate(["name" => "ver-configuraciones"]);
         $permGestionarUsuarios = Permission::updateOrCreate(["name" => "gestionar-usuarios"]);
         $permGestionarCategorias = Permission::updateOrCreate(["name" => "gestionar-categorias"]);
+        $permGestionarEquipos = Permission::updateOrCreate(["name" => "gestionar-equipos"]);
+        $permGestionarCatalogos = Permission::updateOrCreate(["name" => "gestionar-catalogos"]);
+        $permVerRendimiento = Permission::updateOrCreate(["name" => "ver-rendimiento-tecnico"]);
+        $permVerAuditorias = Permission::updateOrCreate(["name" => "ver-auditorias"]);
 
         // --- 1.3 ASIGNACIÓN DE PERMISOS A ROLES ---
         // Rol Usuario
@@ -52,7 +56,11 @@ class DatabaseSeeder extends Seeder
         $roleGestor->syncPermissions([
             $permVerPanelOperativo,
             $permAsignarTickets,
-            $permComentarInterno
+            $permComentarInterno,
+            $permGestionarEquipos,
+            $permGestionarCatalogos,
+            $permVerRendimiento,
+            $permVerAuditorias
         ]);
 
         // Rol Admin (Tiene todos los permisos)
@@ -89,11 +97,10 @@ class DatabaseSeeder extends Seeder
         Prioridad::firstOrCreate(["nombre_prioridad" => "Alta"]);
         Prioridad::firstOrCreate(["nombre_prioridad" => "Crítica"]);
 
-        TipoEquipo::firstOrCreate(["nombre_tipo_equipo" => "Laptop"]);
-        TipoEquipo::firstOrCreate(["nombre_tipo_equipo" => "Desktop"]);
-        TipoEquipo::firstOrCreate(["nombre_tipo_equipo" => "Impresora"]);
+        $this->call(TipoEquipoSeeder::class);
 
         $this->call(CategoriaSeeder::class);
+        $this->call(MarcaModeloSeeder::class);
 
         // --- 3. CREACIÓN DE PERSONAS ---
         $personaAdmin = Persona::firstOrCreate(

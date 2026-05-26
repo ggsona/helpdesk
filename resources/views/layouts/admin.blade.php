@@ -101,7 +101,7 @@
 
         /* Contenedor de Contenido */
         #content {
-            flex-grow: 1; padding: 2.5rem;
+            flex-grow: 1; padding: 2.5rem 2.5rem 2.5rem 1.5rem;
         }
 
         /* Tarjeta Premium que reacciona al tema */
@@ -280,6 +280,33 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         }
+
+        /* Estilos premium para la paginación (Soporta Dark y Light Mode) */
+        .pagination .page-link {
+            background-color: var(--bs-custom-card-bg, #fff) !important;
+            border-color: var(--bs-border-color) !important;
+            color: var(--bs-body-color) !important;
+            border-radius: 8px !important;
+            margin: 0 3px !important;
+            padding: 8px 16px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+        }
+        [data-bs-theme="dark"] .pagination .page-link {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: #fff !important;
+        }
+        .pagination .page-link:hover {
+            background-color: var(--bs-secondary-bg) !important;
+            border-color: var(--bs-border-color) !important;
+            color: #0d6efd !important;
+        }
     </style>
 </head>
 <body>
@@ -365,12 +392,32 @@
                         @can("gestionar-categorias")
                          <li>
                             <a href="{{ route("admin.categorias.index") }}" class="nav-link {{ request()->routeIs("admin.categorias.*") ? "active" : "" }}">
-                                <i class="bi bi-tags-fill me-3"></i>Categorías
+                                <i class="bi bi-tags-fill me-3"></i>Categorías de Tickets
                             </a>
                         </li>
                         @endcan
-                        <li><a href="#" class="nav-link"><i class="bi bi-pc-display me-3"></i>Asignación de Equipos</a></li>
-                        <li><a href="#" class="nav-link"><i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico</a></li>
+                        @can("gestionar-equipos")
+                        <li>
+                            <a href="{{ route("admin.equipos.index") }}" class="nav-link {{ request()->routeIs("admin.equipos.*") && !request()->routeIs("admin.equipos.catalogos.*") ? "active" : "" }}">
+                                <i class="bi bi-pc-display me-3"></i>Asignación de Equipos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route("admin.equipos.catalogos.index") }}" class="nav-link {{ request()->routeIs("admin.equipos.catalogos.*") ? "active" : "" }}">
+                                <i class="bi bi-list-stars me-3"></i>Catálogo de Activos
+                            </a>
+                        </li>
+                        @endcan
+                        <li>
+                            <a href="{{ route('admin.rendimiento.index') }}" class="nav-link {{ request()->routeIs('admin.rendimiento.*') ? 'active' : '' }}">
+                                <i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.auditorias.index') }}" class="nav-link {{ request()->routeIs('admin.auditorias.*') ? 'active' : '' }}">
+                                <i class="bi bi-journal-text me-3"></i>Bitácora de Auditorías
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </div>
