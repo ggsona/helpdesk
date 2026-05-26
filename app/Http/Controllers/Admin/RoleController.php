@@ -53,6 +53,17 @@ class RoleController extends Controller
         if ($request->has('permissions')) {
             $permissions = Permission::whereIn('id', $request->permissions)->get();
             $role->syncPermissions($permissions);
+
+            \App\Models\AuditLog::create([
+                'user_id' => auth()->id(),
+                'auditable_type' => get_class($role),
+                'auditable_id' => $role->id,
+                'action' => 'sync_permissions',
+                'old_values' => null,
+                'new_values' => ['permissions' => $permissions->pluck('name')->toArray()],
+                'ip_address' => request() ? request()->ip() : null,
+                'user_agent' => request() ? request()->userAgent() : null,
+            ]);
         }
 
         return redirect()->route('admin.roles.index')
@@ -93,9 +104,24 @@ class RoleController extends Controller
             $role->save();
         }
 
+        $oldPermissions = $role->permissions->pluck('name')->toArray();
+
         // Sincronizar permisos (los no seleccionados se quitan automáticamente)
         $permissions = Permission::whereIn('id', $request->permissions ?? [])->get();
         $role->syncPermissions($permissions);
+
+        $newPermissions = $permissions->pluck('name')->toArray();
+
+        \App\Models\AuditLog::create([
+            'user_id' => auth()->id(),
+            'auditable_type' => get_class($role),
+            'auditable_id' => $role->id,
+            'action' => 'sync_permissions',
+            'old_values' => ['permissions' => $oldPermissions],
+            'new_values' => ['permissions' => $newPermissions],
+            'ip_address' => request() ? request()->ip() : null,
+            'user_agent' => request() ? request()->userAgent() : null,
+        ]);
 
         return redirect()->route('admin.roles.index')
             ->with('success', "El rol '{$role->name}' y sus permisos se han actualizado correctamente.");

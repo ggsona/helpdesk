@@ -35,6 +35,10 @@
                         <option value="create" {{ request('action') == 'create' ? 'selected' : '' }}>Crear (create)</option>
                         <option value="update" {{ request('action') == 'update' ? 'selected' : '' }}>Actualizar (update)</option>
                         <option value="delete" {{ request('action') == 'delete' ? 'selected' : '' }}>Eliminar (delete)</option>
+                        <option value="login" {{ request('action') == 'login' ? 'selected' : '' }}>Inicio de Sesión (login)</option>
+                        <option value="logout" {{ request('action') == 'logout' ? 'selected' : '' }}>Cierre de Sesión (logout)</option>
+                        <option value="login_failed" {{ request('action') == 'login_failed' ? 'selected' : '' }}>Sesión Fallida</option>
+                        <option value="sync_permissions" {{ request('action') == 'sync_permissions' ? 'selected' : '' }}>Sincronizar Permisos</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -45,6 +49,10 @@
                         <option value="TipoEquipo" {{ request('type') == 'TipoEquipo' ? 'selected' : '' }}>Tipos de Equipos</option>
                         <option value="Marca" {{ request('type') == 'Marca' ? 'selected' : '' }}>Marcas</option>
                         <option value="Modelo" {{ request('type') == 'Modelo' ? 'selected' : '' }}>Modelos</option>
+                        <option value="User" {{ request('type') == 'User' ? 'selected' : '' }}>Usuarios / Sesiones</option>
+                        <option value="Role" {{ request('type') == 'Role' ? 'selected' : '' }}>Roles de Seguridad</option>
+                        <option value="Ticket" {{ request('type') == 'Ticket' ? 'selected' : '' }}>Tickets de Soporte</option>
+                        <option value="Equipo" {{ request('type') == 'Equipo' ? 'selected' : '' }}>Equipos de Inventario</option>
                     </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
@@ -110,6 +118,22 @@
                                 @elseif($log->action === 'delete')
                                     <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
                                         <i class="bi bi-trash3-fill me-1"></i>Eliminación
+                                    </span>
+                                @elseif($log->action === 'login')
+                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>Ingreso
+                                    </span>
+                                @elseif($log->action === 'logout')
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Salida
+                                    </span>
+                                @elseif($log->action === 'login_failed')
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-exclamation-octagon-fill me-1"></i>Acceso Fallido
+                                    </span>
+                                @elseif($log->action === 'sync_permissions')
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                        <i class="bi bi-shield-check me-1"></i>Permisos Sinc.
                                     </span>
                                 @else
                                     <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">

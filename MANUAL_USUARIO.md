@@ -154,6 +154,45 @@ Desde la sección **Usuarios** (Bajo *Configuración y Activos*), puedes adminis
 *   **Cambiar Roles (Privilegios)**: Al hacer clic en el botón de edición (el lápiz azul) junto al rol actual de un usuario, puedes ascenderlo o reasignarlo. *Ejemplo: Convertir a un 'usuario' en 'técnico'.*
 *   **Interruptor de Acceso (Activar/Desactivar)**: En la columna "Acceso", puedes apagar el interruptor azul para desactivar a un usuario instantáneamente (por ejemplo, por despido o suspensión). El sistema expulsará al usuario inmediatamente y no le permitirá iniciar sesión hasta que vuelvas a encender el interruptor.
 
+### C. Catálogo de Activos de Hardware
+Desde el menú **Catálogo de Activos**, los gestores y administradores pueden organizar el inventario lógico de hardware del sistema a través de tres pestañas operativas:
+1.  **Tipos de Equipos**: Categorización base del hardware (Ej: Laptops, Desktops, Impresoras, Tarjetas Gráficas).
+2.  **Fabricantes / Marcas**: Marcas del hardware, vinculadas opcionalmente a un tipo de equipo compatible (Ej: *NVIDIA* como fabricante asociado a *Tarjeta Gráfica*).
+3.  **Modelos**: Línea de producto específica vinculada a una marca (Ej: *GeForce RTX 4070*).
+*   **Buscadores y Paginación**: Cada una de las pestañas cuenta con su propia barra de búsqueda y paginador para manejar listados de forma ágil.
+*   **Smart Deletes (Eliminación Inteligente)**: Para proteger la integridad de tus datos, el sistema no te permitirá eliminar un tipo de equipo si tiene marcas o modelos asignados, ni una marca si tiene modelos activos en uso.
+
+---
+
+## 7. MÓDULOS DE CONTROL INTERNO Y AUDITORÍA (GESTORES Y ADMINISTRADORES)
+
+Para garantizar la seguridad lógica, transparencia del sistema y el control de la productividad, se incorporaron tres paneles avanzados:
+
+### A. Preservación del Historial de Categorías en Tickets
+Si editas el nombre de una categoría o la desactivas, los tickets antiguos **nunca verán alterada su información**. Cada ticket congela permanentemente el nombre de la categoría asignada al crearse, lo que asegura reportes e historiales consistentes a través del tiempo.
+
+### B. Bitácora de Auditorías (Logs de Actividades)
+Ubicada en **Bitácora de Auditorías** en el menú lateral, esta interfaz permite monitorear todos los movimientos del sistema en tiempo real:
+*   **¿Qué registra?**:
+    *   Inicios de sesión (`login`) y salidas (`logout`) del sistema.
+    *   Intentos de accesos fallidos (`login_failed`) para alertar sobre actividad sospechosa.
+    *   Sincronización de permisos sobre roles de seguridad.
+    *   Creaciones, modificaciones y eliminaciones de cualquier elemento del catálogo.
+*   **Detalles JSON de Cambios**: Puedes expandir cada registro para ver con exactitud los datos anteriores (`old_values`) y los datos nuevos (`new_values`) en formato legible.
+*   **Filtros de Búsqueda**: Filtra logs por tipo de acción, componente afectado o responsable de la acción.
+*   **Exportar Reportes**: Cuenta con dos botones principales debajo del título de la bitácora:
+    *   **Excel (CSV)**: Descarga un reporte completo en formato compatible con hojas de cálculo.
+    *   **Descargar PDF**: Genera un documento PDF formal, limpio y en formato horizontal para revisiones de control interno.
+    *   *Nota: Ambas exportaciones respetan automáticamente los filtros de búsqueda que tengas aplicados en pantalla.*
+
+### C. Módulo de Rendimiento Técnico (KPIs de Productividad)
+Accediendo a **Rendimiento Técnico**, los supervisores pueden monitorear el desempeño del equipo de soporte de forma gráfica e interactiva:
+*   **Tarjetas de KPIs Globales**: Muestra la cantidad total de tickets en el sistema, resueltos, en proceso y la tasa de resolución global de la organización.
+*   **Métricas por Especialista**: Muestra la productividad individual de cada técnico:
+    *   Cantidad de tickets asignados, activos y resueltos.
+    *   **Tasa de Cierre (Barra de progreso)**: Porcentaje de casos solucionados.
+    *   **Tiempo Promedio de Cierre**: Horas de respuesta promedio calculadas automáticamente desde el momento de la asignación del ticket hasta su resolución técnica en el spooler.
+
 ---
 
 > [!TIP]

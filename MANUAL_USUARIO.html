@@ -255,6 +255,8 @@
 <li class="menu-item-h2"><a href="#3-manual-del-usuario-final-cliente" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>3. MANUAL DEL USUARIO FINAL (CLIENTE)</a></li>
 <li class="menu-item-h2"><a href="#4-manual-del-gestor-despachador-de-soporte" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>4. MANUAL DEL GESTOR (DESPACHADOR DE SOPORTE)</a></li>
 <li class="menu-item-h2"><a href="#5-manual-del-tcnico-especialista-en-resolucin" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>5. MANUAL DEL TÉCNICO (ESPECIALISTA EN RESOLUCIÓN)</a></li>
+<li class="menu-item-h2"><a href="#6-manual-del-administrador-global-sper-usuario" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>6. MANUAL DEL ADMINISTRADOR GLOBAL (SÚPER USUARIO)</a></li>
+<li class="menu-item-h2"><a href="#7-mdulos-de-control-interno-y-auditora-gestores-y-administradores" class="menu-link"><i class="bi bi-chevron-right small me-2 opacity-50"></i>7. MÓDULOS DE CONTROL INTERNO Y AUDITORÍA (GESTORES Y ADMINISTRADORES)</a></li>
 
                 </ul>
             </div>
@@ -393,6 +395,59 @@
 <p class="lead-body my-3">1.  Ve a la pestaña <strong>Historial de Resueltos</strong>.</p>
 <p class="lead-body my-3">2.  Haz clic en <strong>Editar Solución</strong> sobre el ticket correspondiente.</p>
 <p class="lead-body my-3">3.  Actualiza los campos necesarios y confirma los cambios. La solución se actualizará sin modificar el estatus del ticket cerrado.</p>
+<p class="lead-body my-3">---</p>
+<h2 id="6-manual-del-administrador-global-sper-usuario" class="fw-bold mt-5 mb-3 text-secondary heading-section">6. MANUAL DEL ADMINISTRADOR GLOBAL (SÚPER USUARIO)</h2>
+<p class="lead-body my-3">El Administrador tiene el control total sobre la seguridad, los accesos y la configuración del sistema.</p>
+<h3 id="a-bandeja-de-aprobaciones-nuevos-registros" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Bandeja de Aprobaciones (Nuevos Registros)</h3>
+<p class="lead-body my-3">Por motivos de seguridad, cuando un colaborador nuevo se registra en el Helpdesk, su cuenta entra a una <strong>Sala de Espera</strong>. No podrá crear tickets ni ver el panel hasta que sea validado.</p>
+<p class="lead-body my-3">1. Ingresa a la sección <strong>Aprobación de Usuarios</strong> en el menú lateral.</p>
+<p class="lead-body my-3">2. Verás una lista de usuarios "Pendientes" con la ruta organizacional que declararon al registrarse (ej. Sede Central &gt; División de Tecnología).</p>
+<p class="lead-body my-3">3. Evalúa si los datos son legítimos y haz clic en <strong>Aprobar Acceso</strong>. En caso de un registro erróneo o fraudulento, puedes <strong>Rechazar</strong>.</p>
+<h3 id="b-directorio-dinmico-de-usuarios" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Directorio Dinámico de Usuarios</h3>
+<p class="lead-body my-3">Desde la sección <strong>Usuarios</strong> (Bajo *Configuración y Activos*), puedes administrar a toda la plantilla del sistema.</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Buscador Rápido</strong>: Utiliza la barra de búsqueda superior para encontrar inmediatamente a un colaborador tecleando su nombre, correo o número de cédula. La tabla se filtrará instantáneamente.</li>
+<li>  <strong>Cambiar Roles (Privilegios)</strong>: Al hacer clic en el botón de edición (el lápiz azul) junto al rol actual de un usuario, puedes ascenderlo o reasignarlo. *Ejemplo: Convertir a un 'usuario' en 'técnico'.*</li>
+<li>  <strong>Interruptor de Acceso (Activar/Desactivar)</strong>: En la columna "Acceso", puedes apagar el interruptor azul para desactivar a un usuario instantáneamente (por ejemplo, por despido o suspensión). El sistema expulsará al usuario inmediatamente y no le permitirá iniciar sesión hasta que vuelvas a encender el interruptor.</li>
+</ul>
+<h3 id="c-catlogo-de-activos-de-hardware" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Catálogo de Activos de Hardware</h3>
+<p class="lead-body my-3">Desde el menú <strong>Catálogo de Activos</strong>, los gestores y administradores pueden organizar el inventario lógico de hardware del sistema a través de tres pestañas operativas:</p>
+<p class="lead-body my-3">1.  <strong>Tipos de Equipos</strong>: Categorización base del hardware (Ej: Laptops, Desktops, Impresoras, Tarjetas Gráficas).</p>
+<p class="lead-body my-3">2.  <strong>Fabricantes / Marcas</strong>: Marcas del hardware, vinculadas opcionalmente a un tipo de equipo compatible (Ej: *NVIDIA* como fabricante asociado a *Tarjeta Gráfica*).</p>
+<p class="lead-body my-3">3.  <strong>Modelos</strong>: Línea de producto específica vinculada a una marca (Ej: *GeForce RTX 4070*).</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Buscadores y Paginación</strong>: Cada una de las pestañas cuenta con su propia barra de búsqueda y paginador para manejar listados de forma ágil.</li>
+<li>  <strong>Smart Deletes (Eliminación Inteligente)</strong>: Para proteger la integridad de tus datos, el sistema no te permitirá eliminar un tipo de equipo si tiene marcas o modelos asignados, ni una marca si tiene modelos activos en uso.</li>
+</ul>
+<p class="lead-body my-3">---</p>
+<h2 id="7-mdulos-de-control-interno-y-auditora-gestores-y-administradores" class="fw-bold mt-5 mb-3 text-secondary heading-section">7. MÓDULOS DE CONTROL INTERNO Y AUDITORÍA (GESTORES Y ADMINISTRADORES)</h2>
+<p class="lead-body my-3">Para garantizar la seguridad lógica, transparencia del sistema y el control de la productividad, se incorporaron tres paneles avanzados:</p>
+<h3 id="a-preservacin-del-historial-de-categoras-en-tickets" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">A. Preservación del Historial de Categorías en Tickets</h3>
+<p class="lead-body my-3">Si editas el nombre de una categoría o la desactivas, los tickets antiguos <strong>nunca verán alterada su información</strong>. Cada ticket congela permanentemente el nombre de la categoría asignada al crearse, lo que asegura reportes e historiales consistentes a través del tiempo.</p>
+<h3 id="b-bitcora-de-auditoras-logs-de-actividades" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">B. Bitácora de Auditorías (Logs de Actividades)</h3>
+<p class="lead-body my-3">Ubicada en <strong>Bitácora de Auditorías</strong> en el menú lateral, esta interfaz permite monitorear todos los movimientos del sistema en tiempo real:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>¿Qué registra?</strong>:</li>
+<li>  Inicios de sesión (<code>login</code>) y salidas (<code>logout</code>) del sistema.</li>
+<li>  Intentos de accesos fallidos (<code>login_failed</code>) para alertar sobre actividad sospechosa.</li>
+<li>  Sincronización de permisos sobre roles de seguridad.</li>
+<li>  Creaciones, modificaciones y eliminaciones de cualquier elemento del catálogo.</li>
+<li>  <strong>Detalles JSON de Cambios</strong>: Puedes expandir cada registro para ver con exactitud los datos anteriores (<code>old_values</code>) y los datos nuevos (<code>new_values</code>) en formato legible.</li>
+<li>  <strong>Filtros de Búsqueda</strong>: Filtra logs por tipo de acción, componente afectado o responsable de la acción.</li>
+<li>  <strong>Exportar Reportes</strong>: Cuenta con dos botones principales debajo del título de la bitácora:</li>
+<li>  <strong>Excel (CSV)</strong>: Descarga un reporte completo en formato compatible con hojas de cálculo.</li>
+<li>  <strong>Descargar PDF</strong>: Genera un documento PDF formal, limpio y en formato horizontal para revisiones de control interno.</li>
+<li>  *Nota: Ambas exportaciones respetan automáticamente los filtros de búsqueda que tengas aplicados en pantalla.*</li>
+</ul>
+<h3 id="c-mdulo-de-rendimiento-tcnico-kpis-de-productividad" class="fw-bold mt-4 mb-3 text-dark-emphasis heading-section">C. Módulo de Rendimiento Técnico (KPIs de Productividad)</h3>
+<p class="lead-body my-3">Accediendo a <strong>Rendimiento Técnico</strong>, los supervisores pueden monitorear el desempeño del equipo de soporte de forma gráfica e interactiva:</p>
+<ul class="list-custom mb-3">
+<li>  <strong>Tarjetas de KPIs Globales</strong>: Muestra la cantidad total de tickets en el sistema, resueltos, en proceso y la tasa de resolución global de la organización.</li>
+<li>  <strong>Métricas por Especialista</strong>: Muestra la productividad individual de cada técnico:</li>
+<li>  Cantidad de tickets asignados, activos y resueltos.</li>
+<li>  <strong>Tasa de Cierre (Barra de progreso)</strong>: Porcentaje de casos solucionados.</li>
+<li>  <strong>Tiempo Promedio de Cierre</strong>: Horas de respuesta promedio calculadas automáticamente desde el momento de la asignación del ticket hasta su resolución técnica en el spooler.</li>
+</ul>
 <p class="lead-body my-3">---</p>
 
             </main>

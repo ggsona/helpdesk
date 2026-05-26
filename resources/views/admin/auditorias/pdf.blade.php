@@ -169,6 +169,14 @@
                             <span class="badge bg-warning">Edición</span>
                         @elseif($log->action === 'delete')
                             <span class="badge bg-danger">Eliminación</span>
+                        @elseif($log->action === 'login')
+                            <span class="badge bg-success" style="background-color: #cfe2ff; color: #084298;">Ingreso</span>
+                        @elseif($log->action === 'logout')
+                            <span class="badge bg-secondary">Salida</span>
+                        @elseif($log->action === 'login_failed')
+                            <span class="badge bg-danger" style="background-color: #f8d7da; color: #842029;">Acceso Fallido</span>
+                        @elseif($log->action === 'sync_permissions')
+                            <span class="badge bg-success" style="background-color: #e0cffc; color: #563d7c;">Permisos Sinc.</span>
                         @else
                             <span class="badge bg-secondary">{{ $log->action }}</span>
                         @endif

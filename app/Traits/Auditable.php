@@ -9,25 +9,7 @@ trait Auditable
 {
     public static function bootAuditable()
     {
-        static::created(function ($model) {
-            $model->logAudit('create', null, $model->getDirtyForAudit());
-        });
-
-        static::updated(function ($model) {
-            $dirty = $model->getDirtyForAudit();
-            if (!empty($dirty)) {
-                // Get original values of only the dirty attributes
-                $old = [];
-                foreach ($dirty as $key => $value) {
-                    $old[$key] = $model->getOriginal($key);
-                }
-                $model->logAudit('update', $old, $dirty);
-            }
-        });
-
-        static::deleted(function ($model) {
-            $model->logAudit('delete', $model->getAttributes(), null);
-        });
+        // Deactivated: Global model listener in EventServiceProvider handles this to prevent duplication.
     }
 
     protected function getDirtyForAudit(): array
