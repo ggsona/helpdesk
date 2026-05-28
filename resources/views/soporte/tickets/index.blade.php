@@ -74,10 +74,10 @@
                                         <td class="small text-muted">{{ $ticket->created_at->format('d/m/Y h:i A') }}</td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex justify-content-end gap-2 align-items-center">
-                                                <button class="btn btn-sm btn-primary px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#asignarModal{{ $ticket->id_ticket }}">
+                                                <button class="btn btn-sm btn-primary px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold btn-action-premium" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#asignarModal{{ $ticket->id_ticket }}">
                                                     <i class="bi bi-person-plus-fill"></i> Asignar
                                                 </button>
-                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Ver Detalles">
+                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center btn-action-icon" style="width: 32px; height: 32px;" title="Ver Detalles">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
                                             </div>
@@ -137,10 +137,10 @@
                                         </td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex justify-content-end gap-2 align-items-center">
-                                                <button class="btn btn-sm btn-warning text-dark px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#reasignarModal{{ $ticket->id_ticket }}">
+                                                <button class="btn btn-sm btn-warning text-dark px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold btn-action-premium" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#reasignarModal{{ $ticket->id_ticket }}">
                                                     <i class="bi bi-arrow-repeat"></i> Reasignar
                                                 </button>
-                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Ver Detalles">
+                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center btn-action-icon" style="width: 32px; height: 32px;" title="Ver Detalles">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
                                             </div>
@@ -188,10 +188,10 @@
                                         <td class="text-muted small">{{ $ticket->updated_at->format('d/m/Y') }}</td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex justify-content-end gap-2 align-items-center">
-                                                <button class="btn btn-sm btn-success px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#verResueltoModal{{ $ticket->id_ticket }}">
+                                                <button class="btn btn-sm btn-success px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold btn-action-premium" style="height: 32px;" data-bs-toggle="modal" data-bs-target="#verResueltoModal{{ $ticket->id_ticket }}">
                                                     <i class="bi bi-file-earmark-check"></i> Cierre
                                                 </button>
-                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Ver Detalles">
+                                                <a href="{{ route('soporte.tickets.show', $ticket->id_ticket) }}" class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center btn-action-icon" style="width: 32px; height: 32px;" title="Ver Detalles">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
                                             </div>
@@ -216,116 +216,98 @@
 
     {{-- --- BLOQUE B: VISTA DE TÉCNICO ESPECIALISTA --- --}}
     @if(request()->routeIs('soporte.tickets.tecnico.index'))
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold theme-text mb-1"><i class="bi bi-tools me-2 text-primary"></i>Mi Bandeja Operativa</h2>
-                    <p class="text-muted mb-0">Resuelve las solicitudes asignadas ordenadas por el semáforo de prioridades.</p>
-                </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold theme-text mb-1"><i class="bi bi-layout-text-window-reverse me-2 text-primary"></i>Tablero de Trabajo Técnico</h2>
+                <p class="text-muted mb-0">Arrastra tus tickets entre columnas para actualizar su progreso operativo.</p>
+            </div>
+        </div>
+
+        <div class="card-premium shadow-sm border-0 p-4 mb-5">
+            <div class="pills-container mb-4 shadow-sm py-2 px-3 rounded-3" style="background: var(--bg-main);">
+                <ul class="nav nav-pills nav-fill gap-2" id="tecnico-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold rounded-3" id="pills-kanban-tab" data-bs-toggle="pill" data-bs-target="#pills-kanban" type="button" role="tab">
+                            <i class="bi bi-columns-gap me-2"></i> Flujo Técnico
+                            <span class="badge bg-primary text-white ms-2">{{ $ticketsPendientes->count() + $ticketsEnProgreso->count() }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold rounded-3" id="pills-resueltos-tecnico-tab" data-bs-toggle="pill" data-bs-target="#pills-resueltos-tecnico" type="button" role="tab">
+                            <i class="bi bi-check-all me-2"></i> Historial Cerrados
+                            <span class="badge bg-success text-white ms-2">{{ $ticketsResueltos->count() }}</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
 
-            <div class="card-premium shadow-sm border-0 p-4 mb-5">
-                {{-- Navegación Pestañas Técnico --}}
-                <div class="pills-container mb-4 shadow-sm py-2 px-3 rounded-3" style="background: var(--bg-main);">
-                    <ul class="nav nav-pills nav-fill gap-2" id="tecnico-tab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold rounded-3" id="pills-asignados-tab" data-bs-toggle="pill" data-bs-target="#pills-asignados" type="button" role="tab">
-                                <i class="bi bi-person-workspace me-2"></i> Mis Tareas Asignadas
-                                <span class="badge bg-warning text-black ms-2">
-                                    {{ $ticketsCriticos->count() + $ticketsAltos->count() + $ticketsMedios->count() + $ticketsBajos->count() }}
-                                </span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold rounded-3" id="pills-resueltos-tecnico-tab" data-bs-toggle="pill" data-bs-target="#pills-resueltos-tecnico" type="button" role="tab">
-                                <i class="bi bi-check-all me-2"></i> Historial Cerrados
-                                <span class="badge bg-success text-white ms-2">{{ $ticketsResueltos->count() }}</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+            <div class="tab-content" id="tecnico-tabContent">
+                <div class="tab-pane fade show active" id="pills-kanban" role="tabpanel">
+                    <div class="row g-3 kanban-board" data-kanban-update-url-template="{{ route('soporte.tickets.tecnico.actualizar-kanban-estado', ['id' => '__TICKET_ID__']) }}">
+                        @php
+                            $kanbanColumns = [
+                                ['key' => 'pendiente', 'title' => 'Pendiente', 'icon' => 'bi-pause-circle', 'badge' => 'warning', 'items' => $ticketsPendientes],
+                                ['key' => 'en_progreso', 'title' => 'En progreso', 'icon' => 'bi-play-circle', 'badge' => 'info', 'items' => $ticketsEnProgreso],
+                            ];
+                        @endphp
 
-                <div class="tab-content" id="tecnico-tabContent">
-                    {{-- TAB TÉCNICO: ASIGNADOS POR PRIORIDAD (SEMÁFORO) --}}
-                    <div class="tab-pane fade show active" id="pills-asignados" role="tabpanel">
-                        @php $tieneTareas = false; @endphp
-
-                        @foreach([
-                            'Crítica' => [$ticketsCriticos, 'danger', '🔥 PRIORIDAD CRÍTICA - ATENCIÓN URGENTE'],
-                            'Alta'    => [$ticketsAltos, 'warning', '⚡ PRIORIDAD ALTA - RESOLUCIÓN RÁPIDA'],
-                            'Media'   => [$ticketsMedios, 'info', '📋 PRIORIDAD MEDIA - ATENCIÓN REGULAR'],
-                            'Baja'    => [$ticketsBajos, 'success', '🍃 PRIORIDAD BAJA - PROGRAMABLE']
-                        ] as $nombrePrioridad => $config)
-                            
-                            @if($config[0]->count() > 0)
-                                @php $tieneTareas = true; @endphp
-                                <div class="mb-5">
-                                    <div class="d-flex align-items-center mb-3 bg-{{ $config[1] }} bg-opacity-10 p-3 rounded-3 border-start border-4 border-{{ $config[1] }}">
-                                        <h6 class="text-{{ $config[1] }}-emphasis fw-bold mb-0" style="letter-spacing: 0.5px;">
-                                            {{ $config[2] }}
+                        @foreach($kanbanColumns as $column)
+                            <div class="col-12 col-lg-6">
+                                <div class="border rounded-3 h-100 d-flex flex-column bg-light-subtle">
+                                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0 fw-bold text-dark">
+                                            <i class="bi {{ $column['icon'] }} me-2"></i>{{ $column['title'] }}
                                         </h6>
-                                        <span class="badge bg-{{ $config[1] }} text-white ms-3 rounded-pill">{{ $config[0]->count() }}</span>
+                                        <span class="badge bg-{{ $column['badge'] }} text-white rounded-pill">{{ $column['items']->count() }}</span>
                                     </div>
 
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
-                                            <thead>
-                                                <tr class="text-custom-muted">
-                                                    <th style="width: 10%;">ID</th>
-                                                    <th style="width: 35%;">Asunto / Reportante</th>
-                                                    <th style="width: 25%;">Categoría / Equipo</th>
-                                                    <th style="width: 15%;">Fecha</th>
-                                                    <th class="text-end pe-4" style="width: 15%;">Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($config[0] as $ticket)
-                                                    <tr class="border-bottom border-secondary border-opacity-10">
-                                                        <td class="fw-bold text-primary">#{{ $ticket->id_ticket }}</td>
-                                                        <td>
-                                                            <div class="fw-bold theme-text mb-1">{{ $ticket->asunto }}</div>
-                                                            <small class="text-muted"><i class="bi bi-person me-1"></i>{{ $ticket->usuario->name ?? 'N/A' }}</small>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 mb-1" style="font-size: 0.7rem;">
-                                                                <i class="bi bi-tag-fill me-1"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'S/C' }}
-                                                            </span>
-                                                            <div class="small text-muted fs-7">{{ $ticket->tipoEquipo->nombre_tipo_equipo ?? 'Genérico' }}</div>
-                                                        </td>
-                                                        <td class="text-muted small">{{ $ticket->created_at->format('d/m/Y') }}</td>
-                                                        <td class="text-end pe-4">
-                                                            <div class="d-flex justify-content-end gap-2 align-items-center">
-                                                                @if($ticket->estatus == 2)
-                                                                    <a href="{{ route('soporte.tickets.tecnico.resolver', $ticket->id_ticket) }}" 
-                                                                       class="btn btn-sm btn-success px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold" style="height: 32px;">
-                                                                        <i class="bi bi-check2-circle"></i> Resolver
-                                                                    </a>
-                                                                @endif
-                                                                <a href="{{ route('soporte.tickets.tecnico.show', $ticket->id_ticket) }}" 
-                                                                   class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Detalles & Chat">
-                                                                    <i class="bi bi-chat-left-text-fill"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                    <div class="p-3 flex-grow-1 kanban-column" data-column="{{ $column['key'] }}" style="min-height: 380px;">
+                                        @forelse($column['items'] as $ticket)
+                                            <div class="card border-0 shadow-sm mb-3 kanban-ticket"
+                                                draggable="true"
+                                                data-ticket-id="{{ $ticket->id_ticket }}"
+                                                data-current-column="{{ $column['key'] }}">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <span class="fw-bold text-primary">#{{ $ticket->id_ticket }}</span>
+                                                        <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                                                            {{ $ticket->prioridad->nombre_prioridad ?? 'Sin prioridad' }}
+                                                        </span>
+                                                    </div>
+                                                    <h6 class="mb-1">{{ Str::limit($ticket->asunto, 55) }}</h6>
+                                                    <p class="text-muted small mb-2">
+                                                        <i class="bi bi-person me-1"></i>{{ $ticket->usuario->name ?? 'N/A' }}
+                                                    </p>
+                                                    <p class="text-muted small mb-3">
+                                                        <i class="bi bi-tag-fill me-1"></i>{{ $ticket->categoria_nombre_historico ?? $ticket->categoria->nombre_categoria ?? 'Sin categoría' }}
+                                                    </p>
+
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('soporte.tickets.tecnico.show', $ticket->id_ticket) }}"
+                                                            class="btn btn-sm btn-outline-info flex-fill btn-action-premium">
+                                                            <i class="bi bi-eye-fill me-1"></i> Ver
+                                                        </a>
+
+                                                        <a href="{{ route('soporte.tickets.tecnico.resolver', $ticket->id_ticket) }}"
+                                                            class="btn btn-sm btn-success flex-fill btn-action-premium">
+                                                            <i class="bi bi-check2-circle me-1"></i> Resolver
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-center text-muted small py-4 border border-dashed rounded-3">
+                                                Sin tickets en esta columna.
+                                            </div>
+                                        @endforelse
                                     </div>
                                 </div>
-                            @endif
-                        @endforeach
-
-                        @if(!$tieneTareas)
-                            <div class="text-center py-5">
-                                <div class="opacity-25 mb-3"><i class="bi bi-emoji-sunglasses-fill fs-1 theme-text"></i></div>
-                                <h5 class="fw-bold theme-text mb-1">¡Todo en orden, Especialista!</h5>
-                                <p class="text-muted mb-0">No tienes tareas asignadas pendientes en este momento.</p>
                             </div>
-                        @endif
+                        @endforeach
                     </div>
+                </div>
 
-                    {{-- TAB TÉCNICO: HISTORIAL DE RESUELTOS --}}
-                    <div class="tab-pane fade" id="pills-resueltos-tecnico" role="tabpanel">
+                <div class="tab-pane fade" id="pills-resueltos-tecnico" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
                                 <thead>
@@ -354,11 +336,11 @@
                                             <td class="text-end pe-4">
                                                 <div class="d-flex justify-content-end gap-2 align-items-center">
                                                     <a href="{{ route('soporte.tickets.tecnico.editar-solucion', $ticket->id_ticket) }}" 
-                                                       class="btn btn-sm btn-outline-warning border-warning-subtle px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold" style="height: 32px;">
+                                                       class="btn btn-sm btn-outline-warning border-warning-subtle px-3 rounded-3 shadow-sm d-inline-flex align-items-center gap-1 fw-bold btn-action-premium" style="height: 32px;">
                                                         <i class="bi bi-pencil-square"></i> Editar Solución
                                                     </a>
                                                     <a href="{{ route('soporte.tickets.tecnico.show', $ticket->id_ticket) }}" 
-                                                       class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Detalles">
+                                                       class="btn btn-sm btn-outline-info border-info-subtle px-0 rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center btn-action-icon" style="width: 32px; height: 32px;" title="Detalles">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </a>
                                                 </div>
@@ -375,9 +357,80 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
                 </div>
             </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const board = document.querySelector('.kanban-board');
+                if (!board) {
+                    return;
+                }
+
+                const csrfToken = '{{ csrf_token() }}';
+                const routeTemplate = board.dataset.kanbanUpdateUrlTemplate;
+                let draggedCard = null;
+
+                const updateKanbanState = async (ticketId, targetColumn) => {
+                    const url = routeTemplate.replace('__TICKET_ID__', ticketId);
+                    const response = await fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ estado_tecnico: targetColumn }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('No se pudo actualizar el ticket.');
+                    }
+                };
+
+                board.querySelectorAll('.kanban-ticket[draggable="true"]').forEach((card) => {
+                    card.addEventListener('dragstart', () => {
+                        draggedCard = card;
+                        card.classList.add('opacity-50');
+                    });
+
+                    card.addEventListener('dragend', () => {
+                        card.classList.remove('opacity-50');
+                    });
+                });
+
+                board.querySelectorAll('.kanban-column').forEach((column) => {
+                    column.addEventListener('dragover', (event) => {
+                        event.preventDefault();
+                    });
+
+                    column.addEventListener('drop', async (event) => {
+                        event.preventDefault();
+                        if (!draggedCard) {
+                            return;
+                        }
+
+                        const fromColumn = draggedCard.dataset.currentColumn;
+                        const toColumn = column.dataset.column;
+                        if (fromColumn === toColumn) {
+                            return;
+                        }
+
+                        try {
+                            await updateKanbanState(draggedCard.dataset.ticketId, toColumn);
+                            draggedCard.dataset.currentColumn = toColumn;
+                            column.prepend(draggedCard);
+                        } catch (error) {
+                            console.error(error);
+                            alert('No se pudo mover el ticket. Intenta nuevamente.');
+                        } finally {
+                            draggedCard = null;
+                        }
+                    });
+                });
+            });
+        </script>
     @endif
 </div>
 @endsection

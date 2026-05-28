@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mb-4">
-        <h3 class="fw-bold">Panel de Control</h3>
+        <h3 class="fw-bold theme-text">Panel de Control</h3>
         <p class="text-muted">Resumen general de incidencias y soporte técnico.</p>
     </div>
 

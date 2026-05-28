@@ -1,6 +1,21 @@
 @extends('layouts.admin')
 
 @section('content')
+@push('styles')
+<style>
+    .theme-surface-soft {
+        background-color: color-mix(in srgb, var(--bs-body-bg) 82%, var(--bs-tertiary-bg) 18%) !important;
+    }
+    [data-bs-theme="dark"] .theme-surface-soft {
+        background-color: #1f2327 !important;
+    }
+    .theme-badge-soft {
+        background-color: var(--bs-tertiary-bg) !important;
+        color: var(--bs-body-color) !important;
+        border: 1px solid var(--bs-border-color) !important;
+    }
+</style>
+@endpush
 <div class="container-fluid">
     {{-- Encabezado --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -17,7 +32,7 @@
             <p class="text-muted">Bienvenido, <strong class="text-primary">{{ Auth::user()->name }}</strong>. Aquí tienes el resumen de actividades de hoy.</p>
         </div>
         <div class="text-end">
-            <span class="badge bg-light text-dark border px-3 py-2 shadow-sm rounded-pill">
+            <span class="badge theme-badge-soft px-3 py-2 shadow-sm rounded-pill">
                 <i class="bi bi-calendar3 me-2 text-primary"></i> {{ date('d/m/Y') }}
             </span>
         </div>
@@ -60,7 +75,7 @@
             <div class="col-lg-8">
                 <div class="card-premium mb-4 shadow-sm" style="min-height: 350px;">
                     <h5 class="fw-bold mb-4 theme-text"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Rendimiento por Técnico</h5>
-                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center bg-light theme-bg-dark border-secondary border-opacity-25" style="height: 250px;">
+                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center theme-surface-soft border-secondary border-opacity-25" style="height: 250px;">
                         <i class="bi bi-activity text-primary fs-1 mb-2"></i>
                         <p class="text-muted mb-0 small">[ Gráfica en tiempo real de carga de trabajo de especialistas ]</p>
                     </div>
@@ -69,7 +84,7 @@
             <div class="col-lg-4">
                 <div class="card-premium mb-4 shadow-sm" style="min-height: 350px;">
                     <h5 class="fw-bold mb-4 theme-text"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Porcentaje por Categoría</h5>
-                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center bg-light theme-bg-dark border-secondary border-opacity-25" style="height: 250px;">
+                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center theme-surface-soft border-secondary border-opacity-25" style="height: 250px;">
                         <i class="bi bi-pie-chart text-primary fs-1 mb-2"></i>
                         <p class="text-muted mb-0 small">[ Hardware (55%) | Software (30%) | Redes (15%) ]</p>
                     </div>

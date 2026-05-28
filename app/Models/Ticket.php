@@ -23,6 +23,7 @@ class Ticket extends Model {
         'id_categoria', 
         'descripcion_problema', 
         'estatus', 
+        'estado_tecnico',
         'id_usuario_tecnico', 
         'fecha_cierre'
     ];

@@ -21,25 +21,29 @@ class TicketTecnicoController extends Controller
     }
 
     /**
-     * Vista principal con Tabs (Pills) para Asignados y Resueltos.
+     * Vista principal del tablero Kanban para técnicos.
      */
     public function index() 
     {
         $usuarioId = Auth::id();
 
-        // 1. Tickets asignados (se mantiene igual por ahora)
-        $queryAsignados = Ticket::with(['prioridad', 'usuario.persona.unidadAdministrativa'])
+        $queryKanban = Ticket::with(['prioridad', 'usuario.persona.unidadAdministrativa', 'categoria', 'tipoEquipo'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
-            })
-            ->where('estatus', 2);
+            });
 
-        $ticketsCriticos = (clone $queryAsignados)->where('id_prioridad', 4)->latest()->get();
-        $ticketsAltos    = (clone $queryAsignados)->where('id_prioridad', 3)->latest()->get();
-        $ticketsMedios   = (clone $queryAsignados)->where('id_prioridad', 2)->latest()->get();
-        $ticketsBajos    = (clone $queryAsignados)->where('id_prioridad', 1)->latest()->get();
+        $ticketsPendientes = (clone $queryKanban)
+            ->where('estatus', 2)
+            ->where('estado_tecnico', 'pendiente')
+            ->latest()
+            ->get();
 
-        // 2. ACTUALIZACIÓN AQUÍ: Agregamos 'solucion' a la carga
+        $ticketsEnProgreso = (clone $queryKanban)
+            ->where('estatus', 2)
+            ->where('estado_tecnico', 'en_progreso')
+            ->latest()
+            ->get();
+
         $ticketsResueltos = Ticket::with(['prioridad', 'usuario.persona.unidadAdministrativa', 'solucion'])
             ->whereHas('asignacion', function ($q) use ($usuarioId) {
                 $q->where('id_usuario_tecnico', $usuarioId);
@@ -49,10 +53,8 @@ class TicketTecnicoController extends Controller
             ->get();
 
         return view('soporte.tickets.index', compact(
-            'ticketsCriticos', 
-            'ticketsAltos', 
-            'ticketsMedios', 
-            'ticketsBajos', 
+            'ticketsPendientes',
+            'ticketsEnProgreso',
             'ticketsResueltos'
         ));
     }
@@ -123,6 +125,7 @@ class TicketTecnicoController extends Controller
         // 2. Cerrar el ticket
         $ticket->update([
             'estatus' => 3,
+            'estado_tecnico' => 'resuelto',
             'fecha_cierre' => now(),
         ]);
 
@@ -163,5 +166,28 @@ class TicketTecnicoController extends Controller
 
         return redirect()->route('soporte.tickets.tecnico.index')
                         ->with('success', 'La solución técnica ha sido actualizada.');
+    }
+
+    public function actualizarEstadoKanban(Request $request, $id)
+    {
+        $request->validate([
+            'estado_tecnico' => 'required|in:pendiente,en_progreso',
+        ]);
+
+        $ticket = Ticket::where('id_ticket', $id)
+            ->where('estatus', 2)
+            ->whereHas('asignacion', function ($q) {
+                $q->where('id_usuario_tecnico', Auth::id());
+            })
+            ->firstOrFail();
+
+        $ticket->update([
+            'estado_tecnico' => $request->estado_tecnico,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'mensaje' => 'Estado actualizado correctamente.',
+        ]);
     }
 }

@@ -153,6 +153,7 @@ Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('sopo
         Route::post('/tickets/{id}/guardar-solucion', [TicketTecnicoController::class, 'guardarSolucion'])->name('guardar-solucion');
         Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('editar-solucion');
         Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('actualizar-solucion');
+        Route::patch('/tickets/{id}/kanban-estado', [TicketTecnicoController::class, 'actualizarEstadoKanban'])->name('actualizar-kanban-estado');
     });
 });
 

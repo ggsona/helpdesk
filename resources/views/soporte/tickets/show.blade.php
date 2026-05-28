@@ -1,6 +1,84 @@
 @extends('layouts.admin')
 
 @section('content')
+@push('styles')
+<style>
+    .ticket-chat-shell {
+        height: 520px;
+        overflow-y: auto;
+        background: color-mix(in srgb, var(--bs-body-bg) 78%, var(--bs-tertiary-bg) 22%);
+        border-top: 1px solid var(--bs-border-color);
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+    [data-bs-theme="dark"] .ticket-chat-shell {
+        background: #15181b;
+    }
+    .chat-bubble-wrap {
+        display: flex;
+        gap: 0.65rem;
+        align-items: flex-end;
+        max-width: 88%;
+    }
+    .chat-bubble-wrap.mine {
+        margin-left: auto;
+        flex-direction: row-reverse;
+    }
+    .chat-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        border: 1px solid var(--bs-border-color);
+        background: var(--bs-tertiary-bg);
+        color: var(--bs-body-color);
+    }
+    .chat-bubble {
+        border-radius: 16px;
+        padding: 0.75rem 0.9rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid transparent;
+    }
+    .chat-bubble.public-mine {
+        background: #0d6efd;
+        color: #fff;
+    }
+    .chat-bubble.public-other {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border-color: var(--bs-border-color);
+    }
+    .chat-bubble.internal {
+        background: rgba(255, 193, 7, 0.16);
+        color: #664d03;
+        border-color: rgba(255, 193, 7, 0.45);
+    }
+    [data-bs-theme="dark"] .chat-bubble.internal {
+        color: #ffda6a;
+        background: rgba(255, 193, 7, 0.14);
+        border-color: rgba(255, 193, 7, 0.32);
+    }
+    .chat-meta {
+        font-size: 0.67rem;
+        letter-spacing: 0.02em;
+    }
+    .chat-meta.public-mine {
+        color: rgba(255, 255, 255, 0.82);
+    }
+    .chat-meta.public-other {
+        color: var(--bs-secondary-color);
+    }
+    .chat-text {
+        white-space: pre-wrap;
+        line-height: 1.45;
+        font-size: 0.87rem;
+    }
+</style>
+@endpush
 <div class="container-fluid">
     {{-- Encabezado Premium con Botón de Regreso Dinámico --}}
     <div class="mb-4">
@@ -106,12 +184,12 @@
             {{-- Chat de Comunicación con el Usuario --}}
             <div class="card card-premium border-0 shadow-sm overflow-hidden mb-5">
                 <div class="card-header bg-secondary bg-opacity-10 py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0 theme-text"><i class="bi bi-chat-dots-fill me-2 text-primary"></i>Bitácora y Mensajes de Auditoría</h6>
-                    <span class="badge bg-primary rounded-pill">Soporte GDC</span>
+                    <h6 class="fw-bold mb-0 theme-text"><i class="bi bi-chat-dots-fill me-2 text-primary"></i>Conversación del Caso</h6>
+                    <span class="badge bg-primary rounded-pill">Chat en tiempo real</span>
                 </div>
                 
                 {{-- Contenedor del Chat --}}
-                <div class="card-body chat-container p-4" style="height: 480px; overflow-y: auto; background-color: rgba(0,0,0, 0.02);">
+                <div class="card-body ticket-chat-shell p-4" id="ticket-chat-shell">
                     @forelse($ticket->comentarios as $comentario)
                         @php
                             $esMio = $comentario->id_usuario == auth()->id();
@@ -131,21 +209,33 @@
                             } else {
                                 $remitente = 'Cliente (' . $comentario->usuario->name . ')';
                             }
+                            $avatar = strtoupper(substr($comentario->usuario->name ?? 'S', 0, 1));
+                            $tipoBurbuja = $comentario->es_interno
+                                ? 'internal'
+                                : ($esMio ? 'public-mine' : 'public-other');
                         @endphp
-                        <div class="d-flex mb-4 {{ $esMio ? 'justify-content-end' : 'justify-content-start' }}">
-                            <div class="p-3 shadow-sm rounded-3 {{ $comentario->es_interno ? 'bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25' : ($esMio ? 'bg-primary text-white' : 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25 text-main') }}" style="max-width: 80%; border-radius: 12px !important;">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                                        @if($comentario->es_interno) 
-                                            <i class="bi bi-eye-slash-fill me-1 text-warning"></i> NOTA INTERNA: 
-                                        @endif
-                                        {{ $remitente }}
-                                    </small>
-                                    <small class="ms-4 opacity-50 small" style="font-size: 0.6rem;">
-                                        {{ $comentario->created_at->diffForHumans() }}
-                                    </small>
+                        <div class="mb-4">
+                            <div class="chat-bubble-wrap {{ $esMio ? 'mine' : '' }}">
+                                <div class="chat-avatar">{{ $avatar }}</div>
+                                <div class="chat-bubble {{ $tipoBurbuja }}">
+                                    <div class="d-flex justify-content-between align-items-center gap-3 mb-1">
+                                        <small class="fw-semibold chat-meta {{ $esMio && !$comentario->es_interno ? 'public-mine' : 'public-other' }}">
+                                            @if($comentario->es_interno)
+                                                <i class="bi bi-eye-slash-fill me-1"></i> Nota interna ·
+                                            @endif
+                                            {{ $remitente }}
+                                        </small>
+                                        <small class="chat-meta {{ $esMio && !$comentario->es_interno ? 'public-mine' : 'public-other' }}">
+                                            {{ $comentario->created_at->format('H:i') }} · {{ $comentario->created_at->diffForHumans() }}
+                                        </small>
+                                    </div>
+                                    <p class="mb-0 chat-text">{{ $comentario->mensaje }}</p>
+                                    @if($comentario->es_interno)
+                                        <small class="d-block mt-2 chat-meta public-other">
+                                            Visible solo para staff de soporte.
+                                        </small>
+                                    @endif
                                 </div>
-                                <p class="mb-0 small" style="line-height: 1.4; white-space: pre-wrap;">{{ $comentario->mensaje }}</p>
                             </div>
                         </div>
                     @empty
@@ -294,5 +384,12 @@ function toggleNoteStyle(checkbox) {
         label.classList.remove('fw-bold');
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatShell = document.getElementById("ticket-chat-shell");
+    if (chatShell) {
+        chatShell.scrollTop = chatShell.scrollHeight;
+    }
+});
 </script>
 @endsection

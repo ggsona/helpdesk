@@ -78,7 +78,8 @@ class TicketGestorController extends Controller
         // 2. Actualizar el ticket principal (Prioridad y Estatus)
         $ticket->update([
             'id_prioridad' => $request->id_prioridad,
-            'estatus' => 2 // Siempre pasa a "En Proceso"
+            'estatus' => 2, // Siempre pasa a "En Proceso"
+            'estado_tecnico' => 'pendiente',
         ]);
 
         // 3. Generar comentario automático para el historial de mensajes

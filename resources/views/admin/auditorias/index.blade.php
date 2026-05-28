@@ -1,6 +1,50 @@
 @extends('layouts.admin')
 
 @section('content')
+@push('styles')
+<style>
+    .audit-action-badge {
+        font-size: 0.75rem;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+        letter-spacing: 0.02em;
+        display: inline-flex;
+        align-items: center;
+    }
+    .audit-create { background: rgba(25, 135, 84, 0.2); color: #0f5132; border-color: rgba(25, 135, 84, 0.35); }
+    .audit-update { background: rgba(255, 193, 7, 0.22); color: #664d03; border-color: rgba(255, 193, 7, 0.38); }
+    .audit-delete { background: rgba(220, 53, 69, 0.2); color: #842029; border-color: rgba(220, 53, 69, 0.35); }
+    .audit-login { background: rgba(13, 202, 240, 0.2); color: #055160; border-color: rgba(13, 202, 240, 0.35); }
+    .audit-logout { background: rgba(108, 117, 125, 0.22); color: #41464b; border-color: rgba(108, 117, 125, 0.35); }
+    .audit-failed { background: rgba(220, 53, 69, 0.2); color: #842029; border-color: rgba(220, 53, 69, 0.35); }
+    .audit-sync { background: rgba(13, 110, 253, 0.2); color: #084298; border-color: rgba(13, 110, 253, 0.35); }
+    .audit-generic { background: rgba(108, 117, 125, 0.18); color: #495057; border-color: rgba(108, 117, 125, 0.3); }
+
+    [data-bs-theme="dark"] .audit-create { color: #75d7ae; background: rgba(25, 135, 84, 0.22); border-color: rgba(25, 135, 84, 0.45); }
+    [data-bs-theme="dark"] .audit-update { color: #ffda6a; background: rgba(255, 193, 7, 0.22); border-color: rgba(255, 193, 7, 0.45); }
+    [data-bs-theme="dark"] .audit-delete { color: #f5a3ad; background: rgba(220, 53, 69, 0.24); border-color: rgba(220, 53, 69, 0.45); }
+    [data-bs-theme="dark"] .audit-login { color: #6edff6; background: rgba(13, 202, 240, 0.2); border-color: rgba(13, 202, 240, 0.45); }
+    [data-bs-theme="dark"] .audit-logout { color: #ced4da; background: rgba(108, 117, 125, 0.25); border-color: rgba(108, 117, 125, 0.45); }
+    [data-bs-theme="dark"] .audit-failed { color: #f1aeb5; background: rgba(220, 53, 69, 0.24); border-color: rgba(220, 53, 69, 0.45); }
+    [data-bs-theme="dark"] .audit-sync { color: #9ec5fe; background: rgba(13, 110, 253, 0.22); border-color: rgba(13, 110, 253, 0.45); }
+    [data-bs-theme="dark"] .audit-generic { color: #dee2e6; background: rgba(108, 117, 125, 0.25); border-color: rgba(108, 117, 125, 0.45); }
+
+    .audit-json {
+        font-size: 0.7rem;
+        max-width: 250px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+    }
+    [data-bs-theme="dark"] .audit-json {
+        background: #1f2327 !important;
+        color: #e9ecef !important;
+        border-color: #343a40 !important;
+    }
+</style>
+@endpush
 <div class="py-3 px-1">
     <div class="row mb-4 align-items-center">
         <div class="col">
@@ -84,7 +128,7 @@
                     @forelse($logs as $log)
                         <tr class="text-nowrap" style="border-bottom: 1px solid var(--bs-border-color);">
                             <td class="ps-4 py-3">
-                                <span class="fw-semibold text-dark">{{ $log->created_at->format('d/m/Y') }}</span><br>
+                                <span class="fw-semibold theme-text">{{ $log->created_at->format('d/m/Y') }}</span><br>
                                 <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
                             </td>
                             <td class="py-3">
@@ -101,42 +145,42 @@
                                         </div>
                                     </div>
                                 @else
-                                    <span class="badge bg-dark bg-opacity-10 text-dark-emphasis px-2 py-1.5 rounded" style="font-size: 0.75rem;">
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis px-2 py-1.5 rounded" style="font-size: 0.75rem;">
                                         <i class="bi bi-cpu-fill me-1 text-secondary"></i>Sistema (Consola / Seeder)
                                     </span>
                                 @endif
                             </td>
                             <td class="py-3">
                                 @if($log->action === 'create')
-                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-create">
                                         <i class="bi bi-plus-circle-fill me-1"></i>Creación
                                     </span>
                                 @elseif($log->action === 'update')
-                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-update">
                                         <i class="bi bi-pencil-square me-1"></i>Modificación
                                     </span>
                                 @elseif($log->action === 'delete')
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-delete">
                                         <i class="bi bi-trash3-fill me-1"></i>Eliminación
                                     </span>
                                 @elseif($log->action === 'login')
-                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-login">
                                         <i class="bi bi-box-arrow-in-right me-1"></i>Ingreso
                                     </span>
                                 @elseif($log->action === 'logout')
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-logout">
                                         <i class="bi bi-box-arrow-right me-1"></i>Salida
                                     </span>
                                 @elseif($log->action === 'login_failed')
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-failed">
                                         <i class="bi bi-exclamation-octagon-fill me-1"></i>Acceso Fallido
                                     </span>
                                 @elseif($log->action === 'sync_permissions')
-                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-sync">
                                         <i class="bi bi-shield-check me-1"></i>Permisos Sinc.
                                     </span>
                                 @else
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.75rem;">
+                                    <span class="audit-action-badge audit-generic">
                                         {{ strtoupper($log->action) }}
                                     </span>
                                 @endif
@@ -153,7 +197,7 @@
                                         Ver datos <i class="bi bi-chevron-down ms-1"></i>
                                     </button>
                                     <div class="collapse mt-2" id="old-{{ $log->id }}">
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap" style="font-size: 0.7rem; max-width: 250px; overflow-x: auto; white-space: pre-wrap;"><code>{{ json_encode($log->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
                                     <span class="text-muted small italic">Ninguno (Registro Nuevo)</span>
@@ -165,14 +209,14 @@
                                         Ver datos <i class="bi bi-chevron-down ms-1"></i>
                                     </button>
                                     <div class="collapse mt-2" id="new-{{ $log->id }}">
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap" style="font-size: 0.7rem; max-width: 250px; overflow-x: auto; white-space: pre-wrap;"><code>{{ json_encode($log->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
                                     <span class="text-muted small italic">Ninguno (Eliminación)</span>
                                 @endif
                             </td>
                             <td class="py-3 pe-4">
-                                <small class="fw-semibold text-dark d-block"><i class="bi bi-pc-display me-1 text-muted"></i>{{ $log->ip_address ?? 'Local' }}</small>
+                                <small class="fw-semibold theme-text d-block"><i class="bi bi-pc-display me-1 text-muted"></i>{{ $log->ip_address ?? 'Local' }}</small>
                                 <small class="text-muted text-truncate d-block" style="max-width: 150px;" title="{{ $log->user_agent }}">{{ $log->user_agent ?? 'N/A' }}</small>
                             </td>
                         </tr>

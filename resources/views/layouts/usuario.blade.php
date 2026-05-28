@@ -7,6 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-bs-theme", savedTheme);
+    </script>
     
     {{-- CSS de Select2 --}}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -217,7 +221,6 @@
             html.setAttribute("data-bs-theme", target);
             localStorage.setItem("theme", target);
         }
-        document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("theme") || "light");
     </script>
     @stack("scripts") {{-- Para JS de vistas específicas --}}
 </body>

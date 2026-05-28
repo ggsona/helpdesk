@@ -7,6 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-bs-theme", savedTheme);
+    </script>
     
     @stack("styles") {{-- Para CSS de vistas específicas --}}
 
@@ -21,7 +25,6 @@
             --bg-main: #0b0c0d;
             --sb-bg: #111214;
         }
-
         body {
             font-family: "Inter", sans-serif; 
             background-color: var(--bg-main) !important; 
@@ -192,8 +195,9 @@
                 opacity: 0;
                 visibility: hidden;
                 transition: opacity 0.3s ease, visibility 0.3s ease;
-            }{
+            }
             .sidebar-backdrop.show 
+            {
                 opacity: 1;
                 visibility: visible;
             }
@@ -307,6 +311,65 @@
             border-color: var(--bs-border-color) !important;
             color: #0d6efd !important;
         }
+
+        /* Estandar premium para listados de Admin/Soporte */
+        .card-premium .table {
+            margin-bottom: 0;
+        }
+        .card-premium .table thead th {
+            border-bottom: 1px solid color-mix(in srgb, var(--bs-border-color) 85%, transparent);
+            color: var(--bs-secondary-color);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 700;
+            padding-top: 0.9rem;
+            padding-bottom: 0.9rem;
+        }
+        .card-premium .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        .card-premium .table tbody tr:hover {
+            background-color: color-mix(in srgb, var(--bs-primary-bg-subtle) 30%, transparent);
+        }
+        .card-premium .table td {
+            vertical-align: middle;
+        }
+        .card-premium .table .btn {
+            white-space: nowrap;
+        }
+        .btn-action-premium {
+            border-radius: 10px !important;
+            font-weight: 600;
+            min-height: 34px;
+            white-space: nowrap;
+        }
+        .btn-action-icon {
+            min-width: 34px;
+            min-height: 34px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .table .d-flex.gap-2 {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        /* Estándar de columnas de tabla heredado de SIGEINV */
+        .th-id {
+            width: 80px;
+            min-width: 80px;
+        }
+        .th-estado {
+            width: 120px;
+            min-width: 120px;
+        }
+        .th-acciones {
+            width: 140px;
+            min-width: 140px;
+            text-align: right;
+        }
+
     </style>
 </head>
 <body>
@@ -377,7 +440,7 @@
                     @endif
 
                     {{-- CONFIGURACIÓN Y ACTIVOS --}}
-                    @if(auth()->user()->can("gestionar-usuarios") || auth()->user()->can("ver-configuraciones") || auth()->user()->can("asignar-tickets") || auth()->user()->can("gestionar-categorias"))
+                    @if(auth()->user()->can("gestionar-usuarios") || auth()->user()->can("ver-configuraciones") || auth()->user()->can("asignar-tickets") || auth()->user()->can("gestionar-categorias") || auth()->user()->can("ver-rendimiento-tecnico") || auth()->user()->can("ver-auditorias"))
                         <hr class="mx-3 my-2 opacity-25 text-muted">
                         <small class="text-muted fw-bold ps-4 text-uppercase mb-2 d-block" style="font-size: 0.65rem; letter-spacing: 1px;">Configuración y Activos</small>
 
@@ -408,16 +471,20 @@
                             </a>
                         </li>
                         @endcan
-                        <li>
-                            <a href="{{ route('admin.rendimiento.index') }}" class="nav-link {{ request()->routeIs('admin.rendimiento.*') ? 'active' : '' }}">
-                                <i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.auditorias.index') }}" class="nav-link {{ request()->routeIs('admin.auditorias.*') ? 'active' : '' }}">
-                                <i class="bi bi-journal-text me-3"></i>Bitácora de Auditorías
-                            </a>
-                        </li>
+                        @can('ver-rendimiento-tecnico')
+                            <li>
+                                <a href="{{ route('admin.rendimiento.index') }}" class="nav-link {{ request()->routeIs('admin.rendimiento.*') ? 'active' : '' }}">
+                                    <i class="bi bi-bar-chart-line-fill me-3"></i>Rendimiento Técnico
+                                </a>
+                            </li>
+                        @endcan
+                        @can('ver-auditorias')
+                            <li>
+                                <a href="{{ route('admin.auditorias.index') }}" class="nav-link {{ request()->routeIs('admin.auditorias.*') ? 'active' : '' }}">
+                                    <i class="bi bi-journal-text me-3"></i>Bitácora de Auditorías
+                                </a>
+                            </li>
+                        @endcan
                     @endif
                 </ul>
             </div>
@@ -489,8 +556,6 @@
             html.setAttribute("data-bs-theme", target);
             localStorage.setItem("theme", target);
         }
-        const savedTheme = localStorage.getItem("theme") || "light";
-        document.documentElement.setAttribute("data-bs-theme", savedTheme);
 
         // Control del sidebar responsivo
         document.addEventListener("DOMContentLoaded", function() {
