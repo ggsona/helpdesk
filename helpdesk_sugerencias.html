@@ -3,41 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sugerencias Helpdesk</title>
+    <title>Sugerencias de Mejora - Helpdesk Laravel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
-        h1, h2 { color: #0d6efd; }
-        h2 { border-bottom: 2px solid #0d6efd; padding-bottom: 5px; margin-top: 30px; }
-        ul { margin-bottom: 20px; }
-        li { margin-bottom: 10px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.7; color: #1e293b; max-width: 900px; margin: 0 auto; padding: 40px 24px; background: #f8fafc; }
+        h1 { color: #0d6efd; font-size: 2rem; border-bottom: 3px solid #0d6efd; padding-bottom: 12px; margin-top: 0; }
+        h2 { color: #0f172a; font-size: 1.4rem; margin-top: 40px; padding: 10px 16px; background: linear-gradient(135deg, #e0e7ff, #ede9fe); border-radius: 10px; border-left: 5px solid #0d6efd; }
+        h3 { color: #475569; font-size: 1.1rem; margin-top: 24px; }
+        p { margin-bottom: 12px; }
         strong { color: #0f172a; }
+        code { background: #f1f5f9; color: #0d6efd; padding: 2px 7px; border-radius: 5px; font-size: 0.9em; font-family: 'Courier New', monospace; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 12px; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; border-left: 5px solid #0d6efd; }
+        pre code { background: transparent; color: inherit; padding: 0; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        hr { border: none; border-top: 2px dashed #cbd5e1; margin: 32px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        thead { background: linear-gradient(135deg, #0d6efd, #4f46e5); color: white; }
+        th { padding: 12px 16px; text-align: left; font-weight: 600; }
+        td { padding: 10px 16px; border-bottom: 1px solid #e2e8f0; }
+        tbody tr:nth-child(even) { background: #f8fafc; }
+        tbody tr:hover { background: #e0e7ff; }
+        .intro { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .emoji-label { font-size: 1.2em; margin-right: 4px; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+        .badge-high { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-mid { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .badge-low { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 0.92rem; }
+        .warn { background: #fefce8; border-left: 4px solid #eab308; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 0.92rem; }
     </style>
 </head>
 <body>
-    <h1>Sugerencias para el Sistema Helpdesk Laravel</h1>
-    <p>Este documento contiene sugerencias específicas para mejorar y añadir valor operativo al sistema de Mesa de Ayuda (Helpdesk).</p>
+    <h1>📋 Sugerencias de Mejora para Helpdesk Laravel</h1>
+    <div class="intro">
+        <p>Este documento contiene sugerencias específicas para mejorar y añadir valor operativo al sistema de Mesa de Ayuda (Helpdesk GDC), incluyendo hallazgos de la comparación con el módulo de Incidencias de SIGEINV.</p>
+    </div>
 
-    <h2>🎨 1. Mejoras Estéticas y de Experiencia de Usuario (UX/UI)</h2>
+    <h2><span class="emoji-label">🎨</span> A. Mejoras Estéticas y de Experiencia de Usuario (UX/UI)</h2>
+
+    <h3>A1. Dashboard con Datos Reales y Gráficos Interactivos</h3>
+    <p><strong>Estado actual:</strong> El dashboard muestra tarjetas con datos hardcodeados (12, 25, 8, 45m) y los placeholders de gráficas están vacíos.</p>
+    <p><strong>Propuesta:</strong> Conectar las tarjetas a datos reales con queries de Eloquent. Integrar <strong>Chart.js</strong> o <strong>ApexCharts</strong> para las gráficas de "Rendimiento por Técnico" (barras horizontales) y "Porcentaje por Categoría" (donut chart).</p>
+
+    <h3>A2. Animaciones Micro en Tarjetas y Tablas</h3>
+    <p><strong>Estado actual:</strong> Las tarjetas <code>.card-premium</code> tienen estilos completos y soportan dark mode, pero carecen de animaciones al interactuar.</p>
+    <p><strong>Propuesta:</strong> Agregar transiciones suaves de <code>transform</code> y <code>box-shadow</code> al hacer hover sobre las tarjetas y filas de tabla.</p>
+    <pre><code>.card-premium {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}</code></pre>
+
+    <h3>A3. Indicadores de Estado con Colores Semánticos (Badges Mejorados)</h3>
+    <p><strong>Propuesta:</strong> Crear badges con gradientes sutiles y bordes redondeados tipo "pill" que sean más expresivos para los estados de los tickets.</p>
+
+    <h3>A4. Skeleton Loaders para Carga</h3>
+    <p><strong>Propuesta:</strong> Cuando las tablas o tarjetas están cargando datos, mostrar esqueletos animados (shimmer effect) en lugar de pantalla en blanco. Esto da una sensación profesional y de alta calidad.</p>
+
+    <h3>A5. Breadcrumbs Contextuales</h3>
+    <p><strong>Estado actual:</strong> El header superior está casi vacío.</p>
+    <p><strong>Propuesta:</strong> Agregar migas de pan automáticas: <code>Dashboard > Mesa de Despacho > Ticket #42</code>.</p>
+
+    <h3>A6. Editor de Texto Enriquecido y Pegado de Imágenes <span class="badge badge-high">Recuperada</span></h3>
+    <p><strong>Estado actual:</strong> Los campos de comentario son <code>&lt;textarea&gt;</code> de texto plano. Para mostrar un error con captura, el usuario debe adjuntar un archivo manualmente.</p>
+    <p><strong>Propuesta:</strong> Integrar un editor ligero como <strong>TinyMCE</strong>, <strong>Quill.js</strong> o <strong>Trix</strong> en el campo de comentarios del chat. Funcionalidades clave:</p>
     <ul>
-        <li><strong>Vista de Tablero Kanban para Técnicos:</strong> En lugar de ver los tickets solo como una tabla tradicional, implementa una vista "Kanban" (estilo Trello o Jira). Los técnicos pueden simplemente arrastrar un ticket de "Pendiente" a "En Progreso" y luego a "Resuelto".</li>
-        <li><strong>Interfaz de Comentarios Estilo "Chat":</strong> Cambiar la vista de detalles del ticket para que el historial de comentarios parezca un chat moderno (burbujas de conversación).</li>
-        <li><strong>Editor de Texto Enriquecido y Pegado de Imágenes:</strong> Asegurar que el campo de comentarios soporte "Pegar desde el portapapeles" (Ctrl+V) para subir capturas de pantalla de errores rápidamente.</li>
+        <li><strong>Pegado de imágenes desde portapapeles</strong> (Ctrl+V): Screenshot → Ctrl+V → subida automática vía AJAX.</li>
+        <li><strong>Formato básico:</strong> Negritas, cursivas, listas y bloques de código.</li>
+        <li><strong>Previsualización inline:</strong> Capturas pegadas visibles directamente en la burbuja del chat.</li>
+    </ul>
+    <div class="note">Especialmente crítico para soporte técnico donde "una imagen vale más que mil palabras".</div>
+
+    <h3>A7. Chat Flotante Fijo (Panel Deslizable) <span class="badge badge-high">Prioridad Alta</span></h3>
+    <p><strong>Estado actual:</strong> El chat está embebido dentro del flujo vertical de <code>show.blade.php</code>. El técnico pierde de vista los detalles del ticket al hacer scroll hasta el chat.</p>
+    <p><strong>Propuesta:</strong> Convertir el chat en un <strong>panel flotante lateral fijo</strong> que se desliza desde la derecha (estilo WhatsApp Web / Intercom).</p>
+    <p><strong>Comportamiento:</strong></p>
+    <ul>
+        <li><strong>Botón flotante (FAB)</strong> en la esquina inferior derecha: 💬 con badge de número de mensajes.</li>
+        <li><strong>Panel lateral deslizable</strong> (400px) con header, burbujas de chat scrolleables y footer fijo con textarea + botón de enviar.</li>
+        <li><strong>Siempre visible</strong> mientras el técnico navega por detalles, adjuntos o timeline.</li>
+        <li><strong>En móviles:</strong> ocupa el 100% de la pantalla como modal fullscreen.</li>
+        <li>Se cierra con botón ×, tecla Escape o clic fuera (backdrop).</li>
+    </ul>
+    <pre><code>.chat-floating-panel {
+    position: fixed; right: 0; top: 0;
+    width: 400px; height: 100vh;
+    background: var(--bs-body-bg);
+    border-left: 1px solid var(--bs-border-color);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+    z-index: 1050;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.chat-floating-panel.open { transform: translateX(0); }
+.chat-fab {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd, #4f46e5);
+    color: white; border: none;
+    box-shadow: 0 6px 20px rgba(13,110,253,0.4);
+    z-index: 1040; cursor: pointer;
+}
+.chat-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 28px rgba(13,110,253,0.55);
+}</code></pre>
+    <div class="note"><strong>Ventaja clave:</strong> El técnico puede leer detalles del equipo, ver adjuntos y responder <strong>sin perder contexto</strong>. El chat se siente como una app de mensajería moderna.</div>
+
+    <hr>
+
+    <h2><span class="emoji-label">⚙️</span> B. Mejoras de Funcionalidad y Automatización</h2>
+
+    <h3>B1. Cronómetros Visuales de SLA <span class="badge badge-high">Prioridad Alta</span></h3>
+    <p><strong>Estado actual:</strong> Los tickets tienen Prioridad pero no hay indicador visual del tiempo transcurrido ni SLA.</p>
+    <p><strong>Propuesta:</strong> Crear una barra de progreso visual por cada ticket que muestre el tiempo restante según su prioridad:</p>
+    <ul>
+        <li><strong>Baja:</strong> 72 horas → Barra verde</li>
+        <li><strong>Media:</strong> 48 horas → Barra amarilla al 50%</li>
+        <li><strong>Alta:</strong> 24 horas → Barra naranja al 70%</li>
+        <li><strong>Crítica:</strong> 4 horas → Barra roja si excede</li>
     </ul>
 
-    <h2>⚙️ 2. Mejoras de Funcionalidad y Automatización</h2>
-    <ul>
-        <li><strong>Base de Conocimientos (Deflexión de Tickets):</strong> Sugerir automáticamente artículos de ayuda según la categoría seleccionada al crear un ticket.</li>
-        <li><strong>Cronómetros Visuales de SLA:</strong> Mostrar un cronómetro o barra de progreso (Verde ➔ Amarillo ➔ Rojo) en el dashboard del técnico basado en el Nivel/SLA.</li>
-        <li><strong>Respuestas Rápidas (Macros):</strong> Permitir a los técnicos guardar "plantillas" de texto para responder problemas comunes con un solo clic.</li>
-        <li><strong>Encuestas de Satisfacción (CSAT):</strong> Enviar un correo o notificación pidiendo calificar el servicio del 1 al 5.</li>
-        <li><strong>Auto-asignación (Round-Robin):</strong> Asignar automáticamente los tickets entrantes al técnico con menor carga de trabajo.</li>
-    </ul>
+    <h3>B2. Respuestas Rápidas / Macros para Técnicos <span class="badge badge-high">Prioridad Alta</span></h3>
+    <p><strong>Estado actual:</strong> Los técnicos escriben cada comentario manualmente.</p>
+    <p><strong>Propuesta:</strong> Crear una tabla <code>respuestas_rapidas</code> con columnas <code>titulo</code>, <code>contenido</code>, <code>id_usuario_creador</code>. En la interfaz del chat, agregar un botón "⚡ Macro" que despliegue un dropdown con las plantillas guardadas.</p>
 
-    <h2>🛠️ 3. Mejoras Avanzadas (Módulos Opcionales)</h2>
-    <ul>
-        <li><strong>Creación de Tickets por Email:</strong> Leer una bandeja de entrada y crear tickets automáticamente cuando un correo llega a soporte.</li>
-        <li><strong>Fusión de Tickets (Merge):</strong> Permitir al Gestor "Fusionar" múltiples tickets idénticos durante fallas masivas.</li>
-        <li><strong>Notificaciones Webhooks (Teams/Slack):</strong> Enviar alertas a canales corporativos cuando se creen tickets críticos.</li>
-    </ul>
+    <h3>B3. Línea de Tiempo del Ticket (Timeline)</h3>
+    <p><strong>Propuesta de SIGEINV:</strong> En SIGEINV cada incidencia registra automáticamente quién la creó y modificó gracias a <code>spatie/laravel-activitylog</code>.</p>
+    <p><strong>Implementación:</strong> En la vista <code>show.blade.php</code> del ticket, agregar un panel lateral tipo "timeline" vertical que muestre cada evento del ticket cronológicamente.</p>
+
+    <h3>B4. Encuestas de Satisfacción (CSAT)</h3>
+    <p><strong>Propuesta:</strong> Cuando el técnico cierra un ticket, mostrar al usuario un modal de calificación con 5 estrellas. Guardar en tabla <code>ticket_calificaciones</code>. Esto alimenta directamente la vista de Rendimiento Técnico.</p>
+
+    <h3>B5. Base de Conocimientos (Deflexión de Tickets)</h3>
+    <p><strong>Estado actual:</strong> Existe un modelo <code>Faq.php</code> pero parece sin uso.</p>
+    <p><strong>Propuesta:</strong> Activar y llenar esa tabla. Sugerir automáticamente artículos de FAQ según la categoría seleccionada al crear un ticket.</p>
+
+    <h3>B6. Auto-asignación Inteligente (Round-Robin)</h3>
+    <p><strong>Propuesta de SIGEINV:</strong> En SIGEINV las incidencias se filtran por <code>especialidad_id</code> del técnico.</p>
+    <p><strong>Implementación:</strong> Crear un botón "⚡ Auto-asignar" que busque al técnico con menos tickets activos.</p>
+
+    <h3>B7. Ficha de Servicio en PDF (Acta de Entrega)</h3>
+    <p><strong>Propuesta de SIGEINV:</strong> SIGEINV tiene fichas PDF individuales por incidencia.</p>
+    <p><strong>Implementación:</strong> Crear una ruta que genere un PDF con datos del usuario, equipo, problema, solución y espacio para firma. Se usa <code>barryvdh/laravel-dompdf</code> que ya está instalado.</p>
+
+    <h3>B8. Exportación Masiva de Tickets a Excel</h3>
+    <p><strong>Propuesta:</strong> Permitir al Gestor exportar la tabla de tickets filtrada a Excel con <code>maatwebsite/excel</code>.</p>
+
+    <h3>B9. Fusión de Tickets (Merge)</h3>
+    <p><strong>Propuesta:</strong> Permitir al Gestor fusionar múltiples tickets idénticos durante fallas masivas en un "Ticket Padre".</p>
+
+    <h3>B10. Creación de Tickets por Email</h3>
+    <p><strong>Propuesta:</strong> Configurar un comando de Laravel que lea una bandeja de entrada IMAP y cree tickets automáticamente.</p>
+
+    <h3>B11. Notificaciones Webhooks a Microsoft Teams / Slack <span class="badge badge-mid">Recuperada</span></h3>
+    <p><strong>Estado actual:</strong> No existe un sistema de notificaciones externo.</p>
+    <p><strong>Propuesta:</strong> Al crear un ticket de prioridad <strong>Alta</strong> o <strong>Crítica</strong>, enviar automáticamente un Webhook a Teams/Slack con un mensaje formateado:</p>
+    <pre><code>🚨 Nuevo Ticket Crítico #142
+Usuario: Juan Pérez (Departamento de RRHH)
+Categoría: Hardware
+Asunto: Laptop no enciende
+Prioridad: 🔴 Crítica
+→ Ver ticket: https://helpdesk.tuempresa.com/soporte/tickets/142</code></pre>
+    <p>En Laravel se implementa con <code>Http::post()</code> al URL del Webhook. Alerta a todo el equipo de TI inmediatamente.</p>
+
+    <hr>
+
+    <h2><span class="emoji-label">🛠️</span> C. Mejoras de Estilo Concretas (CSS/Layout)</h2>
+
+    <h3>C1. Efecto Glassmorphism en la Sidebar</h3>
+    <pre><code>#sidebar {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+[data-bs-theme="dark"] #sidebar {
+    background: rgba(17, 18, 20, 0.85);
+}</code></pre>
+
+    <h3>C2. Transiciones Suaves al Cambiar de Tema</h3>
+    <pre><code>#sidebar, .card-premium, .nav-link, .badge, .btn,
+.table thead th, .table tbody tr, .dropdown-menu {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}</code></pre>
+
+    <h3>C3. Animación del Scroll del Chat</h3>
+    <pre><code>chatShell.scrollTo({
+    top: chatShell.scrollHeight,
+    behavior: 'smooth'
+});</code></pre>
+
+    <h3>C4. Tooltips en los Iconos de la Sidebar</h3>
+    <p>Agregar <code>title</code> y activar los tooltips de Bootstrap para una navegación más intuitiva.</p>
+
+    <h3>C5. Hover en Filas de Tabla con Indicador de Prioridad</h3>
+    <p>Al hacer hover sobre un ticket de prioridad "Crítica", el borde izquierdo de la fila se pinte de rojo intenso.</p>
+
+    <h3>C6. Campo de Búsqueda Animado Estilo "Spotlight"</h3>
+    <pre><code>.search-premium:focus {
+    width: 100%;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+    border-color: #0d6efd;
+}</code></pre>
+
+    <hr>
+
+    <h2><span class="emoji-label">🔀</span> D. Hallazgos de la Comparación con SIGEINV</h2>
+
+    <h3>D1. Reactividad con Livewire (Diferencia Clave)</h3>
+    <div class="note"><strong>SIGEINV</strong> usa Livewire 3, logrando filtrado y paginación instantáneos. <strong>Helpdesk</strong> usa controladores tradicionales. A mediano plazo, considerar migrar la Mesa de Despacho a Livewire.</div>
+
+    <h3>D2. Vinculación Polimórfica con Activos</h3>
+    <p>SIGEINV vincula incidencias polimórficamente a múltiples tipos de activo. El modelo de Helpdesk (tabla única <code>Equipo</code>) es más limpio para soporte. Considerar agregar campos como IP o AnyDesk ID al equipo.</p>
+
+    <h3>D3. Configuraciones Dinámicas desde la BD</h3>
+    <p>Ampliar las configuraciones para incluir tiempos de SLA, toggle de auto-asignación y de encuesta de satisfacción.</p>
+
+    <h3>D4. Filtros Avanzados por Especialidad</h3>
+    <p>Agregar una relación entre <code>Categoria</code> y <code>User</code> (muchos a muchos) para que el técnico de "Hardware" reciba solo tickets de esa categoría.</p>
+
+    <h3>D5. Notas Internas y Visibilidad Diferenciada (Ventaja de Helpdesk)</h3>
+    <div class="note">El sistema de chat con notas internas (checkbox <code>es_interno</code>) y burbujas diferenciadas es una funcionalidad que SIGEINV NO tenía. <strong>Mantener esta ventaja.</strong></div>
+
+    <h3>D6. Sistema de Auditoría</h3>
+    <p>Evaluar si vale la pena migrar a <code>spatie/laravel-activitylog</code> para reducir código boilerplate y tener logs automáticos.</p>
+
+    <hr>
+
+    <h2><span class="emoji-label">📋</span> E. Resumen de Prioridades Sugeridas</h2>
+
+    <table>
+        <thead>
+            <tr><th>#</th><th>Mejora</th><th>Impacto</th><th>Esfuerzo</th><th>Prioridad</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>A7</td><td>Chat Flotante Fijo (Panel Deslizable)</td><td><span class="badge badge-high">Muy Alto</span></td><td>Medio</td><td>⭐⭐⭐</td></tr>
+            <tr><td>B1</td><td>Cronómetros de SLA</td><td><span class="badge badge-high">Muy Alto</span></td><td>Medio</td><td>⭐⭐⭐</td></tr>
+            <tr><td>A1</td><td>Dashboard con datos reales</td><td><span class="badge badge-high">Muy Alto</span></td><td>Bajo</td><td>⭐⭐⭐</td></tr>
+            <tr><td>B2</td><td>Respuestas Rápidas (Macros)</td><td><span class="badge badge-mid">Alto</span></td><td>Bajo</td><td>⭐⭐⭐</td></tr>
+            <tr><td>A6</td><td>Editor Rich Text + Pegado Imágenes</td><td><span class="badge badge-mid">Alto</span></td><td>Medio</td><td>⭐⭐⭐</td></tr>
+            <tr><td>B3</td><td>Timeline del Ticket</td><td><span class="badge badge-mid">Alto</span></td><td>Medio</td><td>⭐⭐</td></tr>
+            <tr><td>A2</td><td>Micro-animaciones CSS</td><td><span class="badge badge-low">Medio</span></td><td>Muy Bajo</td><td>⭐⭐⭐</td></tr>
+            <tr><td>C1</td><td>Glassmorphism Sidebar</td><td><span class="badge badge-low">Medio</span></td><td>Muy Bajo</td><td>⭐⭐</td></tr>
+            <tr><td>B4</td><td>Encuestas de Satisfacción</td><td><span class="badge badge-mid">Alto</span></td><td>Medio</td><td>⭐⭐</td></tr>
+            <tr><td>B7</td><td>Ficha de Servicio PDF</td><td><span class="badge badge-mid">Alto</span></td><td>Medio</td><td>⭐⭐</td></tr>
+            <tr><td>B11</td><td>Notificaciones Webhooks Teams/Slack</td><td><span class="badge badge-mid">Alto</span></td><td>Bajo</td><td>⭐⭐</td></tr>
+            <tr><td>B5</td><td>Base de Conocimientos / FAQ</td><td><span class="badge badge-mid">Alto</span></td><td>Alto</td><td>⭐</td></tr>
+            <tr><td>B6</td><td>Auto-asignación Round-Robin</td><td><span class="badge badge-mid">Alto</span></td><td>Medio</td><td>⭐</td></tr>
+            <tr><td>D1</td><td>Migrar a Livewire</td><td><span class="badge badge-high">Muy Alto</span></td><td>Muy Alto</td><td>⭐ (Largo plazo)</td></tr>
+            <tr><td>B8</td><td>Exportación Excel de Tickets</td><td><span class="badge badge-low">Medio</span></td><td>Bajo</td><td>⭐⭐</td></tr>
+            <tr><td>B9</td><td>Fusión de Tickets</td><td><span class="badge badge-low">Medio</span></td><td>Alto</td><td>⭐</td></tr>
+            <tr><td>B10</td><td>Tickets por Email</td><td><span class="badge badge-low">Medio</span></td><td>Alto</td><td>⭐</td></tr>
+        </tbody>
+    </table>
 </body>
 </html>
