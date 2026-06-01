@@ -13,6 +13,7 @@
     </script>
     
     @stack("styles") {{-- Para CSS de vistas específicas --}}
+    @livewireStyles
 
     <style>
         :root { 
@@ -138,6 +139,49 @@
         .row > [class*="col-"] {
             min-width: 0;
         }
+        }
+
+        /* ================= SUGERENCIAS UI/UX ================= */
+        /* Efecto Glassmorphism en Sidebar (C1) */
+        #sidebar {
+            background: rgba(255, 255, 255, 0.72) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+        [data-bs-theme="dark"] #sidebar {
+            background: rgba(17, 18, 20, 0.85) !important;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Transiciones Suaves al Cambiar de Tema (C2) y Micro-animaciones (A2) */
+        #sidebar, .card-premium, .nav-link, .badge, .btn, .table thead th, .table tbody tr, .dropdown-menu {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        [data-bs-theme="dark"] .card-premium:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Spotlight Search (C6) */
+        .search-premium {
+            transition: all 0.3s ease;
+        }
+        .search-premium:focus {
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+            border-color: #0d6efd;
+        }
+
+        /* Badges Semánticos Mejorados (A3) */
+        .badge-status-abierto { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white !important; border: none; }
+        .badge-status-proceso { background: linear-gradient(135deg, #f59e0b, #d97706); color: white !important; border: none; }
+        .badge-status-resuelto { background: linear-gradient(135deg, #10b981, #059669); color: white !important; border: none; }
+        .badge-status-cerrado { background: linear-gradient(135deg, #6b7280, #4b5563); color: white !important; border: none; }
+        /* ===================================================== */
 
         /* Truncar texto de una línea sin romper el layout */
         .text-truncate-safe {
@@ -600,8 +644,15 @@
                     backdrop.classList.remove("show");
                 });
             }
+
+            // Inicializar Tooltips (C4)
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
     </script>
     @stack("scripts") {{-- Para JS de vistas específicas --}}
+    @livewireScripts
 </body>
 </html>
