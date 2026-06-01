@@ -1,18 +1,18 @@
 <div>
     <!-- Filtros y Búsqueda -->
-    <div class="card card-premium shadow-sm border-0 mb-4">
-        <div class="card-body p-4">
+    <div class="card card-premium shadow-sm border-0 mb-2">
+        <div class="card-body p-3">
             <div class="row g-3">
                 <div class="col-md-5">
                     <label class="form-label fw-semibold text-secondary small mb-1">Buscar por tipo, acción o responsable</label>
-                    <div class="input-group">
+                    <div class="input-group" style="height: 42px;">
                         <span class="input-group-text bg-transparent border-end-0 border-secondary border-opacity-25 text-secondary"><i class="bi bi-search"></i></span>
                         <input type="text" wire:model.live.debounce.300ms="search" class="form-control form-control-premium border-start-0 border-secondary border-opacity-25" placeholder="Ej. Categoria, create, Admin...">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold text-secondary small mb-1">Acción Realizada</label>
-                    <select wire:model.live="action" class="form-select form-select-premium border-secondary border-opacity-25">
+                    <select wire:model.live="action" class="form-select form-select-premium border-secondary border-opacity-25" style="height: 42px;">
                         <option value="">Todas las acciones</option>
                         <option value="created">Crear (created)</option>
                         <option value="updated">Actualizar (updated)</option>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold text-secondary small mb-1">Componente / Tabla</label>
-                    <select wire:model.live="type" class="form-select form-select-premium border-secondary border-opacity-25">
+                    <select wire:model.live="type" class="form-select form-select-premium border-secondary border-opacity-25" style="height: 42px;">
                         <option value="">Todos los componentes</option>
                         <option value="Categoria">Categorías</option>
                         <option value="TipoEquipo">Tipos de Equipos</option>
@@ -41,7 +41,7 @@
                     </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                    <button wire:click="$set('search', ''); $set('action', ''); $set('type', '')" class="btn btn-light rounded-3 px-3 fw-bold w-100" style="height: calc(2.25rem + 2px); display: inline-flex; align-items: center; justify-content: center;" title="Limpiar filtros">
+                    <button wire:click="$set('search', ''); $set('action', ''); $set('type', '')" class="btn btn-light rounded-3 px-3 fw-bold w-100" style="height: 42px; display: inline-flex; align-items: center; justify-content: center;" title="Limpiar filtros">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
                 </div>
@@ -49,15 +49,19 @@
         </div>
     </div>
 
-    <!-- Indicador de Carga -->
-    <div wire:loading class="w-100 text-center mb-4">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
-        </div>
-    </div>
-
     <!-- Tabla de Logs Ampliada (Premium sin padding en la tarjeta) -->
-    <div class="card-premium shadow-sm border-0 p-0 overflow-hidden mb-4 position-relative" wire:loading.class="opacity-50">
+    <div class="card-premium shadow-sm border-0 p-0 overflow-hidden mb-4 position-relative">
+        
+        <!-- Indicador de Carga Overlay -->
+        <div wire:loading.flex class="position-absolute w-100 h-100 justify-content-center align-items-center bg-white bg-opacity-75" style="z-index: 10; top: 0; left: 0; backdrop-filter: blur(2px);">
+            <div class="text-primary d-flex flex-column align-items-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <span class="mt-2 fw-semibold">Cargando bitácora...</span>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead style="background: var(--bg-main);">
