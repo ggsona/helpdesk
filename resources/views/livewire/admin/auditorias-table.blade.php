@@ -2,12 +2,12 @@
     <!-- Filtros y Búsqueda -->
     <div class="card card-premium shadow-sm border-0 mb-2">
         <div class="card-body p-3">
-            <div class="row g-3">
+            <div class="row g-3 align-items-end">
                 <div class="col-md-5">
                     <label class="form-label fw-semibold text-secondary small mb-1">Buscar por tipo, acción o responsable</label>
-                    <div class="input-group" style="height: 42px;">
-                        <span class="input-group-text bg-transparent border-end-0 border-secondary border-opacity-25 text-secondary"><i class="bi bi-search"></i></span>
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control form-control-premium border-start-0 border-secondary border-opacity-25" placeholder="Ej. Categoria, create, Admin...">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary border-opacity-25 text-secondary" style="height: 42px;"><i class="bi bi-search"></i></span>
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control form-control-premium border-start-0 border-secondary border-opacity-25" placeholder="Ej. Categoria, create, Admin..." style="height: 42px;">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -41,7 +41,7 @@
                     </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                    <button wire:click="$set('search', ''); $set('action', ''); $set('type', '')" class="btn btn-light rounded-3 px-3 fw-bold w-100" style="height: 42px; display: inline-flex; align-items: center; justify-content: center;" title="Limpiar filtros">
+                    <button wire:click="clearFilters" class="btn btn-light rounded-3 px-3 fw-bold w-100" style="height: 42px; display: inline-flex; align-items: center; justify-content: center;" title="Limpiar filtros">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
                 </div>
@@ -164,7 +164,7 @@
                                         <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['old'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
-                                    <span class="text-muted small italic">Ninguno (Registro Nuevo)</span>
+                                    <span class="text-muted small italic">Ninguno</span>
                                 @endif
                             </td>
                             <td class="py-3">
@@ -176,7 +176,7 @@
                                         <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['attributes'] ?? $log->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
-                                    <span class="text-muted small italic">Ninguno (Eliminación)</span>
+                                    <span class="text-muted small italic">Ninguno</span>
                                 @endif
                             </td>
                             <td class="py-3 pe-4">

@@ -27,6 +27,12 @@ class AuditoriasTable extends Component
         $this->resetPage();
     }
 
+    public function clearFilters()
+    {
+        $this->reset(['search', 'action', 'type']);
+        $this->resetPage();
+    }
+
     public function updatingAction()
     {
         $this->resetPage();
