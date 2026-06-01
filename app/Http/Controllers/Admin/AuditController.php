@@ -16,38 +16,7 @@ class AuditController extends Controller
 
     public function index(Request $request)
     {
-        $query = Activity::with('causer')->orderBy('created_at', 'desc');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('subject_type', 'like', "%{$search}%")
-                  ->orWhere('event', 'like', "%{$search}%")
-                  ->orWhere('log_name', 'like', "%{$search}%")
-                  ->orWhereHas('causer', function ($uq) use ($search) {
-                      $uq->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        if ($request->filled('action')) {
-            $query->where('event', $request->action);
-        }
-
-        if ($request->filled('type')) {
-            if ($request->type === 'User') {
-                $query->where(function ($q) use ($request) {
-                    $q->where('subject_type', 'like', "%{$request->type}%")
-                      ->orWhere('log_name', 'Autenticación');
-                });
-            } else {
-                $query->where('subject_type', 'like', "%{$request->type}%");
-            }
-        }
-
-        $logs = $query->paginate(15);
-
-        return view('admin.auditorias.index', compact('logs'));
+        return view('admin.auditorias.index');
     }
 
     public function export(Request $request)

@@ -5,6 +5,8 @@ namespace App\Livewire\Soporte;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Models\Prioridad;
 use Illuminate\Support\Facades\Auth;
 
 class TicketsTable extends Component
@@ -14,6 +16,8 @@ class TicketsTable extends Component
     public $search = '';
     public $filtroEstado = '1'; // Default: Por Asignar
     public $modoGestor = false;
+
+    protected $paginationTheme = 'bootstrap';
 
     // Reset pagination when searching
     public function updatingSearch()
@@ -61,6 +65,9 @@ class TicketsTable extends Component
 
         $tickets = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('livewire.soporte.tickets-table', compact('tickets'));
+        $tecnicos = User::role(['tecnico', 'gestor', 'admin'])->get();
+        $prioridades = Prioridad::all();
+
+        return view('livewire.soporte.tickets-table', compact('tickets', 'tecnicos', 'prioridades'));
     }
 }
