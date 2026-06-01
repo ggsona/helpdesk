@@ -407,6 +407,32 @@
                         </li>
                     @endcan
 
+                    @can("ver-conocimiento")
+                        <li>
+                            <a href="#kbMenu" data-bs-toggle="collapse" class="nav-link {{ request()->routeIs('soporte.conocimiento.*') || request()->routeIs('soporte.tags.*') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-journal-bookmark-fill me-3"></i>Base de Conocimiento</span>
+                                <i class="bi bi-chevron-down" style="font-size: 0.8rem;"></i>
+                            </a>
+                            <ul class="collapse {{ request()->routeIs('soporte.conocimiento.*') || request()->routeIs('soporte.tags.*') ? 'show' : '' }} nav flex-column ms-3" id="kbMenu">
+                                <li class="mt-1">
+                                    <a href="{{ route('soporte.conocimiento.index') }}" class="nav-link py-1 {{ request()->routeIs('soporte.conocimiento.*') && request('estado') !== 'archivados' ? 'text-primary fw-bold' : 'text-muted' }}">
+                                        <i class="bi bi-circle me-2" style="font-size: 0.5rem;"></i> Artículos
+                                    </a>
+                                </li>
+                                <li class="mb-1">
+                                    <a href="{{ route('soporte.tags.index') }}" class="nav-link py-1 {{ request()->routeIs('soporte.tags.*') ? 'text-primary fw-bold' : 'text-muted' }}">
+                                        <i class="bi bi-circle me-2" style="font-size: 0.5rem;"></i> Etiquetas (Tags)
+                                    </a>
+                                </li>
+                                <li class="mb-1">
+                                    <a href="{{ route('soporte.conocimiento.index', ['estado' => 'archivados']) }}" class="nav-link py-1 {{ request('estado') === 'archivados' ? 'text-primary fw-bold' : 'text-muted' }}">
+                                        <i class="bi bi-archive me-2" style="font-size: 0.8rem;"></i> Archivados
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
+
                     {{-- CONTROL DE ACCESOS (SÓLO ADMINISTRADORES) --}}
                     @if(auth()->user()->can("gestionar-roles") || auth()->user()->can("gestionar-usuarios"))
                         <hr class="mx-3 my-2 opacity-25 text-muted">

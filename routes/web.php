@@ -8,6 +8,7 @@ use App\Http\Controllers\Usuario\TicketUsuarioController;
 use App\Http\Controllers\Gestor\TicketGestorController;
 use App\Http\Controllers\Tecnico\TicketTecnicoController;
 use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Soporte\ConocimientoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,7 +111,10 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
         Route::put('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'updateUnidad'])->name('estructura.unidades.update');
         Route::delete('/estructura/unidades/{id}', [\App\Http\Controllers\Admin\EstructuraOrganizacionalController::class, 'destroyUnidad'])->name('estructura.unidades.destroy');
 
+
+
         Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuraciones.index');
+        Route::post('/configuraciones/limites', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateLimites'])->name('configuraciones.limites.update');
         Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])->name('configuraciones.niveles.reorder');
         Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])->name('configuraciones.niveles.toggle');
         Route::post('/configuraciones/ad', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateAd'])->name('configuraciones.ad.update');
@@ -154,6 +158,33 @@ Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('sopo
         Route::get('/tickets/{id}/editar-solucion', [TicketTecnicoController::class, 'editarSolucion'])->name('editar-solucion');
         Route::put('/tickets/{id}/actualizar-solucion', [TicketTecnicoController::class, 'actualizarSolucion'])->name('actualizar-solucion');
         Route::patch('/tickets/{id}/kanban-estado', [TicketTecnicoController::class, 'actualizarEstadoKanban'])->name('actualizar-kanban-estado');
+    });
+
+    // --- CENTRO DE CONOCIMIENTO (Blog/Wiki) ---
+    Route::prefix('conocimiento')->name('conocimiento.')->middleware('can:ver-conocimiento')->group(function () {
+        Route::get('/', [ConocimientoController::class, 'index'])->name('index');
+        Route::get('/crear', [ConocimientoController::class, 'create'])->name('create')->middleware('can:crear-articulo');
+        Route::post('/', [ConocimientoController::class, 'store'])->name('store')->middleware('can:crear-articulo');
+        
+        // Rutas extra
+        Route::post('/{id}/valorar', [ConocimientoController::class, 'valorar'])->name('valorar');
+        Route::get('/adjunto/{id}/descargar', [ConocimientoController::class, 'descargar'])->name('descargar');
+        Route::get('/api/tags/buscar', [ConocimientoController::class, 'buscarTags'])->name('tags.buscar');
+        
+        // Rutas con slug al final para no interferir con las estáticas
+        Route::get('/{slug}', [ConocimientoController::class, 'show'])->name('show');
+        Route::get('/{slug}/editar', [ConocimientoController::class, 'edit'])->name('edit')->middleware('can:editar-articulo');
+        Route::put('/{slug}', [ConocimientoController::class, 'update'])->name('update')->middleware('can:editar-articulo');
+        Route::delete('/{id}', [ConocimientoController::class, 'destroy'])->name('destroy')->middleware('can:eliminar-articulo');
+    });
+
+    // --- GESTION DE TAGS ---
+    Route::prefix('tags')->name('tags.')->middleware('can:ver-conocimiento')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Soporte\TagController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Soporte\TagController::class, 'store'])->name('store');
+        Route::put('/{id}', [\App\Http\Controllers\Soporte\TagController::class, 'update'])->name('update');
+        Route::post('/{id}/toggle', [\App\Http\Controllers\Soporte\TagController::class, 'toggle'])->name('toggle');
+        Route::delete('/{id}', [\App\Http\Controllers\Soporte\TagController::class, 'destroy'])->name('destroy');
     });
 });
 

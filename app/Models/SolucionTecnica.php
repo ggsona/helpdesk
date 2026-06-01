@@ -15,10 +15,25 @@ class SolucionTecnica extends Model
         'id_ticket', 
         'id_usuario_tecnico', 
         'resumen_usuario', 
-        'procedimiento_detallado'
+        'procedimiento_detallado',
+        'diagnostico',
+        'causa_raiz',
+        'acciones_preventivas',
+        'tiempo_resolucion',
+        'dificultad',
+        'publicar_en_kb',
+    ];
+
+    protected $casts = [
+        'publicar_en_kb' => 'boolean',
     ];
 
     public function ticket() {
         return $this->belongsTo(Ticket::class, 'id_ticket');
+    }
+
+    public function articulo()
+    {
+        return $this->hasOne(ArticuloConocimiento::class, 'id_solucion', 'id_solucion');
     }
 }

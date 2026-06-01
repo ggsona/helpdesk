@@ -38,6 +38,47 @@
     @endif
 
     <div class="row g-4">
+        {{-- CONFIGURACIÓN DE LIMITES DEL SISTEMA --}}
+        <div class="col-12">
+            <div class="card card-premium shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold theme-text mb-1"><i class="bi bi-hdd-fill text-primary me-2"></i> Límites de Almacenamiento Global</h5>
+                        <p class="small text-muted mb-0">Configura el tamaño máximo permitido para subir archivos a la base de conocimiento y tickets.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.configuraciones.limites.update') }}" method="POST">
+                        @csrf
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-5">
+                                <label class="form-label small fw-bold text-secondary">Tamaño Máximo de Adjuntos</label>
+                                @php
+                                    $kbActual = env('KB_MAX_UPLOAD_KB', 1048576);
+                                    // Si es divisible exactamente por 1048576 (1GB), lo mostramos en GB, sino en MB
+                                    $esGb = ($kbActual >= 1048576 && $kbActual % 1048576 == 0);
+                                    $valorMostrar = $esGb ? ($kbActual / 1048576) : ($kbActual / 1024);
+                                @endphp
+                                <div class="input-group">
+                                    <input type="number" name="upload_size_value" class="form-control form-control-premium" value="{{ $valorMostrar }}" required min="1">
+                                    <select name="upload_size_unit" class="form-select bg-light fw-bold" style="max-width: 100px;">
+                                        <option value="MB" {{ !$esGb ? 'selected' : '' }}>MB</option>
+                                        <option value="GB" {{ $esGb ? 'selected' : '' }}>GB</option>
+                                    </select>
+                                </div>
+                                <div class="form-text small opacity-75">Ejemplo: 500 MB o 1 GB. Afecta a bases de conocimiento y tickets.</div>
+                            </div>
+                            <div class="col-12 col-md-4 mt-4 mt-md-0 pt-md-2">
+                                <button type="submit" class="btn btn-primary px-4 fw-bold rounded-pill shadow-sm">
+                                    <i class="bi bi-save-fill me-2"></i>Guardar Límite
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         {{-- CONFIGURACIÓN DE NIVELES (DRAG & DROP) --}}
         <div class="col-12">
             <div class="card card-premium shadow-sm border-0">

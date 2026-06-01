@@ -28,15 +28,31 @@
                             @error('resumen_usuario') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label theme-text fw-bold">Procedimiento Detallado (Uso Interno de TI)</label>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label theme-text fw-bold">Diagnóstico Inicial</label>
+                                <textarea name="diagnostico" class="form-control form-control-premium" rows="2">{{ old('diagnostico', $ticket->solucion->diagnostico) }}</textarea>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label theme-text fw-bold">Causa Raíz</label>
+                                <textarea name="causa_raiz" class="form-control form-control-premium" rows="2">{{ old('causa_raiz', $ticket->solucion->causa_raiz) }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label theme-text fw-bold">Procedimiento Detallado (Paso a paso)</label>
                             {{-- Contenedor para Quill --}}
-                            <div id="editor" style="height: 380px;" class="theme-text">
+                            <div id="editor" style="height: 300px;" class="theme-text">
                                 {!! old('procedimiento_detallado', $ticket->solucion->procedimiento_detallado) !!}
                             </div>
                             {{-- Input oculto para enviar el HTML al servidor --}}
                             <input type="hidden" name="procedimiento_detallado" id="procedimiento_detallado">
                             @error('procedimiento_detallado') <div class="text-danger small mt-2">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label theme-text fw-bold">Acciones Preventivas (Opcional)</label>
+                            <textarea name="acciones_preventivas" class="form-control form-control-premium" rows="2">{{ old('acciones_preventivas', $ticket->solucion->acciones_preventivas) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -48,18 +64,42 @@
                     <div class="card-body">
                         <h6 class="fw-bold theme-text mb-3">Información del Caso</h6>
                         
-                        <div class="p-3 rounded-3 mb-3 bg-light theme-bg-dark border border-secondary border-opacity-10">
+                        <div class="p-3 rounded-3 mb-3 bg-body-secondary theme-bg-dark border border-secondary border-opacity-10">
                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Ticket Asociado</small>
                             <span class="theme-text fw-semibold d-block">#{{ $ticket->id_ticket }}</span>
                             <span class="theme-text text-muted small d-block">{{ Str::limit($ticket->asunto, 60) }}</span>
                         </div>
                         
-                        <div class="p-3 rounded-3 mb-4 bg-light theme-bg-dark border border-secondary border-opacity-10">
+                        <div class="p-3 rounded-3 mb-4 theme-bg-dark border border-secondary border-opacity-10">
                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Fecha de Cierre Original</small>
                             <span class="theme-text fw-semibold d-block">
                                 <i class="bi bi-clock-history me-1 text-success"></i>
                                 {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y h:i A') : $ticket->updated_at->format('d/m/Y h:i A') }}
                             </span>
+                        </div>
+
+                        <div class="p-3 rounded-3 mb-4 theme-bg-dark border border-secondary border-opacity-10">
+                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.65rem;">Métricas de Solución</small>
+                            <div class="mb-2">
+                                <label class="small text-secondary mb-1">Dificultad</label>
+                                <select name="dificultad" class="form-select form-select-sm theme-text" style="background-color: var(--bg-main);">
+                                    <option value="basica" {{ $ticket->solucion->dificultad == 'basica' ? 'selected' : '' }}>Básica</option>
+                                    <option value="intermedia" {{ $ticket->solucion->dificultad == 'intermedia' ? 'selected' : '' }}>Intermedia</option>
+                                    <option value="avanzada" {{ $ticket->solucion->dificultad == 'avanzada' ? 'selected' : '' }}>Avanzada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="small text-secondary mb-1">Tiempo de Resolución Estimado</label>
+                                <input type="text" name="tiempo_resolucion" class="form-control form-control-sm theme-text" style="background-color: var(--bg-main);" value="{{ old('tiempo_resolucion', $ticket->solucion->tiempo_resolucion) }}">
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-3 mb-4 bg-primary bg-opacity-10 border border-primary border-opacity-25">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="publicar_en_kb" name="publicar_en_kb" value="1" {{ $ticket->solucion->publicar_en_kb ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold text-primary" for="publicar_en_kb">Publicar en Base de Conocimiento</label>
+                            </div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Si marcas esto, esta solución se convertirá (o actualizará) en un artículo de la Wiki para que otros técnicos puedan consultarlo.</small>
                         </div>
 
                         <button type="submit" class="btn btn-warning w-100 rounded-pill py-2 shadow-sm mb-2 text-white fw-bold">
@@ -105,7 +145,17 @@
 </script>
 
 <style>
-    .ql-toolbar { background: #fff !important; border-top-left-radius: 10px; border-top-right-radius: 10px; border-color: var(--bs-border-color) !important; }
+    .ql-toolbar { background: transparent !important; border-top-left-radius: 10px; border-top-right-radius: 10px; border-color: var(--bs-border-color) !important; }
     .ql-container { border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background: var(--bg-main); color: var(--text-main); font-size: 1rem; border-color: var(--bs-border-color) !important; }
+    .ql-toolbar .ql-stroke { stroke: var(--text-main); }
+    .ql-toolbar .ql-fill { fill: var(--text-main); }
+    .ql-toolbar .ql-picker { color: var(--text-main); }
+    /* Soporte Dark Mode para Quill Editor */
+    [data-bs-theme="dark"] .ql-toolbar.ql-snow { border-color: #323248; background-color: #1e1e2d; }
+    [data-bs-theme="dark"] .ql-container.ql-snow { border-color: #323248; background-color: #1e1e2d; color: #fff; }
+    [data-bs-theme="dark"] .ql-snow .ql-stroke { stroke: #ccc; }
+    [data-bs-theme="dark"] .ql-snow .ql-fill { fill: #ccc; }
+    [data-bs-theme="dark"] .ql-snow .ql-picker { color: #ccc; }
+    [data-bs-theme="dark"] .ql-snow .ql-picker-options { background-color: #1e1e2d; border-color: #323248; }
 </style>
 @endsection

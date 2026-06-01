@@ -19,6 +19,37 @@ class ConfiguracionController extends Controller
         return view('admin.configuraciones.index', compact('niveles', 'existenUnidades'));
     }
 
+    public function updateLimites(Request $request)
+    {
+        $request->validate([
+            'upload_size_value' => 'required|integer|min:1',
+            'upload_size_unit'  => 'required|in:MB,GB'
+        ]);
+
+        $valor = $request->upload_size_value;
+        $unidad = $request->upload_size_unit;
+
+        // Convertir el valor a KB
+        if ($unidad === 'GB') {
+            $kb = $valor * 1048576; // 1 GB = 1048576 KB
+        } else {
+            $kb = $valor * 1024; // 1 MB = 1024 KB
+        }
+        
+        $path = base_path('.env');
+        if (file_exists($path)) {
+            $env = file_get_contents($path);
+            if (preg_match('/^KB_MAX_UPLOAD_KB=/m', $env)) {
+                $env = preg_replace('/^KB_MAX_UPLOAD_KB=.*/m', 'KB_MAX_UPLOAD_KB=' . $kb, $env);
+            } else {
+                $env .= "\nKB_MAX_UPLOAD_KB=" . $kb;
+            }
+            file_put_contents($path, $env);
+        }
+        
+        return redirect()->back()->with('success', 'Límite de subida de archivos actualizado.');
+    }
+
     public function reorderNiveles(Request $request)
     {
         // Doble validación de seguridad a nivel de backend: 
