@@ -78,8 +78,8 @@
                     @forelse($logs as $log)
                         <tr class="text-nowrap" style="border-bottom: 1px solid var(--bs-border-color);" wire:key="log-{{ $log->id }}">
                             <td class="ps-3 py-3">
-                                <span class="fw-semibold theme-text">{{ $log->created_at->format('d/m/Y') }}</span><br>
-                                <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
+                                <span class="fw-semibold theme-text">{{ $log->created_at->tz(config('app.timezone'))->format('d/m/Y') }}</span><br>
+                                <small class="text-muted">{{ $log->created_at->tz(config('app.timezone'))->format('H:i:s') }}</small>
                             </td>
                             <td class="py-3">
                                 @if($log->causer)

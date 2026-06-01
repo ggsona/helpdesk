@@ -58,6 +58,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Align MySQL session timezone with application timezone (America/Caracas, UTC-4)
+            'timezone' => '-04:00',
+            // No explicit timezone, let MySQL use its default (UTC)
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
