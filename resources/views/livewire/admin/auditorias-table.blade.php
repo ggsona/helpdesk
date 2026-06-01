@@ -66,20 +66,18 @@
             <table class="table table-hover align-middle mb-0">
                 <thead style="background: var(--bg-main);">
                     <tr class="text-nowrap">
-                        <th class="ps-4 py-3 border-0 text-muted small text-uppercase">Fecha y Hora</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase">Responsable del Cambio</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase">Tipo de Acción</th>
+                        <th class="ps-3 py-3 border-0 text-muted small text-uppercase">Fecha y Hora</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase">Responsable</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase">Acción</th>
                         <th class="py-3 border-0 text-muted small text-uppercase">Elemento Afectado</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase">ID Ref</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase">Valores Anteriores</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase">Valores Nuevos</th>
-                        <th class="py-3 border-0 text-muted small text-uppercase pe-4">Dirección IP y Navegador</th>
+                        <th class="ps-4 py-3 border-0 text-muted small text-uppercase" style="min-width: 160px;">Detalles del Cambio</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase pe-3">IP y Navegador</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($logs as $log)
                         <tr class="text-nowrap" style="border-bottom: 1px solid var(--bs-border-color);" wire:key="log-{{ $log->id }}">
-                            <td class="ps-4 py-3">
+                            <td class="ps-3 py-3">
                                 <span class="fw-semibold theme-text">{{ $log->created_at->format('d/m/Y') }}</span><br>
                                 <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
                             </td>
@@ -98,7 +96,7 @@
                                     </div>
                                 @else
                                     <span class="badge bg-secondary-subtle text-secondary-emphasis px-2 py-1.5 rounded" style="font-size: 0.75rem;">
-                                        <i class="bi bi-cpu-fill me-1 text-secondary"></i>Sistema (Consola / Seeder)
+                                        <i class="bi bi-cpu-fill me-1 text-secondary"></i>Sistema (Automático)
                                     </span>
                                 @endif
                             </td>
@@ -151,42 +149,43 @@
                             </td>
                             <td class="py-3">
                                 <span class="fw-bold theme-text">{{ $log->subject_type ? class_basename($log->subject_type) : $log->log_name }}</span>
-                            </td>
-                            <td class="py-3">
-                                <code class="text-secondary fw-bold">#{{ $log->subject_id ?? 'N/A' }}</code>
-                            </td>
-                            <td class="py-3">
-                                @if(isset($log->properties['old']))
-                                    <button class="btn btn-sm btn-outline-secondary py-1 px-2 rounded-3" data-bs-toggle="collapse" data-bs-target="#old-{{ $log->id }}" style="font-size: 0.75rem;">
-                                        Ver datos <i class="bi bi-chevron-down ms-1"></i>
-                                    </button>
-                                    <div class="collapse mt-2" id="old-{{ $log->id }}" wire:ignore.self>
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['old'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
-                                    </div>
-                                @else
-                                    <span class="text-muted small italic">Ninguno</span>
+                                @if($log->subject_id)
+                                    <code class="text-secondary ms-1">#{{ $log->subject_id }}</code>
                                 @endif
                             </td>
-                            <td class="py-3">
-                                @if(isset($log->properties['attributes']) || count($log->properties) > 0)
-                                    <button class="btn btn-sm btn-outline-primary py-1 px-2 rounded-3" data-bs-toggle="collapse" data-bs-target="#new-{{ $log->id }}" style="font-size: 0.75rem;">
-                                        Ver datos <i class="bi bi-chevron-down ms-1"></i>
-                                    </button>
-                                    <div class="collapse mt-2" id="new-{{ $log->id }}" wire:ignore.self>
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['attributes'] ?? $log->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
-                                    </div>
-                                @else
-                                    <span class="text-muted small italic">Ninguno</span>
-                                @endif
+                            <td class="ps-4 py-3">
+                                <div class="d-flex flex-column gap-1">
+                                    @if(isset($log->properties['old']))
+                                        <button class="btn btn-sm btn-outline-secondary py-1 px-2 rounded-2 text-start" data-bs-toggle="collapse" data-bs-target="#old-{{ $log->id }}" style="font-size: 0.70rem;">
+                                            <i class="bi bi-clock-history me-1"></i> Anterior <i class="bi bi-chevron-down float-end ms-2"></i>
+                                        </button>
+                                        <div class="collapse" id="old-{{ $log->id }}" wire:ignore.self>
+                                            <pre class="bg-light p-1 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json" style="font-size: 0.65rem;"><code>{{ json_encode($log->properties['old'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        </div>
+                                    @endif
+
+                                    @if(isset($log->properties['attributes']) || (count($log->properties) > 0 && !isset($log->properties['old'])))
+                                        <button class="btn btn-sm btn-outline-primary py-1 px-2 rounded-2 text-start" data-bs-toggle="collapse" data-bs-target="#new-{{ $log->id }}" style="font-size: 0.70rem;">
+                                            <i class="bi bi-lightning-charge me-1"></i> Nuevo <i class="bi bi-chevron-down float-end ms-2"></i>
+                                        </button>
+                                        <div class="collapse" id="new-{{ $log->id }}" wire:ignore.self>
+                                            <pre class="bg-light p-1 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json" style="font-size: 0.65rem;"><code>{{ json_encode($log->properties['attributes'] ?? $log->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        </div>
+                                    @endif
+                                    
+                                    @if(!isset($log->properties['old']) && !isset($log->properties['attributes']) && count($log->properties) == 0)
+                                        <span class="text-muted small italic">Ninguno</span>
+                                    @endif
+                                </div>
                             </td>
-                            <td class="py-3 pe-4">
+                            <td class="py-3 pe-3">
                                 <small class="fw-semibold theme-text d-block"><i class="bi bi-pc-display me-1 text-muted"></i>{{ $log->properties['ip'] ?? 'Local' }}</small>
-                                <small class="text-muted text-truncate d-block" style="max-width: 150px;" title="{{ $log->properties['user_agent'] ?? 'N/A' }}">{{ $log->properties['user_agent'] ?? 'N/A' }}</small>
+                                <small class="text-muted text-truncate d-block" style="max-width: 120px;" title="{{ $log->properties['user_agent'] ?? 'N/A' }}">{{ $log->properties['user_agent'] ?? 'N/A' }}</small>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <i class="bi bi-info-circle text-muted fs-2 mb-3 d-block"></i>
                                 <p class="text-muted mb-0">No se encontraron registros de auditoría en la bitácora.</p>
                             </td>

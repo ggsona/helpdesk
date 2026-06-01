@@ -34,6 +34,10 @@ class EventServiceProvider extends ServiceProvider
                 activity('Autenticación')
                     ->causedBy($event->user)
                     ->event('login')
+                    ->withProperties([
+                        'ip' => request()->ip() ?? 'Local',
+                        'user_agent' => request()->userAgent() ?? 'N/A'
+                    ])
                     ->log('Inicio de sesión exitoso');
             } catch (\Exception $e) {
                 logger()->error("Failed to write login audit: " . $e->getMessage());
@@ -46,6 +50,10 @@ class EventServiceProvider extends ServiceProvider
                     activity('Autenticación')
                         ->causedBy($event->user)
                         ->event('logout')
+                        ->withProperties([
+                            'ip' => request()->ip() ?? 'Local',
+                            'user_agent' => request()->userAgent() ?? 'N/A'
+                        ])
                         ->log('Cierre de sesión');
                 }
             } catch (\Exception $e) {
@@ -57,7 +65,11 @@ class EventServiceProvider extends ServiceProvider
             try {
                 activity('Autenticación')
                     ->event('login_failed')
-                    ->withProperties(['email' => $event->credentials['email'] ?? 'Desconocido'])
+                    ->withProperties([
+                        'email' => $event->credentials['email'] ?? 'Desconocido',
+                        'ip' => request()->ip() ?? 'Local',
+                        'user_agent' => request()->userAgent() ?? 'N/A'
+                    ])
                     ->log('Intento de inicio de sesión fallido');
             } catch (\Exception $e) {
                 logger()->error("Failed to write login failed audit: " . $e->getMessage());
