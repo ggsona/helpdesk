@@ -78,63 +78,7 @@
                     </div>
                 </div>
 
-                {{-- Chat / Comunicación --}}
-                <div class="card border-0 shadow-sm bg-body-tertiary">
-                    <div class="card-header bg-transparent py-3 border-bottom border-light-subtle">
-                        <h6 class="fw-bold mb-0 text-body"><i class="bi bi-chat-dots me-2 text-primary"></i>Historial de Mensajes</h6>
-                    </div>
-                    
-                    <div class="card-body bg-body-secondary bg-opacity-25 chat-container" style="max-height: 500px; overflow-y: auto; padding: 1.5rem;">
-                        @php
-                            $mensajesPublicos = $ticket->comentarios->where('es_interno', false);
-                        @endphp
-
-                        @if($mensajesPublicos->count() > 0)
-                            @foreach($mensajesPublicos as $comentario)
-                                <div class="d-flex mb-4 {{ $comentario->id_usuario == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
-                                    <div class="p-3 rounded-3 shadow-sm {{ $comentario->id_usuario == auth()->id() ? 'bg-primary text-white' : 'bg-body border border-light-subtle' }}" style="max-width: 80%;">
-                                        <div class="d-flex justify-content-between align-items-center mb-2 gap-3">
-                                            <small class="fw-bold text-uppercase {{ $comentario->id_usuario == auth()->id() ? 'text-white-50' : 'text-primary' }}" style="font-size: 0.7rem;">
-                                                {{ $comentario->usuario->name }} 
-                                                @if($comentario->id_usuario != auth()->id()) 
-                                                    <span class="badge bg-primary-subtle text-primary ms-1" style="font-size: 0.6rem;">SOPORTE</span> 
-                                                @endif
-                                            </small>
-                                            <small class="{{ $comentario->id_usuario == auth()->id() ? 'text-white-50' : 'text-secondary' }}" style="font-size: 0.65rem;">
-                                                {{ $comentario->created_at->format('H:i | d/m/y') }}
-                                            </small>
-                                        </div>
-                                        <p class="mb-0" style="font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap;">{{ $comentario->mensaje }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="text-center py-5">
-                                <i class="bi bi-chat-left-text display-4 opacity-25"></i>
-                                <p class="mt-3">Aún no hay mensajes públicos. Espera a que un técnico responda.</p>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Caja de Texto --}}
-                    @if($ticket->estatus != 0)
-                        <div class="card-footer bg-transparent border-top border-light-subtle p-3">
-                            <form action="{{ route('usuario.tickets.comentar', $ticket->id_ticket) }}" method="POST">
-                                @csrf
-                                <div class="input-group">
-                                    <textarea name="mensaje" class="form-control bg-body border border-light-subtle shadow-none text-body" placeholder="Escribe tu mensaje aquí..." rows="2" required style="resize: none;"></textarea>
-                                    <button class="btn btn-primary px-4" type="submit">
-                                        <i class="bi bi-send-fill fs-5"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    @else
-                        <div class="card-footer bg-body-secondary bg-opacity-50 text-center py-3">
-                            <span class="small"><i class="bi bi-lock-fill me-1"></i> El chat se habilitará cuando envíes el ticket a soporte.</span>
-                        </div>
-                    @endif
-                </div>
+                {{-- ELIMINADO EL CHAT INLINE: SE MOVIÓ A UN PANEL FLOTANTE (OFFCANVAS) ABAJO --}}
             </div>
 
             {{-- Sidebar derecho --}}
@@ -200,4 +144,141 @@
             </div>
         </div>
     </div>
+
+    {{-- Botón Flotante para abrir el Chat --}}
+    <button class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+            type="button" 
+            data-bs-toggle="offcanvas" 
+            data-bs-target="#chatOffcanvas" 
+            aria-controls="chatOffcanvas"
+            style="position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; z-index: 1040; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <i class="bi bi-chat-dots-fill fs-3"></i>
+        @php
+            $mensajesPublicos = $ticket->comentarios->where('es_interno', false);
+        @endphp
+        @if($mensajesPublicos->count() > 0)
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light border-2" style="font-size: 0.8rem; padding: 0.35em 0.65em;">
+                {{ $mensajesPublicos->count() }}
+            </span>
+        @endif
+    </button>
+
+    {{-- Panel Deslizable (Offcanvas) de Chat Glassmorphism --}}
+    <div class="offcanvas offcanvas-end shadow-lg border-0" tabindex="-1" id="chatOffcanvas" aria-labelledby="chatOffcanvasLabel" style="width: 450px; max-width: 100vw; background: rgba(var(--bs-body-bg-rgb), 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
+        <div class="offcanvas-header border-bottom border-secondary border-opacity-10 py-3 px-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                    <i class="bi bi-chat-dots-fill fs-5"></i>
+                </div>
+                <div>
+                    <h5 class="offcanvas-title fw-bold mb-0" id="chatOffcanvasLabel">Chat de Soporte</h5>
+                    <small class="text-secondary d-flex align-items-center gap-1">
+                        <span class="d-inline-block bg-success rounded-circle" style="width: 8px; height: 8px;"></span> Ticket #{{ $ticket->id_ticket }}
+                    </small>
+                </div>
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        
+        <div class="offcanvas-body p-0 d-flex flex-column" style="background: rgba(var(--bs-secondary-bg-rgb), 0.3);">
+            {{-- Área de Mensajes --}}
+            <div class="chat-container flex-grow-1 p-4" id="offcanvasChatContainer" style="overflow-y: auto; scroll-behavior: smooth;">
+                @if($mensajesPublicos->count() > 0)
+                    @foreach($mensajesPublicos as $comentario)
+                        <div class="d-flex flex-column mb-4 {{ $comentario->id_usuario == auth()->id() ? 'align-items-end' : 'align-items-start' }}">
+                            <div class="d-flex align-items-end gap-2 {{ $comentario->id_usuario == auth()->id() ? 'flex-row-reverse' : '' }}">
+                                {{-- Avatar Mini --}}
+                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm {{ $comentario->id_usuario == auth()->id() ? 'bg-primary text-white' : 'bg-body-secondary text-secondary-emphasis' }}" style="width: 35px; height: 35px; font-size: 0.8rem; flex-shrink: 0;">
+                                    {{ substr($comentario->usuario->name, 0, 1) }}
+                                </div>
+                                
+                                {{-- Burbuja de Chat --}}
+                                <div class="p-3 rounded-4 shadow-sm {{ $comentario->id_usuario == auth()->id() ? 'bg-primary text-white text-end' : 'bg-body border border-light-subtle' }}" style="max-width: 85%; border-bottom-{{ $comentario->id_usuario == auth()->id() ? 'right' : 'left' }}-radius: 4px !important;">
+                                    <div class="d-flex align-items-center gap-2 mb-1 justify-content-{{ $comentario->id_usuario == auth()->id() ? 'end' : 'start' }}">
+                                        <small class="fw-bold {{ $comentario->id_usuario == auth()->id() ? 'text-white text-opacity-75' : 'text-primary' }}" style="font-size: 0.75rem;">
+                                            {{ $comentario->id_usuario == auth()->id() ? 'Tú' : $comentario->usuario->name }}
+                                        </small>
+                                        @if($comentario->id_usuario != auth()->id()) 
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" style="font-size: 0.55rem; padding: 2px 6px;">SOPORTE</span> 
+                                        @endif
+                                    </div>
+                                    <p class="mb-0" style="font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap;">{{ $comentario->mensaje }}</p>
+                                </div>
+                            </div>
+                            <small class="text-secondary mt-1 px-5" style="font-size: 0.65rem;">
+                                {{ $comentario->created_at->format('h:i A') }}
+                            </small>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="h-100 d-flex flex-column align-items-center justify-content-center text-center py-5 opacity-50">
+                        <i class="bi bi-chat-square-dots display-3 text-secondary mb-3"></i>
+                        <h6 class="fw-bold">No hay mensajes</h6>
+                        <p class="small text-secondary mb-0">Envía un mensaje para contactar al soporte técnico.</p>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Área de Input --}}
+            <div class="p-3 bg-body border-top border-secondary border-opacity-10 shadow-sm z-3">
+                @if($ticket->estatus != 0)
+                    <form action="{{ route('usuario.tickets.comentar', $ticket->id_ticket) }}" method="POST">
+                        @csrf
+                        <div class="position-relative">
+                            <textarea name="mensaje" 
+                                      class="form-control form-control-premium bg-body-secondary bg-opacity-50 border-0 shadow-none pe-5" 
+                                      placeholder="Escribe un mensaje..." 
+                                      rows="1" 
+                                      required 
+                                      style="resize: none; border-radius: 25px; padding-top: 12px; padding-bottom: 12px; transition: all 0.3s ease;"></textarea>
+                            <button class="btn btn-primary rounded-circle position-absolute end-0 top-50 translate-middle-y me-1 d-flex align-items-center justify-content-center shadow-sm hover-scale" 
+                                    type="submit" 
+                                    style="width: 38px; height: 38px;">
+                                <i class="bi bi-send-fill fs-6 ms-1"></i>
+                            </button>
+                        </div>
+                    </form>
+                @else
+                    <div class="bg-secondary bg-opacity-10 text-secondary text-center py-3 rounded-4">
+                        <span class="small fw-medium"><i class="bi bi-lock-fill me-1"></i> Envía el ticket para habilitar el chat.</span>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación al hacer hover en el botón flotante
+            const chatBtn = document.querySelector('[data-bs-target="#chatOffcanvas"]');
+            if (chatBtn) {
+                chatBtn.addEventListener('mouseenter', () => chatBtn.style.transform = 'scale(1.1) rotate(-5deg)');
+                chatBtn.addEventListener('mouseleave', () => chatBtn.style.transform = 'scale(1) rotate(0)');
+            }
+
+            // Auto-scroll al fondo cuando se abre el offcanvas
+            const chatOffcanvas = document.getElementById('chatOffcanvas');
+            if (chatOffcanvas) {
+                chatOffcanvas.addEventListener('shown.bs.offcanvas', function () {
+                    const chatContainer = document.getElementById('offcanvasChatContainer');
+                    if (chatContainer) {
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        // Pequeño focus visual a los mensajes
+                        const mensajes = chatContainer.querySelectorAll('.d-flex.flex-column');
+                        mensajes.forEach((msg, idx) => {
+                            msg.style.opacity = '0';
+                            msg.style.transform = 'translateY(10px)';
+                            setTimeout(() => {
+                                msg.style.transition = 'all 0.3s ease-out';
+                                msg.style.opacity = '1';
+                                msg.style.transform = 'translateY(0)';
+                            }, 50 * idx);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    @endpush
 </x-usuario-layout>

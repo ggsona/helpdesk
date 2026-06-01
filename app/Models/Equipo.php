@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Equipo extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'equipos';
 
@@ -62,5 +64,17 @@ class Equipo extends Model
     public function modelo()
     {
         return $this->belongsTo(Modelo::class, 'id_modelo', 'id_modelo');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'nombre', 'numero_bien', 'id_marca', 'id_modelo', 
+                'ip_address', 'mac_address', 'ram', 'procesador', 
+                'disco_duro', 'id_tipo_equipo', 'id_usuario_asignado', 'estado'
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

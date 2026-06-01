@@ -9,10 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsTo; // Importante añadir esto
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -44,6 +46,19 @@ class User extends Authenticatable
     public function equipos()
     {
         return $this->hasMany(Equipo::class, 'id_usuario_asignado', 'id');
+    }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(TicketAsignacion::class, 'id_usuario_tecnico', 'id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'is_approved', 'role'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 
     /**

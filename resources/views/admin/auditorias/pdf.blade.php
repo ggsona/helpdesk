@@ -155,54 +155,60 @@
                         <span class="text-muted">{{ $log->created_at->format('H:i:s') }}</span>
                     </td>
                     <td>
-                        @if($log->user)
-                            <span class="text-bold">{{ $log->user->name }}</span><br>
-                            <span class="text-muted" style="font-size: 7.5px;">{{ $log->user->roles->pluck('name')->first() ?? 'Soporte' }}</span>
+                        @if($log->causer)
+                            <span class="text-bold">{{ $log->causer->name }}</span><br>
+                            <span class="text-muted" style="font-size: 7.5px;">{{ $log->causer->roles->pluck('name')->first() ?? 'Soporte' }}</span>
                         @else
                             <span class="text-muted">Sistema</span>
                         @endif
                     </td>
                     <td>
-                        @if($log->action === 'create')
+                        @if($log->event === 'created')
                             <span class="badge bg-success">Creación</span>
-                        @elseif($log->action === 'update')
+                        @elseif($log->event === 'updated')
                             <span class="badge bg-warning">Edición</span>
-                        @elseif($log->action === 'delete')
+                        @elseif($log->event === 'deleted')
                             <span class="badge bg-danger">Eliminación</span>
-                        @elseif($log->action === 'login')
+                        @elseif($log->event === 'login')
                             <span class="badge bg-success" style="background-color: #cfe2ff; color: #084298;">Ingreso</span>
-                        @elseif($log->action === 'logout')
+                        @elseif($log->event === 'logout')
                             <span class="badge bg-secondary">Salida</span>
-                        @elseif($log->action === 'login_failed')
+                        @elseif($log->event === 'login_failed')
                             <span class="badge bg-danger" style="background-color: #f8d7da; color: #842029;">Acceso Fallido</span>
-                        @elseif($log->action === 'sync_permissions')
+                        @elseif($log->event === 'registro_solicitado')
+                            <span class="badge bg-success" style="background-color: #cff4fc; color: #055160;">Reg. Solicitado</span>
+                        @elseif($log->event === 'registro_aprobado')
+                            <span class="badge bg-success" style="background-color: #d1e7dd; color: #0f5132;">Reg. Aprobado</span>
+                        @elseif($log->event === 'registro_rechazado')
+                            <span class="badge bg-danger" style="background-color: #f8d7da; color: #842029;">Reg. Rechazado</span>
+                        @elseif($log->event === 'sync_permissions')
                             <span class="badge bg-success" style="background-color: #e0cffc; color: #563d7c;">Permisos Sinc.</span>
                         @else
-                            <span class="badge bg-secondary">{{ $log->action }}</span>
+                            <span class="badge bg-secondary">{{ $log->event }}</span>
                         @endif
                     </td>
                     <td>
-                        <span class="text-bold">{{ class_basename($log->auditable_type) }}</span>
+                        <span class="text-bold">{{ $log->subject_type ? class_basename($log->subject_type) : $log->log_name }}</span>
                     </td>
                     <td>
-                        <code>#{{ $log->auditable_id }}</code>
+                        <code>#{{ $log->subject_id ?? 'N/A' }}</code>
                     </td>
                     <td>
-                        @if($log->old_values)
-                            <div class="json-box">{{ json_encode($log->old_values, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</div>
+                        @if(isset($log->properties['old']) && count($log->properties['old']) > 0)
+                            <div class="json-box">{{ json_encode($log->properties['old'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</div>
                         @else
-                            <span class="text-muted" style="font-style: italic;">Nuevo Registro</span>
+                            <span class="text-muted" style="font-style: italic;">Ninguno</span>
                         @endif
                     </td>
                     <td>
-                        @if($log->new_values)
-                            <div class="json-box">{{ json_encode($log->new_values, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</div>
+                        @if(isset($log->properties['attributes']) && count($log->properties['attributes']) > 0)
+                            <div class="json-box">{{ json_encode($log->properties['attributes'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) }}</div>
                         @else
-                            <span class="text-muted" style="font-style: italic;">Registro Eliminado</span>
+                            <span class="text-muted" style="font-style: italic;">Ninguno</span>
                         @endif
                     </td>
                     <td>
-                        <code>{{ $log->ip_address ?? 'Local' }}</code>
+                        <code>{{ $log->properties['ip'] ?? 'Local' }}</code>
                     </td>
                 </tr>
             @empty

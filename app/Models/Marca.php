@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Auditable;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Marca extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, LogsActivity;
 
     protected $table = 'marcas';
     protected $primaryKey = 'id_marca';
@@ -28,5 +29,13 @@ class Marca extends Model
     public function equipos()
     {
         return $this->hasMany(Equipo::class, 'id_marca', 'id_marca');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nombre_marca', 'id_tipo_equipo'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\TicketAdjunto;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Ticket extends Model {
+    use LogsActivity;
 
     protected $table = 'tickets';
 
@@ -84,6 +86,16 @@ class Ticket extends Model {
     {
         // Cambiamos Comentario::class por TicketComentario::class
         return $this->hasMany(TicketComentario::class, 'id_ticket', 'id_ticket');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'asunto', 'id_prioridad', 'id_categoria', 'estatus', 'estado_tecnico', 'id_usuario_tecnico'
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
 

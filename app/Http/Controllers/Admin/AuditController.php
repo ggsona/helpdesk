@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -16,25 +16,33 @@ class AuditController extends Controller
 
     public function index(Request $request)
     {
-        $query = AuditLog::with('user')->orderBy('created_at', 'desc');
+        $query = Activity::with('causer')->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('auditable_type', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
+                $q->where('subject_type', 'like', "%{$search}%")
+                  ->orWhere('event', 'like', "%{$search}%")
+                  ->orWhere('log_name', 'like', "%{$search}%")
+                  ->orWhereHas('causer', function ($uq) use ($search) {
                       $uq->where('name', 'like', "%{$search}%");
                   });
             });
         }
 
         if ($request->filled('action')) {
-            $query->where('action', $request->action);
+            $query->where('event', $request->action);
         }
 
         if ($request->filled('type')) {
-            $query->where('auditable_type', 'like', "%{$request->type}%");
+            if ($request->type === 'User') {
+                $query->where(function ($q) use ($request) {
+                    $q->where('subject_type', 'like', "%{$request->type}%")
+                      ->orWhere('log_name', 'Autenticación');
+                });
+            } else {
+                $query->where('subject_type', 'like', "%{$request->type}%");
+            }
         }
 
         $logs = $query->paginate(15);
@@ -44,25 +52,33 @@ class AuditController extends Controller
 
     public function export(Request $request)
     {
-        $query = AuditLog::with('user')->orderBy('created_at', 'desc');
+        $query = Activity::with('causer')->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('auditable_type', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
+                $q->where('subject_type', 'like', "%{$search}%")
+                  ->orWhere('event', 'like', "%{$search}%")
+                  ->orWhere('log_name', 'like', "%{$search}%")
+                  ->orWhereHas('causer', function ($uq) use ($search) {
                       $uq->where('name', 'like', "%{$search}%");
                   });
             });
         }
 
         if ($request->filled('action')) {
-            $query->where('action', $request->action);
+            $query->where('event', $request->action);
         }
 
         if ($request->filled('type')) {
-            $query->where('auditable_type', 'like', "%{$request->type}%");
+            if ($request->type === 'User') {
+                $query->where(function ($q) use ($request) {
+                    $q->where('subject_type', 'like', "%{$request->type}%")
+                      ->orWhere('log_name', 'Autenticación');
+                });
+            } else {
+                $query->where('subject_type', 'like', "%{$request->type}%");
+            }
         }
 
         $logs = $query->get();
@@ -85,25 +101,27 @@ class AuditController extends Controller
                 'Fecha y Hora',
                 'Responsable',
                 'Acción',
-                'Componente',
+                'Módulo',
                 'ID Afectado',
                 'Valores Anteriores',
                 'Valores Nuevos',
-                'IP',
-                'Dispositivo'
+                'Propiedades (JSON)'
             ]);
 
             foreach ($logs as $log) {
+                $old = isset($log->properties['old']) ? json_encode($log->properties['old'], JSON_UNESCAPED_UNICODE) : '';
+                $new = isset($log->properties['attributes']) ? json_encode($log->properties['attributes'], JSON_UNESCAPED_UNICODE) : '';
+                $all_props = json_encode($log->properties, JSON_UNESCAPED_UNICODE);
+
                 fputcsv($file, [
                     $log->created_at->format('d/m/Y H:i:s'),
-                    $log->user ? $log->user->name : 'Sistema',
-                    $log->action,
-                    class_basename($log->auditable_type),
-                    $log->auditable_id,
-                    $log->old_values ? json_encode($log->old_values, JSON_UNESCAPED_UNICODE) : '',
-                    $log->new_values ? json_encode($log->new_values, JSON_UNESCAPED_UNICODE) : '',
-                    $log->ip_address,
-                    $log->user_agent
+                    $log->causer ? $log->causer->name : 'Sistema',
+                    $log->event,
+                    $log->subject_type ? class_basename($log->subject_type) : $log->log_name,
+                    $log->subject_id ?? 'N/A',
+                    $old,
+                    $new,
+                    $all_props
                 ]);
             }
 
@@ -115,25 +133,33 @@ class AuditController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $query = AuditLog::with('user')->orderBy('created_at', 'desc');
+        $query = Activity::with('causer')->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('auditable_type', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
+                $q->where('subject_type', 'like', "%{$search}%")
+                  ->orWhere('event', 'like', "%{$search}%")
+                  ->orWhere('log_name', 'like', "%{$search}%")
+                  ->orWhereHas('causer', function ($uq) use ($search) {
                       $uq->where('name', 'like', "%{$search}%");
                   });
             });
         }
 
         if ($request->filled('action')) {
-            $query->where('action', $request->action);
+            $query->where('event', $request->action);
         }
 
         if ($request->filled('type')) {
-            $query->where('auditable_type', 'like', "%{$request->type}%");
+            if ($request->type === 'User') {
+                $query->where(function ($q) use ($request) {
+                    $q->where('subject_type', 'like', "%{$request->type}%")
+                      ->orWhere('log_name', 'Autenticación');
+                });
+            } else {
+                $query->where('subject_type', 'like', "%{$request->type}%");
+            }
         }
 
         $logs = $query->get();

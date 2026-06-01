@@ -36,7 +36,7 @@
             @if(request('categoria')) <input type="hidden" name="categoria" value="{{ request('categoria') }}"> @endif
 
             <div class="input-group" style="max-width: 600px;">
-                <input type="text" name="q" class="form-control form-control-lg border-0 shadow-sm" placeholder="¿Qué estás buscando...?" value="{{ request('q') }}">
+                <input type="text" name="q" class="form-control form-control-lg border-0 shadow-sm search-premium" placeholder="¿Qué estás buscando...?" value="{{ request('q') }}">
                 <button class="btn btn-light px-4 shadow-sm text-primary fw-bold" type="submit"><i class="bi bi-search"></i> Buscar</button>
             </div>
         </form>

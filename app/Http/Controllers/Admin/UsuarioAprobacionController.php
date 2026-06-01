@@ -64,6 +64,12 @@ class UsuarioAprobacionController extends Controller
 
         $user->save();
 
+        activity('Aprobación')
+            ->causedBy(auth()->user())
+            ->performedOn($user)
+            ->event('registro_aprobado')
+            ->log('Gestor aprobó registro de usuario');
+
         return redirect()->back()->with('success', 'El usuario ' . $user->name . ' ha sido aprobado y activado con el rol ' . strtoupper($request->role_name) . '.');
     }
 
@@ -83,6 +89,11 @@ class UsuarioAprobacionController extends Controller
         if ($persona) {
             $persona->delete();
         }
+
+        activity('Aprobación')
+            ->causedBy(auth()->user())
+            ->event('registro_rechazado')
+            ->log('Gestor rechazó y eliminó solicitud de: ' . $nombre);
 
         return redirect()->back()->with('success', 'La solicitud de ' . $nombre . ' ha sido rechazada y eliminada del sistema.');
     }

@@ -44,29 +44,29 @@
             <div class="col-md-3">
                 <div class="card-premium border-start border-danger border-4 shadow-sm">
                     <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Tickets Sin Asignar</small>
-                    <h2 class="fw-bold mb-0 theme-text mt-1">12</h2>
+                    <h2 class="fw-bold mb-0 theme-text mt-1">{{ $stats['nuevos'] ?? 0 }}</h2>
                     <div class="text-danger small mt-2 fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Requieren técnico</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-premium border-start border-primary border-4 shadow-sm">
                     <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">En Gestión Activa</small>
-                    <h2 class="fw-bold mb-0 theme-text mt-1">25</h2>
+                    <h2 class="fw-bold mb-0 theme-text mt-1">{{ $stats['en_gestion'] ?? 0 }}</h2>
                     <div class="text-primary small mt-2 fw-semibold"><i class="bi bi-gear-fill me-1"></i> Especialistas trabajando</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-premium border-start border-success border-4 shadow-sm">
                     <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Cerrados hoy</small>
-                    <h2 class="fw-bold mb-0 theme-text mt-1">8</h2>
-                    <div class="text-success small mt-2 fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Eficiencia del 85%</div>
+                    <h2 class="fw-bold mb-0 theme-text mt-1">{{ $stats['cerrados_hoy'] ?? 0 }}</h2>
+                    <div class="text-success small mt-2 fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Buen desempeño</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-premium border-start border-warning border-4 shadow-sm">
                     <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Tiempo Promedio</small>
-                    <h2 class="fw-bold mb-0 theme-text mt-1">45m</h2>
-                    <div class="text-warning small mt-2 fw-semibold"><i class="bi bi-clock-history me-1"></i> Tiempo meta: 1h</div>
+                    <h2 class="fw-bold mb-0 theme-text mt-1">{{ $stats['tiempo_promedio'] ?? 'N/A' }}</h2>
+                    <div class="text-warning small mt-2 fw-semibold"><i class="bi bi-clock-history me-1"></i> Meta sugerida: 1h</div>
                 </div>
             </div>
         </div>
@@ -75,18 +75,16 @@
             <div class="col-lg-8">
                 <div class="card-premium mb-4 shadow-sm" style="min-height: 350px;">
                     <h5 class="fw-bold mb-4 theme-text"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Rendimiento por Técnico</h5>
-                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center theme-surface-soft border-secondary border-opacity-25" style="height: 250px;">
-                        <i class="bi bi-activity text-primary fs-1 mb-2"></i>
-                        <p class="text-muted mb-0 small">[ Gráfica en tiempo real de carga de trabajo de especialistas ]</p>
+                    <div class="d-flex flex-column align-items-center justify-content-center p-3 text-center theme-surface-soft border-secondary border-opacity-25 rounded-3" style="height: 250px;">
+                        <canvas id="techChart" style="width: 100%; height: 100%;"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card-premium mb-4 shadow-sm" style="min-height: 350px;">
                     <h5 class="fw-bold mb-4 theme-text"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Porcentaje por Categoría</h5>
-                    <div class="d-flex flex-column align-items-center justify-content-center border border-dashed rounded-3 p-5 text-center theme-surface-soft border-secondary border-opacity-25" style="height: 250px;">
-                        <i class="bi bi-pie-chart text-primary fs-1 mb-2"></i>
-                        <p class="text-muted mb-0 small">[ Hardware (55%) | Software (30%) | Redes (15%) ]</p>
+                    <div class="d-flex flex-column align-items-center justify-content-center p-3 text-center theme-surface-soft border-secondary border-opacity-25 rounded-3" style="height: 250px;">
+                        <canvas id="catChart" style="width: 100%; height: 100%;"></canvas>
                     </div>
                 </div>
             </div>
@@ -100,15 +98,15 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card-premium border-start border-warning border-4 shadow-sm">
                         <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Mis Casos Asignados</small>
-                        <h2 class="fw-bold mb-0 theme-text mt-1">5</h2>
-                        <div class="text-warning small mt-2 fw-semibold"><i class="bi bi-tools me-1"></i> Pendientes de resolución</div>
+                        <h2 class="fw-bold mb-0 theme-text mt-1">{{ ($stats['pendientes_tecnico'] ?? 0) + ($stats['en_proceso_tecnico'] ?? 0) }}</h2>
+                        <div class="text-warning small mt-2 fw-semibold"><i class="bi bi-tools me-1"></i> Pendientes y en progreso</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6 col-lg-4">
                     <div class="card-premium border-start border-success border-4 shadow-sm">
-                        <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Resueltos esta semana</small>
-                        <h2 class="fw-bold mb-0 theme-text mt-1">12</h2>
+                        <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Resueltos Histórico</small>
+                        <h2 class="fw-bold mb-0 theme-text mt-1">{{ $stats['resueltos_tecnico'] ?? 0 }}</h2>
                         <div class="text-success small mt-2 fw-semibold"><i class="bi bi-check-lg me-1"></i> Casos cerrados con éxito</div>
                     </div>
                 </div>
@@ -128,3 +126,64 @@
     @endcannot
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    @can('asignar-tickets')
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const textColor = isDark ? '#adb5bd' : '#6c757d';
+        const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+        // Chart Rendimiento Técnicos
+        const ctxTech = document.getElementById('techChart').getContext('2d');
+        new Chart(ctxTech, {
+            type: 'bar',
+            data: {
+                labels: {!! $stats['chart_tech_labels'] ?? '[]' !!},
+                datasets: [{
+                    label: 'Tickets Resueltos',
+                    data: {!! $stats['chart_tech_data'] ?? '[]' !!},
+                    backgroundColor: 'rgba(13, 110, 253, 0.8)',
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, precision: 0 } },
+                    x: { grid: { display: false }, ticks: { color: textColor } }
+                }
+            }
+        });
+
+        // Chart Categorías
+        const ctxCat = document.getElementById('catChart').getContext('2d');
+        new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: {!! $stats['chart_cat_labels'] ?? '[]' !!},
+                datasets: [{
+                    data: {!! $stats['chart_cat_data'] ?? '[]' !!},
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6c757d'],
+                    borderWidth: 2,
+                    borderColor: isDark ? '#1a1c1e' : '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { color: textColor, boxWidth: 12, font: { size: 11 } } }
+                },
+                cutout: '70%'
+            }
+        });
+    @endcan
+});
+</script>
+@endpush

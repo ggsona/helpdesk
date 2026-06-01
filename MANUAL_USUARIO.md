@@ -201,3 +201,87 @@ Accediendo a **Rendimiento Técnico**, los supervisores pueden monitorear el des
 > *   **Gestores**: Revisen la pestaña "Por Asignar" constantemente y aprovechen las notas de instrucción al asignar especialistas.
 > *   **Técnicos**: Utilicen las Notas Internas para debatir problemas con los gestores antes de dar una respuesta formal al cliente final.
 > *   **Administradores**: Revisen la bandeja de aprobaciones diariamente para no bloquear el flujo de trabajo de nuevos ingresos.
+
+
+## Actualizaciones Recientes: Nueva Interfaz y Panel Flotante
+
+El sistema ha recibido una actualización de interfaz y funcionalidad para mejorar tu experiencia:
+
+### 1. Interfaz Moderna y Animada
+- **Diseño Transparente (Glassmorphism):** La barra lateral izquierda ahora posee un diseño cristalino moderno, adaptándose fluidamente al modo claro y oscuro.
+- **Animaciones Interactivas:** Notarás que las tarjetas y botones reaccionan de manera suave al posar el ratón, mejorando la inmersión en la plataforma.
+- **Búsqueda Avanzada:** En la Base de Conocimiento, al hacer clic en el buscador, la pantalla se enfocará en tu búsqueda para evitar distracciones.
+
+### 2. Chat de Soporte Flotante
+- En el detalle de un Ticket, el chat ya no ocupa gran parte de la pantalla principal.
+- En su lugar, encontrarás un **botón circular flotante** en la esquina inferior derecha. Al hacer clic, se deslizará un panel con toda la conversación. Esto te permite leer el ticket y chatear simultáneamente.
+
+### 3. Tablero de Control Inteligente (Dashboard)
+- El Dashboard principal ha sido habilitado con gráficas y datos en tiempo real.
+- Dependiendo de tu rol, verás tu propio rendimiento o las métricas generales de todo el equipo de soporte.
+
+
+
+## Guía de Uso de Nuevos Módulos (V2.0)
+
+### 1. Panel de Chat Flotante
+Al ingresar al detalle de un Ticket asignado, en lugar de ver todo el historial de chat interrumpiendo la lectura de los detalles, verás un botón circular azul (FAB) en la esquina inferior derecha con un icono de mensaje.
+- **Abrir Chat:** Haz clic en el botón flotante. Se desplegará un panel lateral derecho.
+- **Scroll Automático:** El panel se desplazará automáticamente hacia el mensaje más reciente para que no tengas que bajar manualmente.
+- **Cerrar Chat:** Haz clic en la "X" en la parte superior del panel o en cualquier zona oscura fuera de él.
+
+### 2. Dashboard Interactivo
+El panel de inicio (Dashboard) ahora cuenta con información generada en tiempo real.
+- **Métricas:** En la parte superior verás tarjetas animadas que indican "Nuevos Tickets", "Tickets en Gestión" y "Tickets Cerrados Hoy". Al pasar el ratón, las tarjetas se elevarán ligeramente.
+- **Gráfica de Barras (Rendimiento por Técnico):** Muestra cuántos tickets ha resuelto cada técnico versus los que tiene pendientes. Si pasas el cursor por encima de las barras, se mostrará el número exacto.
+- **Gráfica de Dona (Por Categoría):** Visualiza la distribución de tickets. Puedes hacer clic en las leyendas de colores para ocultar/mostrar categorías específicas en el gráfico.
+
+
+## Actualizaciones Recientes: Nueva Interfaz y Panel Flotante
+
+El sistema ha recibido una actualización de interfaz y funcionalidad para mejorar tu experiencia:
+
+### 1. Interfaz Moderna y Animada
+- **Diseño Transparente (Glassmorphism):** La barra lateral izquierda ahora posee un diseño cristalino moderno, adaptándose fluidamente al modo claro y oscuro.
+- **Animaciones Interactivas:** Notarás que las tarjetas y botones reaccionan de manera suave al posar el ratón, mejorando la inmersión en la plataforma.
+- **Búsqueda Avanzada:** En la Base de Conocimiento, al hacer clic en el buscador, la pantalla se enfocará en tu búsqueda para evitar distracciones.
+
+### 2. Chat de Soporte Flotante
+- En el detalle de un Ticket, el chat ya no ocupa gran parte de la pantalla principal.
+- En su lugar, encontrarás un **botón circular flotante** en la esquina inferior derecha. Al hacer clic, se deslizará un panel con toda la conversación. Esto te permite leer el ticket y chatear simultáneamente.
+
+### 3. Tablero de Control Inteligente (Dashboard)
+- El Dashboard principal ha sido habilitado con gráficas y datos en tiempo real.
+- Dependiendo de tu rol, verás tu propio rendimiento o las métricas generales de todo el equipo de soporte.
+
+
+
+## Guía de Uso de Nuevos Módulos (V2.0)
+
+### 1. Panel de Chat Flotante
+Al ingresar al detalle de un Ticket asignado, en lugar de ver todo el historial de chat interrumpiendo la lectura de los detalles, verás un botón circular azul (FAB) en la esquina inferior derecha con un icono de mensaje.
+- **Abrir Chat:** Haz clic en el botón flotante. Se desplegará un panel lateral derecho.
+- **Scroll Automático:** El panel se desplazará automáticamente hacia el mensaje más reciente para que no tengas que bajar manualmente.
+- **Cerrar Chat:** Haz clic en la "X" en la parte superior del panel o en cualquier zona oscura fuera de él.
+
+### 2. Dashboard Interactivo
+El panel de inicio (Dashboard) ahora cuenta con información generada en tiempo real.
+- **Métricas:** En la parte superior verás tarjetas animadas que indican "Nuevos Tickets", "Tickets en Gestión" y "Tickets Cerrados Hoy". Al pasar el ratón, las tarjetas se elevarán ligeramente.
+- **Gráfica de Barras (Rendimiento por Técnico):** Muestra cuántos tickets ha resuelto cada técnico versus los que tiene pendientes. Si pasas el cursor por encima de las barras, se mostrará el número exacto.
+- **Gráfica de Dona (Por Categoría):** Visualiza la distribución de tickets. Puedes hacer clic en las leyendas de colores para ocultar/mostrar categorías específicas en el gráfico.
+
+### 3. Búsqueda Spotlight en Base de Conocimiento
+- Al dirigirte a "Base de Conocimiento", verás una barra de búsqueda más grande y estilizada.
+- Al hacer clic dentro de la caja de texto para buscar un artículo, el resto de la interfaz se oscurecerá levemente (efecto Spotlight). Esto está diseñado para mejorar el enfoque y evitar distracciones visuales.
+
+### 4. Modo Oscuro Glassmorphism
+- Si tu sistema operativo o tus preferencias están en "Modo Oscuro", notarás que la barra lateral izquierda adquiere una apariencia semitransparente que difumina el fondo, dándole un acabado "Premium" similar al de aplicaciones nativas de alto nivel.
+
+### 5. Auditoría Total e Historial de Eventos (Bitácora Avanzada)
+El módulo de Bitácora de Auditorías ha sido ampliado y ahora es capaz de registrar automáticamente todos los procesos críticos de la plataforma:
+- **Gestión de Hardware:** Se registran creaciones, ediciones y eliminaciones de todo el catálogo de hardware (`Equipos`, `Marcas`, `Modelos`, `Tipos de Equipo`).
+- **Seguimiento de Registros de Usuarios:** El sistema audita desde que un usuario envía su solicitud de registro (marcada con etiqueta azul de **Reg. Solicitado**) hasta que un Administrador aprueba el acceso (**Reg. Aprobado** en etiqueta verde) o lo rechaza (**Reg. Rechazado** en etiqueta roja).
+
+### 6. Chat Flotante Universal (Técnicos y Clientes)
+- El panel de chat lateral (Offcanvas) que se implementó para el panel de los técnicos ahora también está disponible en la **Vista del Usuario (Cliente)**.
+- Esto significa que al entrar a los detalles de tu ticket, contarás con un botón circular de acceso rápido al chat para conversar con tu técnico sin perder de vista los adjuntos o descripciones originales del problema.

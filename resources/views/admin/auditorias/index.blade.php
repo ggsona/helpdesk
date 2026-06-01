@@ -76,12 +76,15 @@
                     <label class="form-label fw-semibold text-secondary small mb-1">Acción Realizada</label>
                     <select name="action" class="form-select form-select-premium border-secondary border-opacity-25" onchange="this.form.submit()">
                         <option value="">Todas las acciones</option>
-                        <option value="create" {{ request('action') == 'create' ? 'selected' : '' }}>Crear (create)</option>
-                        <option value="update" {{ request('action') == 'update' ? 'selected' : '' }}>Actualizar (update)</option>
-                        <option value="delete" {{ request('action') == 'delete' ? 'selected' : '' }}>Eliminar (delete)</option>
-                        <option value="login" {{ request('action') == 'login' ? 'selected' : '' }}>Inicio de Sesión (login)</option>
-                        <option value="logout" {{ request('action') == 'logout' ? 'selected' : '' }}>Cierre de Sesión (logout)</option>
+                        <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}>Crear (created)</option>
+                        <option value="updated" {{ request('action') == 'updated' ? 'selected' : '' }}>Actualizar (updated)</option>
+                        <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Eliminar (deleted)</option>
+                        <option value="login" {{ request('action') == 'login' ? 'selected' : '' }}>Inicio de Sesión</option>
+                        <option value="logout" {{ request('action') == 'logout' ? 'selected' : '' }}>Cierre de Sesión</option>
                         <option value="login_failed" {{ request('action') == 'login_failed' ? 'selected' : '' }}>Sesión Fallida</option>
+                        <option value="registro_solicitado" {{ request('action') == 'registro_solicitado' ? 'selected' : '' }}>Registro Solicitado</option>
+                        <option value="registro_aprobado" {{ request('action') == 'registro_aprobado' ? 'selected' : '' }}>Registro Aprobado</option>
+                        <option value="registro_rechazado" {{ request('action') == 'registro_rechazado' ? 'selected' : '' }}>Registro Rechazado</option>
                         <option value="sync_permissions" {{ request('action') == 'sync_permissions' ? 'selected' : '' }}>Sincronizar Permisos</option>
                     </select>
                 </div>
@@ -132,15 +135,15 @@
                                 <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
                             </td>
                             <td class="py-3">
-                                @if($log->user)
+                                @if($log->causer)
                                     <div class="d-flex align-items-center">
                                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-2" style="width: 32px; height: 32px; font-size: 0.85rem;">
-                                            {{ substr($log->user->name, 0, 1) }}
+                                            {{ substr($log->causer->name, 0, 1) }}
                                         </div>
                                         <div>
-                                            <span class="fw-bold theme-text">{{ $log->user->name }}</span><br>
+                                            <span class="fw-bold theme-text">{{ $log->causer->name }}</span><br>
                                             <span class="badge bg-secondary-subtle text-secondary-emphasis" style="font-size: 0.65rem; padding: 2px 6px;">
-                                                <i class="bi bi-person-badge-fill me-1"></i>{{ $log->user->roles->pluck('name')->first() ?? 'Soporte' }}
+                                                <i class="bi bi-person-badge-fill me-1"></i>{{ $log->causer->roles->pluck('name')->first() ?? 'Soporte' }}
                                             </span>
                                         </div>
                                     </div>
@@ -151,73 +154,85 @@
                                 @endif
                             </td>
                             <td class="py-3">
-                                @if($log->action === 'create')
+                                @if($log->event === 'created' || $log->event === 'create')
                                     <span class="audit-action-badge audit-create">
                                         <i class="bi bi-plus-circle-fill me-1"></i>Creación
                                     </span>
-                                @elseif($log->action === 'update')
+                                @elseif($log->event === 'updated' || $log->event === 'update')
                                     <span class="audit-action-badge audit-update">
                                         <i class="bi bi-pencil-square me-1"></i>Modificación
                                     </span>
-                                @elseif($log->action === 'delete')
+                                @elseif($log->event === 'deleted' || $log->event === 'delete')
                                     <span class="audit-action-badge audit-delete">
                                         <i class="bi bi-trash3-fill me-1"></i>Eliminación
                                     </span>
-                                @elseif($log->action === 'login')
+                                @elseif($log->event === 'login')
                                     <span class="audit-action-badge audit-login">
                                         <i class="bi bi-box-arrow-in-right me-1"></i>Ingreso
                                     </span>
-                                @elseif($log->action === 'logout')
+                                @elseif($log->event === 'logout')
                                     <span class="audit-action-badge audit-logout">
                                         <i class="bi bi-box-arrow-right me-1"></i>Salida
                                     </span>
-                                @elseif($log->action === 'login_failed')
+                                @elseif($log->event === 'login_failed')
                                     <span class="audit-action-badge audit-failed">
                                         <i class="bi bi-exclamation-octagon-fill me-1"></i>Acceso Fallido
                                     </span>
-                                @elseif($log->action === 'sync_permissions')
+                                @elseif($log->event === 'sync_permissions')
                                     <span class="audit-action-badge audit-sync">
                                         <i class="bi bi-shield-check me-1"></i>Permisos Sinc.
                                     </span>
+                                @elseif($log->event === 'registro_solicitado')
+                                    <span class="audit-action-badge audit-create" style="background-color: var(--bs-info-bg-subtle); color: var(--bs-info-text-emphasis); border-color: var(--bs-info-border-subtle);">
+                                        <i class="bi bi-person-lines-fill me-1"></i>Reg. Solicitado
+                                    </span>
+                                @elseif($log->event === 'registro_aprobado')
+                                    <span class="audit-action-badge audit-create" style="background-color: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); border-color: var(--bs-success-border-subtle);">
+                                        <i class="bi bi-person-check-fill me-1"></i>Reg. Aprobado
+                                    </span>
+                                @elseif($log->event === 'registro_rechazado')
+                                    <span class="audit-action-badge audit-delete">
+                                        <i class="bi bi-person-x-fill me-1"></i>Reg. Rechazado
+                                    </span>
                                 @else
                                     <span class="audit-action-badge audit-generic">
-                                        {{ strtoupper($log->action) }}
+                                        {{ strtoupper($log->event) }}
                                     </span>
                                 @endif
                             </td>
                             <td class="py-3">
-                                <span class="fw-bold theme-text">{{ class_basename($log->auditable_type) }}</span>
+                                <span class="fw-bold theme-text">{{ $log->subject_type ? class_basename($log->subject_type) : $log->log_name }}</span>
                             </td>
                             <td class="py-3">
-                                <code class="text-secondary fw-bold">#{{ $log->auditable_id }}</code>
+                                <code class="text-secondary fw-bold">#{{ $log->subject_id ?? 'N/A' }}</code>
                             </td>
                             <td class="py-3">
-                                @if($log->old_values)
+                                @if(isset($log->properties['old']))
                                     <button class="btn btn-sm btn-outline-secondary py-1 px-2 rounded-3" data-bs-toggle="collapse" data-bs-target="#old-{{ $log->id }}" style="font-size: 0.75rem;">
                                         Ver datos <i class="bi bi-chevron-down ms-1"></i>
                                     </button>
                                     <div class="collapse mt-2" id="old-{{ $log->id }}">
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['old'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
                                     <span class="text-muted small italic">Ninguno (Registro Nuevo)</span>
                                 @endif
                             </td>
                             <td class="py-3">
-                                @if($log->new_values)
+                                @if(isset($log->properties['attributes']) || count($log->properties) > 0)
                                     <button class="btn btn-sm btn-outline-primary py-1 px-2 rounded-3" data-bs-toggle="collapse" data-bs-target="#new-{{ $log->id }}" style="font-size: 0.75rem;">
                                         Ver datos <i class="bi bi-chevron-down ms-1"></i>
                                     </button>
                                     <div class="collapse mt-2" id="new-{{ $log->id }}">
-                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
+                                        <pre class="bg-light p-2 rounded text-start text-dark border mb-0 text-overflow-wrap audit-json"><code>{{ json_encode($log->properties['attributes'] ?? $log->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</code></pre>
                                     </div>
                                 @else
                                     <span class="text-muted small italic">Ninguno (Eliminación)</span>
                                 @endif
                             </td>
                             <td class="py-3 pe-4">
-                                <small class="fw-semibold theme-text d-block"><i class="bi bi-pc-display me-1 text-muted"></i>{{ $log->ip_address ?? 'Local' }}</small>
-                                <small class="text-muted text-truncate d-block" style="max-width: 150px;" title="{{ $log->user_agent }}">{{ $log->user_agent ?? 'N/A' }}</small>
+                                <small class="fw-semibold theme-text d-block"><i class="bi bi-pc-display me-1 text-muted"></i>{{ $log->properties['ip'] ?? 'Local' }}</small>
+                                <small class="text-muted text-truncate d-block" style="max-width: 150px;" title="{{ $log->properties['user_agent'] ?? 'N/A' }}">{{ $log->properties['user_agent'] ?? 'N/A' }}</small>
                             </td>
                         </tr>
                     @empty

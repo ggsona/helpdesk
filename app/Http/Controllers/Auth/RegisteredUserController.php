@@ -74,6 +74,11 @@ class RegisteredUserController extends Controller
         $user->save();
         $user->assignRole('usuario');
 
+        activity('Autenticación')
+            ->performedOn($user)
+            ->event('registro_solicitado')
+            ->log('Usuario completó formulario de registro y espera aprobación');
+
         event(new Registered($user));
 
         Auth::login($user);

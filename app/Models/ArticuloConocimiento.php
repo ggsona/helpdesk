@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class ArticuloConocimiento extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $table = 'articulos_conocimiento';
     protected $primaryKey = 'id_articulo';
@@ -70,5 +72,13 @@ class ArticuloConocimiento extends Model
     public function valoraciones()
     {
         return $this->hasMany(ArticuloValoracion::class, 'id_articulo', 'id_articulo');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['titulo', 'estado', 'id_categoria'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
