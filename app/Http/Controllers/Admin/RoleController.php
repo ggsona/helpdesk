@@ -54,16 +54,15 @@ class RoleController extends Controller
             $permissions = Permission::whereIn('id', $request->permissions)->get();
             $role->syncPermissions($permissions);
 
-            \App\Models\AuditLog::create([
-                'user_id' => auth()->id(),
-                'auditable_type' => get_class($role),
-                'auditable_id' => $role->id,
-                'action' => 'sync_permissions',
-                'old_values' => null,
-                'new_values' => ['permissions' => $permissions->pluck('name')->toArray()],
-                'ip_address' => request() ? request()->ip() : null,
-                'user_agent' => request() ? request()->userAgent() : null,
-            ]);
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($role)
+                ->event('sync_permissions')
+                ->withProperties([
+                    'action'      => 'sync_permissions',
+                    'permissions' => $permissions->pluck('name')->toArray(),
+                ])
+                ->log("Permisos asignados al crear el rol '{$role->name}'");
         }
 
         return redirect()->route('admin.roles.index')
@@ -112,16 +111,16 @@ class RoleController extends Controller
 
         $newPermissions = $permissions->pluck('name')->toArray();
 
-        \App\Models\AuditLog::create([
-            'user_id' => auth()->id(),
-            'auditable_type' => get_class($role),
-            'auditable_id' => $role->id,
-            'action' => 'sync_permissions',
-            'old_values' => ['permissions' => $oldPermissions],
-            'new_values' => ['permissions' => $newPermissions],
-            'ip_address' => request() ? request()->ip() : null,
-            'user_agent' => request() ? request()->userAgent() : null,
-        ]);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($role)
+            ->event('sync_permissions')
+            ->withProperties([
+                'action'          => 'sync_permissions',
+                'old_permissions' => $oldPermissions,
+                'new_permissions' => $newPermissions,
+            ])
+            ->log("Permisos actualizados en el rol '{$role->name}'");
 
         return redirect()->route('admin.roles.index')
             ->with('success', "El rol '{$role->name}' y sus permisos se han actualizado correctamente.");

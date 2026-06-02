@@ -58,6 +58,30 @@
     [data-bs-theme="dark"] .article-content h3 { color: #f8fafc; }
     [data-bs-theme="dark"] .attachment-card { background: #1e1e2d; border-color: #323248; }
     [data-bs-theme="dark"] .theme-title { color: #f8fafc !important; }
+
+    /* ---- Estilos para impresión en PDF ---- */
+    @media print {
+        /* Ocultar toda la UI del sistema */
+        nav, footer, aside, .breadcrumb, .btn-feedback,
+        form[action*="valorar"], .attachment-card a,
+        #print-btn-area, .alert, .badge,
+        [data-bs-theme] nav, .sidebar, #kt_aside {
+            display: none !important;
+        }
+        body { background: white !important; color: black !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .article-content { color: black !important; font-size: 12pt; line-height: 1.6; }
+        .article-content h1, .article-content h2, .article-content h3 { color: black !important; }
+        .article-content pre { border: 1px solid #ccc; background: #f5f5f5 !important; color: black !important; }
+        .article-content img { max-width: 100% !important; }
+        h1.fw-bold { color: black !important; font-size: 22pt; }
+        /* Cabecera de impresión */
+        .print-header { display: block !important; }
+        /* Pie de página con URL */
+        @page { margin: 2cm; }
+    }
+    /* El encabezado de impresión está oculto en pantalla */
+    .print-header { display: none; }
 </style>
 
 <div class="container py-4" style="max-width: 900px;">
@@ -168,13 +192,68 @@
         </form>
     </div>
 
-    <!-- Acciones de Edición -->
-    @can('editar-articulo')
-    <div class="d-flex justify-content-center mb-5">
-        <a href="{{ route('soporte.conocimiento.edit', $articulo->slug) }}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
-            <i class="bi bi-pencil-square me-2"></i> Editar Artículo
+    <!-- Acciones del Artículo -->
+    <div id="print-btn-area" class="d-flex justify-content-center gap-3 mb-5 flex-wrap">
+
+        @can('editar-articulo')
+        <a href="{{ route('soporte.conocimiento.edit', $articulo->slug) }}"
+           class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+            <i class="bi bi-pencil-square me-2"></i> Editar
         </a>
+        @endcan
+
+        @can('archivar-articulo')
+        @if($articulo->estado !== 'archivado')
+        <form action="{{ route('soporte.conocimiento.archivar', $articulo->id_articulo) }}" method="POST"
+              onsubmit="return confirm('¿Archivar este artículo? Quedará oculto de la vista pública pero podrás restaurarlo.')">
+            @csrf
+            @method('PATCH')
+            <button type="submit" class="btn btn-outline-warning rounded-pill px-4 fw-bold">
+                <i class="bi bi-archive-fill me-2"></i> Archivar
+            </button>
+        </form>
+        @else
+        <form action="{{ route('soporte.conocimiento.update', $articulo->slug) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="titulo" value="{{ $articulo->titulo }}">
+            <input type="hidden" name="contenido" value="{{ $articulo->contenido }}">
+            <input type="hidden" name="id_categoria" value="{{ $articulo->id_categoria }}">
+            <input type="hidden" name="estado" value="publicado">
+            <button type="submit" class="btn btn-outline-success rounded-pill px-4 fw-bold">
+                <i class="bi bi-arrow-up-circle-fill me-2"></i> Restaurar
+            </button>
+        </form>
+        @endif
+        @endcan
+
+        @can('imprimir-articulo')
+        <button onclick="imprimirArticulo()" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+            <i class="bi bi-printer-fill me-2"></i> Imprimir / PDF
+        </button>
+        @endcan
+
+        {{-- Solo Admin: eliminación permanente --}}
+        @can('eliminar-articulo')
+        <form action="{{ route('soporte.conocimiento.destroy', $articulo->id_articulo) }}" method="POST"
+              onsubmit="return confirm('⚠️ ELIMINAR PERMANENTEMENTE: Esta acción no se puede deshacer. ¿Estás seguro?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">
+                <i class="bi bi-trash3-fill me-2"></i> Eliminar
+            </button>
+        </form>
+        @endcan
+
     </div>
-    @endcan
 </div>
+
+<script>
+function imprimirArticulo() {
+    // Añadir clase temporal para activar estilos de impresión
+    document.body.classList.add('printing');
+    window.print();
+    document.body.classList.remove('printing');
+}
+</script>
 @endsection

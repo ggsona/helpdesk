@@ -48,68 +48,140 @@
 
                     <hr class="my-4 opacity-25">
 
-                    {{-- Grilla de Permisos --}}
+                    {{-- Grilla de Permisos agrupados por categoría --}}
                     <h5 class="fw-bold theme-text mb-3"><i class="bi bi-check2-all text-primary me-2"></i>Sincronizar Permisos</h5>
                     <p class="text-muted small mb-4">Selecciona los accesos y acciones operativas autorizadas para este rol:</p>
-                    
-                    <div class="row g-3">
-                        @foreach($permissions as $permiso)
-                            @php
-                                $color = "primary";
-                                $icon = "bi-shield-check";
-                                $desc = "Permiso general del sistema.";
-                                
-                                if(str_contains($permiso->name, "ticket")) {
-                                    if(str_contains($permiso->name, "crear")) {
-                                        $color = "success"; $icon = "bi-plus-circle-fill";
-                                        $desc = "Permite crear solicitudes de soporte básicas y borradores.";
-                                    } elseif(str_contains($permiso->name, "asignar")) {
-                                        $color = "warning"; $icon = "bi-person-fill-gear";
-                                        $desc = "Permite asignar especialistas y reasignar casos.";
-                                    } elseif(str_contains($permiso->name, "resolver")) {
-                                        $color = "info"; $icon = "bi-check-circle-fill";
-                                        $desc = "Permite atender y reportar la resolución de tickets.";
-                                    }
-                                } elseif(str_contains($permiso->name, "interno")) {
-                                    $color = "danger"; $icon = "bi-chat-left-dots-fill";
-                                    $desc = "Permite enviar y ver notas privadas exclusivas para el staff.";
-                                } elseif(str_contains($permiso->name, "roles")) {
-                                    $color = "dark"; $icon = "bi-gear-fill";
-                                    $desc = "Permiso total para administrar roles, permisos y accesos globales.";
-                                } elseif(str_contains($permiso->name, "panel")) {
-                                    $color = "secondary"; $icon = "bi-layout-text-sidebar-reverse";
-                                    $desc = "Permite el acceso al panel operativo y bandeja del staff.";
-                                } elseif(str_contains($permiso->name, "usuarios")) {
-                                    $color = "primary"; $icon = "bi-people-fill";
-                                    $desc = "Permite gestionar el directorio de usuarios, asignar accesos y aprobar nuevos registros.";
-                                } elseif(str_contains($permiso->name, "configuraciones")) {
-                                    $color = "primary"; $icon = "bi-sliders";
-                                    $desc = "Permite configurar la estructura organizacional y jerarquías del sistema.";
-                                } elseif(str_contains($permiso->name, "categorias")) {
-                                    $color = "success"; $icon = "bi-tags-fill";
-                                    $desc = "Permite la gestión de categorías de tickets.";
-                                }
-                            @endphp
+
+                    @php
+                    // Definición de grupos de permisos con su ícono y color
+                    $grupos = [
+                        'Tickets' => [
+                            'icon'  => 'bi-ticket-perforated-fill',
+                            'color' => 'primary',
+                            'desc'  => 'Gestión del ciclo de vida de los tickets de soporte.',
+                            'keys'  => ['crear-tickets','ver-panel-operativo','asignar-tickets','resolver-tickets','comentar-interno','cerrar-tickets','reabrir-tickets'],
+                        ],
+                        'Usuarios y Roles' => [
+                            'icon'  => 'bi-people-fill',
+                            'color' => 'success',
+                            'desc'  => 'Administración de usuarios, roles y aprobaciones.',
+                            'keys'  => ['gestionar-usuarios','gestionar-roles','aprobar-usuarios'],
+                        ],
+                        'Configuración y Catálogos' => [
+                            'icon'  => 'bi-sliders',
+                            'color' => 'secondary',
+                            'desc'  => 'Configuración general del sistema y catálogos de datos.',
+                            'keys'  => ['ver-configuraciones','gestionar-categorias','gestionar-catalogos'],
+                        ],
+                        'Equipos / Inventario' => [
+                            'icon'  => 'bi-pc-display',
+                            'color' => 'info',
+                            'desc'  => 'Acceso y gestión del inventario de equipos.',
+                            'keys'  => ['gestionar-equipos','ver-equipos'],
+                        ],
+                        'Reportes y Auditoría' => [
+                            'icon'  => 'bi-graph-up-arrow',
+                            'color' => 'warning',
+                            'desc'  => 'Visualización de estadísticas, bitácoras y exportación de datos.',
+                            'keys'  => ['ver-rendimiento-tecnico','ver-auditorias','exportar-reportes'],
+                        ],
+                        'Base de Conocimiento' => [
+                            'icon'  => 'bi-journal-bookmark-fill',
+                            'color' => 'danger',
+                            'desc'  => 'Acceso y gestión de artículos, etiquetas e impresión. <strong class="text-danger">eliminar-articulo</strong> es exclusivo del Admin.',
+                            'keys'  => ['ver-conocimiento','crear-articulo','editar-articulo','archivar-articulo','gestionar-tags','imprimir-articulo','eliminar-articulo'],
+                        ],
+                    ];
+
+                    // Indexar permisos por nombre para lookup rápido
+                    $permisosIndexados = $permissions->keyBy('name');
+
+                    // Permisos que no caen en ningún grupo (ej: permisos futuros)
+                    $todasLasKeys = collect($grupos)->pluck('keys')->flatten()->all();
+                    $sinGrupo = $permissions->filter(fn($p) => !in_array($p->name, $todasLasKeys));
+                    @endphp
+
+                    @foreach($grupos as $nombreGrupo => $grupo)
+                        @php
+                            $permisosDelGrupo = collect($grupo['keys'])
+                                ->map(fn($key) => $permisosIndexados->get($key))
+                                ->filter(); // solo los que existen en BD
+                        @endphp
+
+                        @if($permisosDelGrupo->isNotEmpty())
+                        {{-- Separador de categoría --}}
+                        <div class="d-flex align-items-center gap-3 mt-4 mb-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 shadow-sm flex-shrink-0"
+                                 style="width:40px;height:40px;background:rgba(var(--bs-{{ $grupo['color'] }}-rgb),.12);">
+                                <i class="bi {{ $grupo['icon'] }} text-{{ $grupo['color'] }} fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 theme-text">{{ $nombreGrupo }}</h6>
+                                <small class="text-muted">{!! $grupo['desc'] !!}</small>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-2">
+                            @foreach($permisosDelGrupo as $permiso)
                             <div class="col-md-6">
-                                <div class="card p-3 shadow-sm border border-secondary border-opacity-10 h-100 theme-bg-dark" style="border-radius: 12px;">
+                                <div class="card p-3 shadow-sm border border-{{ $grupo['color'] }} border-opacity-10 h-100 theme-bg-dark" style="border-radius:12px;">
                                     <div class="form-check d-flex align-items-start">
-                                        <input class="form-check-input mt-1 me-2 shadow-none border-secondary" type="checkbox" name="permissions[]" 
-                                               value="{{ $permiso->id }}" id="perm_{{ $permiso->id }}"
-                                               {{ in_array($permiso->id, $rolePermissions) ? "checked" : "" }}>
-                                        
+                                        <input class="form-check-input mt-1 me-2 shadow-none"
+                                               type="checkbox"
+                                               name="permissions[]"
+                                               value="{{ $permiso->id }}"
+                                               id="perm_{{ $permiso->id }}"
+                                               {{ in_array($permiso->id, $rolePermissions) ? 'checked' : '' }}>
                                         <div class="ms-1">
-                                            <label class="form-check-label fw-bold theme-text text-capitalize" for="perm_{{ $permiso->id }}">
-                                                <i class="bi {{ $icon }} text-{{ $color }} me-1"></i> {{ str_replace("-", " ", $permiso->name) }}
+                                            <label class="form-check-label fw-bold theme-text" for="perm_{{ $permiso->id }}">
+                                                <i class="bi {{ $grupo['icon'] }} text-{{ $grupo['color'] }} me-1 small"></i>
+                                                {{ str_replace('-', ' ', $permiso->name) }}
                                             </label>
-                                            <p class="text-muted small mb-0 mt-1" style="font-size: 0.75rem; line-height: 1.4;">
-                                                {{ $desc }}
-                                            </p>
+                                            @if($permiso->name === 'eliminar-articulo')
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1 small">Solo Admin</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    @endforeach
+
+                    {{-- Permisos sin grupo (futuros) --}}
+                    @if($sinGrupo->isNotEmpty())
+                    <div class="d-flex align-items-center gap-3 mt-4 mb-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-3 shadow-sm flex-shrink-0"
+                             style="width:40px;height:40px;background:rgba(var(--bs-secondary-rgb),.12);">
+                            <i class="bi bi-shield-check text-secondary fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 theme-text">Otros Permisos</h6>
+                            <small class="text-muted">Permisos adicionales del sistema.</small>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        @foreach($sinGrupo as $permiso)
+                        <div class="col-md-6">
+                            <div class="card p-3 shadow-sm border h-100 theme-bg-dark" style="border-radius:12px;">
+                                <div class="form-check d-flex align-items-start">
+                                    <input class="form-check-input mt-1 me-2 shadow-none"
+                                           type="checkbox"
+                                           name="permissions[]"
+                                           value="{{ $permiso->id }}"
+                                           id="perm_{{ $permiso->id }}"
+                                           {{ in_array($permiso->id, $rolePermissions) ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold theme-text" for="perm_{{ $permiso->id }}">
+                                        <i class="bi bi-shield-check text-secondary me-1 small"></i>
+                                        {{ str_replace('-', ' ', $permiso->name) }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         @endforeach
                     </div>
+                    @endif
 
                     <div class="text-end mt-5">
                         <hr class="my-4 opacity-25">

@@ -230,11 +230,33 @@ class ConocimientoController extends Controller
                          ->with('success', 'Artículo actualizado correctamente.');
     }
 
+    /**
+     * Archiva un artículo (cambia estado a 'archivado').
+     * No lo elimina, solo lo retira de la vista pública.
+     * Requiere permiso: archivar-articulo
+     */
+    public function archivar($id)
+    {
+        $articulo = ArticuloConocimiento::findOrFail($id);
+        $articulo->update(['estado' => 'archivado']);
+
+        return redirect()->route('soporte.conocimiento.index')
+                         ->with('success', 'Artículo archivado correctamente. Puedes restaurarlo en cualquier momento desde la sección de archivados.');
+    }
+
+    /**
+     * Elimina permanentemente un artículo (soft delete).
+     * Solo accesible para administradores.
+     * Requiere permiso: eliminar-articulo
+     */
     public function destroy($id)
     {
         $articulo = ArticuloConocimiento::findOrFail($id);
-        $articulo->delete();
-        return redirect()->route('soporte.conocimiento.index')->with('success', 'Artículo eliminado.');
+        $titulo = $articulo->titulo;
+        $articulo->delete(); // Soft Delete (deleted_at)
+
+        return redirect()->route('soporte.conocimiento.index')
+                         ->with('success', "Artículo \"{$titulo}\" eliminado permanentemente.");
     }
 
     public function valorar(Request $request, $id)

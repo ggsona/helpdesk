@@ -175,6 +175,7 @@ Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('sopo
         Route::get('/{slug}', [ConocimientoController::class, 'show'])->name('show');
         Route::get('/{slug}/editar', [ConocimientoController::class, 'edit'])->name('edit')->middleware('can:editar-articulo');
         Route::put('/{slug}', [ConocimientoController::class, 'update'])->name('update')->middleware('can:editar-articulo');
+        Route::patch('/{id}/archivar', [ConocimientoController::class, 'archivar'])->name('archivar')->middleware('can:archivar-articulo');
         Route::delete('/{id}', [ConocimientoController::class, 'destroy'])->name('destroy')->middleware('can:eliminar-articulo');
     });
 
