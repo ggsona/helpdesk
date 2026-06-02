@@ -83,8 +83,6 @@ class PermissionSeeder extends Seeder
         // --- Rol USUARIO: crear tickets + ver y imprimir KB ---
         $roleUsuario->syncPermissions([
             'crear-tickets',
-            'ver-conocimiento',
-            'imprimir-articulo',
         ]);
 
         // --- Rol TÉCNICO: operación de tickets + gestión parcial de KB ---

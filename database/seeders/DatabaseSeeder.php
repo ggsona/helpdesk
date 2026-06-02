@@ -58,6 +58,8 @@ class DatabaseSeeder extends Seeder
             $permAsignarTickets,
             $permComentarInterno,
             $permGestionarEquipos,
+        ]);
+
         // --- 2. PERMISOS Y ASIGNACIÓN A ROLES ---
         // Gestionado completamente por PermissionSeeder (separación de responsabilidades)
         $this->call(PermissionSeeder::class);
