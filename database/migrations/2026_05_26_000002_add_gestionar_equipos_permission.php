@@ -17,18 +17,13 @@ return new class extends Migration
         // Crear el permiso
         $permGestionarEquipos = Permission::updateOrCreate(['name' => 'gestionar-equipos']);
 
-        // Asignar al rol Admin (admin tiene syncPermissions(Permission::all()) en el seeder,
-        // pero vamos a asignarlo explícitamente para asegurar que se agregue ahora)
-        $roleAdmin = Role::findByName('admin');
-        if ($roleAdmin) {
-            $roleAdmin->givePermissionTo($permGestionarEquipos);
-        }
+        // Asignar al rol Admin
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
+        $roleAdmin->givePermissionTo($permGestionarEquipos);
 
         // Asignar al rol Gestor
-        $roleGestor = Role::findByName('gestor');
-        if ($roleGestor) {
-            $roleGestor->givePermissionTo($permGestionarEquipos);
-        }
+        $roleGestor = Role::firstOrCreate(['name' => 'gestor']);
+        $roleGestor->givePermissionTo($permGestionarEquipos);
     }
 
     /**
