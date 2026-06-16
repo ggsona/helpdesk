@@ -38,6 +38,38 @@
     @endif
 
     <div class="row g-4">
+        {{-- CONFIGURACIÓN DE SEGURIDAD DE SESIÓN --}}
+        <div class="col-12">
+            <div class="card card-premium shadow-sm border-0">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0">
+                    <h5 class="fw-bold theme-text mb-1"><i class="bi bi-shield-lock-fill text-warning me-2"></i> Seguridad de Sesión</h5>
+                    <p class="small text-muted mb-0">Configura el tiempo máximo de inactividad antes de cerrar la sesión automáticamente.</p>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.configuraciones.sesion.update') }}" method="POST">
+                        @csrf
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-5">
+                                <label class="form-label small fw-bold text-secondary">Tiempo de Inactividad</label>
+                                <div class="input-group">
+                                    <input type="number" name="sesion_timeout" class="form-control form-control-premium" value="{{ \App\Models\Configuracion::where('clave', 'sesion_timeout')->value('valor') ?? 30 }}" required min="1">
+                                    <select name="sesion_unit" class="form-select bg-light fw-bold" style="max-width: 120px;">
+                                        <option value="minutos">Minutos</option>
+                                        <option value="horas">Horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mt-4 mt-md-0 pt-md-2">
+                                <button type="submit" class="btn btn-warning px-4 fw-bold rounded-pill shadow-sm">
+                                    <i class="bi bi-save-fill me-2"></i>Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         {{-- CONFIGURACIÓN DE LIMITES DEL SISTEMA --}}
         <div class="col-12">
             <div class="card card-premium shadow-sm border-0">

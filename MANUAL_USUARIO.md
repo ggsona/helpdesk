@@ -195,12 +195,14 @@ Accediendo a **Rendimiento Técnico**, los supervisores pueden monitorear el des
 
 ---
 
-> [!TIP]
-> **Recomendación para un Soporte de Alta Calidad**
-> *   **Clientes**: Utilicen siempre los borradores para verificar que la descripción sea clara. Esto ahorra tiempo valioso al técnico.
-> *   **Gestores**: Revisen la pestaña "Por Asignar" constantemente y aprovechen las notas de instrucción al asignar especialistas.
-> *   **Técnicos**: Utilicen las Notas Internas para debatir problemas con los gestores antes de dar una respuesta formal al cliente final.
-> *   **Administradores**: Revisen la bandeja de aprobaciones diariamente para no bloquear el flujo de trabajo de nuevos ingresos.
+---
+
+## 8. SEGURIDAD DE SESIÓN (NUEVO V3.1)
+
+El sistema ahora cuenta con medidas avanzadas de seguridad para proteger tu información en caso de que olvides la sesión abierta:
+
+1. **Cierre Automático por Inactividad**: Si no realizas ninguna acción en el sistema (clics, teclado, navegación) durante el tiempo configurado por los administradores (ej. 30 minutos), aparecerá automáticamente un mensaje de aviso en pantalla preguntando si deseas continuar. Si no confirmas tu actividad en 60 segundos, la sesión se cerrará de forma segura para proteger tus datos.
+2. **Cierre al Cerrar Pestaña**: Para mayor seguridad, si cierras la pestaña del navegador o el navegador completo, el sistema detectará el evento y cerrará tu sesión automáticamente de forma inmediata en el servidor, evitando accesos no autorizados si otra persona utiliza tu equipo después.
 
 
 ## Actualizaciones Recientes: Nueva Interfaz y Panel Flotante

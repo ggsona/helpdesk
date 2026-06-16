@@ -35,3 +35,9 @@ El sistema sigue el patrón MVC (Modelo-Vista-Controlador) de Laravel, potenciad
     *   Crear/Editar vista.
 2.  **Permisos**:
     *   Ver `database/seeders/PermissionSeeder.php` para añadir nuevos roles/permisos.
+
+## 4. Seguridad de Sesión
+El sistema incluye protección contra inactividad y cierre al abandonar la pestaña.
+* **Middleware (`App\Http\Middleware\CheckIdleSession`)**: Valida la última actividad del usuario. Se configura mediante la tabla `configuraciones` (clave `sesion_timeout`).
+* **JS Monitoring (`public/js/idle-monitor.js`)**: Detecta inactividad en el frontend. Muestra un modal (`resources/views/components/idle-modal.blade.php`) antes de cerrar la sesión automáticamente.
+* **Cierre de Pestaña**: Utiliza `navigator.sendBeacon` en `resources/js/app.js` para cerrar la sesión al salir.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NivelJerarquico;
 use App\Models\UnidadAdministrativa;
+use App\Models\Configuracion;
 use Illuminate\Http\Request;
 
 class ConfiguracionController extends Controller
@@ -84,23 +85,26 @@ class ConfiguracionController extends Controller
         return response()->json(['success' => true, 'is_active' => $nivel->is_active]);
     }
 
-    public function storeNivel(Request $request)
+    public function updateSesion(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:niveles_jerarquicos,nombre'
+            'sesion_timeout' => 'required|integer|min:1',
+            'sesion_unit' => 'required|in:minutos,horas'
         ]);
 
-        // Lo colocamos automáticamente al final de la cola (último nivel)
-        $ultimoNivel = NivelJerarquico::max('nivel');
-        
-        NivelJerarquico::create([
-            'nombre' => $request->nombre,
-            'nivel' => $ultimoNivel ? $ultimoNivel + 1 : 1,
-            'is_active' => true
-        ]);
+        $timeout = $request->sesion_timeout;
+        if ($request->sesion_unit === 'horas') {
+            $timeout = $timeout * 60; // Convertir horas a minutos
+        }
 
-        return redirect()->back()->with('success', 'Nueva nomenclatura agregada al catálogo.');
+        \App\Models\Configuracion::updateOrCreate(
+            ['clave' => 'sesion_timeout'],
+            ['valor' => $timeout, 'descripcion' => 'Tiempo de inactividad en minutos']
+        );
+
+        return redirect()->back()->with('success', 'Configuración de seguridad de sesión guardada.');
     }
+
     public function updateAd(Request $request)
     {
         $validated = $request->validate([

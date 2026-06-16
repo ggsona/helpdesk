@@ -114,6 +114,7 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
 
 
         Route::get('/configuraciones', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuraciones.index');
+        Route::post('/configuraciones/sesion', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateSesion'])->name('configuraciones.sesion.update');
         Route::post('/configuraciones/limites', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'updateLimites'])->name('configuraciones.limites.update');
         Route::post('/configuraciones/niveles/reorder', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'reorderNiveles'])->name('configuraciones.niveles.reorder');
         Route::post('/configuraciones/niveles/{id}/toggle', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'toggleNivel'])->name('configuraciones.niveles.toggle');

@@ -656,5 +656,7 @@
     </script>
     @stack("scripts") {{-- Para JS de vistas específicas --}}
     @livewireScripts
+    <x-idle-modal />
+    <script src="{{ asset('js/idle-monitor.js') }}"></script>
 </body>
 </html>
