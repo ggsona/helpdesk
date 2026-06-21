@@ -38,7 +38,8 @@ function showIdleModal() {
         if (countdownEl) countdownEl.innerText = countdown;
         if (countdown <= 0) {
             clearInterval(window.idleInterval);
-            fetch('/logout', {
+            const logoutUrl = window.config?.logout_url || '/logout';
+            fetch(logoutUrl, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -60,7 +61,8 @@ window.keepAlive = function() {
     console.log('Sesión extendida');
     
     // Llamada al servidor para refrescar la sesión
-    fetch('/keep-alive', {
+    const keepAliveUrl = window.config?.keep_alive_url || '/keep-alive';
+    fetch(keepAliveUrl, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',

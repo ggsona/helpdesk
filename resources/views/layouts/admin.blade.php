@@ -659,7 +659,9 @@
     @livewireScripts
     <script>
         window.config = {
-            sesion_timeout: {{ \App\Models\Configuracion::where('clave', 'sesion_timeout')->value('valor') ?? 30 }}
+            sesion_timeout: {{ \App\Models\Configuracion::where('clave', 'sesion_timeout')->value('valor') ?? 30 }},
+            keep_alive_url: "{{ url('/keep-alive') }}",
+            logout_url: "{{ url('/logout') }}"
         };
     </script>
     <x-idle-modal />

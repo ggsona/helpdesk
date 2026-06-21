@@ -18,7 +18,8 @@ use App\Http\Controllers\Soporte\ConocimientoController;
 
 // --- RUTAS PÚBLICAS Y UTILIDADES ---
 Route::post('/keep-alive', function () {
-    session(['last_activity' => now()]);
+    session(['last_activity' => now()->timestamp]);
+    session()->save();
     return response()->json(['success' => true]);
 })->middleware('auth');
 

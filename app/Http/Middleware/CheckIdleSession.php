@@ -18,22 +18,27 @@ class CheckIdleSession
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            $lastActivity = session('last_activity', now());
+            $lastActivity = session('last_activity', now()->timestamp);
             $config = DB::table('configuraciones')->where('clave', 'sesion_timeout')->first();
             $timeout = $config ? $config->valor : 30; // Valor por defecto de seguridad si no hay nada en BD
 
-            // Depuración: Verifica qué valor está obteniendo
-            // \Log::info('Timeout configurado: ' . $timeout);
-            // \Log::info('Dif minutos: ' . now()->diffInMinutes($lastActivity));
+            // Compatibilidad con sesiones guardadas como objetos Carbon o strings
+            if ($lastActivity instanceof \Carbon\Carbon) {
+                $lastActivityCarbon = $lastActivity;
+            } else if (is_numeric($lastActivity)) {
+                $lastActivityCarbon = \Carbon\Carbon::createFromTimestamp($lastActivity);
+            } else {
+                $lastActivityCarbon = \Carbon\Carbon::parse($lastActivity);
+            }
 
-            if (now()->diffInMinutes($lastActivity) >= $timeout) {
+            if (now()->diffInMinutes($lastActivityCarbon) >= $timeout) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 return redirect()->route('login')->withErrors(['session' => 'Tu sesión ha expirado por inactividad.']);
             }
 
-            session(['last_activity' => now()]);
+            session(['last_activity' => now()->timestamp]);
         }
 
         return $next($request);
