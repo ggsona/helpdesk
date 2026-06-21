@@ -5909,3 +5909,10 @@ class MigrateAuditLogsToSpatie extends Command
 
 `
 
+
+### 6. Actualización Técnica y Corrección de Bugs (21/06/2026)
+- **Corrección de Sesión por Inactividad:** Se resolvió el bug donde la opción de "Continuar sesión" fallaba al cambiar de sección.
+  - El frontend JS ahora recibe URLs dinámicas (keep_alive_url y logout_url) desde los layouts (dmin y usuario) mediante window.config en lugar de rutas absolutas quemadas, evitando errores 404 en entornos de subcarpeta (como Laragon).
+  - El middleware CheckIdleSession.php fue reescrito para utilizar *Unix Timestamps* (segundos exactos) para calcular la inactividad, erradicando los desajustes causados al serializar/deserializar objetos Carbon con zonas horarias diferentes.
+  - La ruta /keep-alive ahora realiza un guardado de sesión síncrono explícito (session()->save()) previniendo race conditions si el usuario navega a otra sección antes de que el ciclo de vida normal de Laravel guarde la respuesta JSON.
+- **Limpieza del Repositorio:** Toda la documentación adicional, manuales, código de Python e historiales ajenos al ecosistema Laravel puro fueron reubicados en un directorio unificado llamado _documentacion_y_extras en la raíz del proyecto para preservar la limpieza de la arquitectura MVC.

@@ -274,3 +274,6 @@ Anteriormente, al escribir en el buscador, aparecÃ­a un texto de carga que empuj
 
 ### 4. CorrecciÃ³n de Animaciones en MenÃº Lateral
 - Se arreglÃ³ el "parpadeo" horizontal (glitch de Flexbox) que ocurrÃ­a al desplegar el menÃº "Base de Conocimiento" en el panel lateral de navegaciÃ³n, dotÃ¡ndolo ahora de una expansiÃ³n fluida y vertical estricta.
+
+### 6. Actualización de Estabilidad en Sesiones (21/06/2026)
+- **Estabilidad del Temporizador de Inactividad:** Se implementó una mejora técnica para garantizar que tu trabajo no se interrumpa. Ahora, al recibir la advertencia de que la sesión está por expirar, si seleccionas **"Continuar sesión"**, el sistema asegurará firmemente la extensión de tu tiempo en el servidor, permitiéndote cambiar de sección o recargar la página sin riesgo a ser desconectado.
