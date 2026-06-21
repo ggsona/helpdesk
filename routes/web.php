@@ -16,6 +16,12 @@ use App\Http\Controllers\Soporte\ConocimientoController;
 |--------------------------------------------------------------------------
 */
 
+// --- RUTAS PÚBLICAS Y UTILIDADES ---
+Route::post('/keep-alive', function () {
+    session(['last_activity' => now()]);
+    return response()->json(['success' => true]);
+})->middleware('auth');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -39,7 +45,7 @@ Route::middleware(['auth', 'approved'])->group(function () {
 });
 
 // --- RUTAS DE USUARIO ---
-Route::middleware(['auth', 'approved', 'role:usuario'])->group(function () {
+Route::middleware(['auth', 'approved', 'role:usuario', 'idle'])->group(function () {
     
     // Redirección interna para el usuario
     Route::get('/usuario/dashboard', [TicketUsuarioController::class, 'home'])->name('usuario.home');
@@ -59,7 +65,7 @@ Route::middleware(['auth', 'approved', 'role:usuario'])->group(function () {
 });
 
 // --- RUTAS DE ADMIN (ADMINISTRACIÓN GLOBAL DEL SISTEMA) ---
-Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'approved', 'idle'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('can:ver-panel-operativo');
     
     // --- Control de Roles y Permisos ---
@@ -134,7 +140,7 @@ Route::middleware(['auth', 'approved'])->prefix('admin')->name('admin.')->group(
 });
 
 // --- RUTAS UNIFICADAS DE SOPORTE (COORDINADORES Y TÉCNICOS) ---
-Route::middleware(['auth', 'approved', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
+Route::middleware(['auth', 'approved', 'idle', 'can:ver-panel-operativo'])->prefix('soporte')->name('soporte.')->group(function () {
     
     // Vista de Dashboard de Soporte
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

@@ -19,13 +19,18 @@ class CheckIdleSession
     {
         if (Auth::check()) {
             $lastActivity = session('last_activity', now());
-            $timeout = DB::table('configuraciones')->where('clave', 'sesion_timeout')->value('valor') ?? 30; // Minutos
+            $config = DB::table('configuraciones')->where('clave', 'sesion_timeout')->first();
+            $timeout = $config ? $config->valor : 30; // Valor por defecto de seguridad si no hay nada en BD
 
-            if (now()->diffInMinutes($lastActivity) > $timeout) {
+            // Depuración: Verifica qué valor está obteniendo
+            // \Log::info('Timeout configurado: ' . $timeout);
+            // \Log::info('Dif minutos: ' . now()->diffInMinutes($lastActivity));
+
+            if (now()->diffInMinutes($lastActivity) >= $timeout) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                return redirect()->route('login')->with('message', 'Sesión expirada por inactividad.');
+                return redirect()->route('login')->withErrors(['session' => 'Tu sesión ha expirado por inactividad.']);
             }
 
             session(['last_activity' => now()]);

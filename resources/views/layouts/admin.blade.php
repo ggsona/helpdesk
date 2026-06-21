@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Helpdesk GDC</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -656,6 +657,11 @@
     </script>
     @stack("scripts") {{-- Para JS de vistas específicas --}}
     @livewireScripts
+    <script>
+        window.config = {
+            sesion_timeout: {{ \App\Models\Configuracion::where('clave', 'sesion_timeout')->value('valor') ?? 30 }}
+        };
+    </script>
     <x-idle-modal />
     <script src="{{ asset('js/idle-monitor.js') }}"></script>
 </body>

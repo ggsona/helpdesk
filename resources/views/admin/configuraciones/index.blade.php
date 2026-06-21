@@ -53,7 +53,7 @@
                                 <label class="form-label small fw-bold text-secondary">Tiempo de Inactividad</label>
                                 <div class="input-group">
                                     <input type="number" name="sesion_timeout" class="form-control form-control-premium" value="{{ \App\Models\Configuracion::where('clave', 'sesion_timeout')->value('valor') ?? 30 }}" required min="1">
-                                    <select name="sesion_unit" class="form-select bg-light fw-bold" style="max-width: 120px;">
+                                    <select name="sesion_unit" class="form-select bg-white fw-bold" style="max-width: 120px; background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important;">
                                         <option value="minutos">Minutos</option>
                                         <option value="horas">Horas</option>
                                     </select>
@@ -93,7 +93,7 @@
                                 @endphp
                                 <div class="input-group">
                                     <input type="number" name="upload_size_value" class="form-control form-control-premium" value="{{ $valorMostrar }}" required min="1">
-                                    <select name="upload_size_unit" class="form-select bg-light fw-bold" style="max-width: 100px;">
+                                    <select name="upload_size_unit" class="form-select fw-bold" style="max-width: 100px; background-color: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-color) !important;">
                                         <option value="MB" {{ !$esGb ? 'selected' : '' }}>MB</option>
                                         <option value="GB" {{ $esGb ? 'selected' : '' }}>GB</option>
                                     </select>
