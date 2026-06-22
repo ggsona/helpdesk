@@ -15,49 +15,94 @@ class TicketController extends Controller
         
         // Si es usuario estándar, ve sus propios tickets creados
         if ($user->hasRole('usuario')) {
-            $tickets = Ticket::with(['categoria', 'prioridad', 'estado'])
-                ->where('id_usuario_creador', $user->id)
+            $tickets = Ticket::with(['categoria', 'prioridad', 'adjuntos', 'tecnico', 'equipo', 'solucion', 'comentarios.usuario', 'usuario.persona.unidadAdministrativa'])
+                ->where('id_usuario', $user->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
+            $tickets->each->append('estado_texto');
             return response()->json($tickets);
         }
         
         // Si es técnico, ve los tickets que tiene asignados
         if ($user->hasRole('tecnico')) {
-            $tickets = Ticket::with(['categoria', 'prioridad', 'estado', 'creador'])
-                ->whereHas('asignaciones', function($query) use ($user) {
-                    $query->where('id_usuario_tecnico', $user->id)
-                          ->where('activo', true); // Asumiendo que solo se ven los activos/actuales
+            $tickets = Ticket::with(['categoria', 'prioridad', 'usuario.persona.unidadAdministrativa', 'adjuntos', 'tecnico', 'equipo', 'solucion', 'comentarios.usuario'])
+                ->whereHas('asignacion', function ($q) use ($user) {
+                    $q->where('id_usuario_tecnico', $user->id);
                 })
                 ->orderBy('created_at', 'desc')
                 ->get();
+            $tickets->each->append('estado_texto');
+            return response()->json($tickets);
+        }
+
+        // Si es admin o gestor, ve todos los tickets
+        if ($user->hasRole('admin') || $user->hasRole('gestor')) {
+            $tickets = Ticket::with(['categoria', 'prioridad', 'usuario.persona.unidadAdministrativa', 'adjuntos', 'tecnico', 'equipo', 'solucion', 'comentarios.usuario'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $tickets->each->append('estado_texto');
             return response()->json($tickets);
         }
 
         return response()->json(['message' => 'Rol no soportado en la App'], 403);
     }
 
+    public function getFormOptions()
+    {
+        $categorias = \App\Models\Categoria::where('estado', true)->get();
+        $tiposEquipo = \App\Models\TipoEquipo::all();
+        $equipos = Auth::user()->equipos()->with('tipoEquipo')->where('estado', true)->get();
+        
+        return response()->json([
+            'success' => true,
+            'categorias' => $categorias,
+            'tipos_equipo' => $tiposEquipo,
+            'equipos' => $equipos,
+        ]);
+    }
+
     public function store(Request $request)
     {
-        // Esta lógica se ampliará luego con carga de imágenes y más detalles.
-        // Solo un esquema básico para iniciar.
         $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria'
+            "asunto" => "required|string|max:200",
+            "descripcion_problema" => "required|string",
+            "id_categoria" => "required|exists:categorias,id_categoria",
+            "id_tipo_equipo" => "required|exists:tipos_equipo,id_tipo_equipo",
+            "id_equipo" => "nullable|exists:equipos,id_equipo",
+            "adjuntos" => "nullable|array",
+            "adjuntos.*" => "image|max:10240", // Hasta 10MB por imagen
         ]);
 
+        $categoria = \App\Models\Categoria::find($request->id_categoria);
+        
         $ticket = Ticket::create([
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'id_categoria' => $request->id_categoria,
-            'id_usuario_creador' => Auth::id(),
-            'id_estado' => 1, // Nuevo / Por Asignar
-            'id_prioridad' => 1, // Prioridad base
-            'codigo_ticket' => 'TKT-' . strtoupper(uniqid()), // Simplificado por ahora
+            "id_usuario" => Auth::id(),
+            "asunto" => $request->asunto,
+            "id_categoria" => $request->id_categoria,
+            "categoria_nombre_historico" => $categoria ? $categoria->nombre_categoria : null,
+            "id_tipo_equipo" => $request->id_tipo_equipo,
+            "id_equipo" => $request->id_equipo,
+            "descripcion_problema" => $request->descripcion_problema,
+            "id_prioridad" => null,
+            "estatus" => 1,
         ]);
+
+        if ($request->hasFile("adjuntos")) {
+            foreach ($request->file("adjuntos") as $archivo) {
+                $ruta = $archivo->store("tickets/". $ticket->id_ticket, "public");
+
+                \App\Models\TicketAdjunto::create([
+                    "id_ticket" => $ticket->id_ticket,
+                    "ruta_archivo" => $ruta,
+                    "nombre_original" => $archivo->getClientOriginalName(),
+                    "tipo_mimo" => $archivo->getMimeType(),
+                    "tamano" => $archivo->getSize(),
+                ]);
+            }
+        }
 
         return response()->json([
+            'success' => true,
             'message' => 'Ticket creado con éxito',
             'ticket' => $ticket
         ], 201);

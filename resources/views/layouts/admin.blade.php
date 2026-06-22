@@ -140,7 +140,6 @@
         .row > [class*="col-"] {
             min-width: 0;
         }
-        }
 
         /* ================= SUGERENCIAS UI/UX ================= */
         /* Efecto Glassmorphism en Sidebar (C1) */
@@ -160,11 +159,11 @@
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .card-premium:hover {
+        body:not(.modal-open) .card-premium:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
-        [data-bs-theme="dark"] .card-premium:hover {
+        [data-bs-theme="dark"] body:not(.modal-open) .card-premium:hover {
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 

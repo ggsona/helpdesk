@@ -35,6 +35,18 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Módulo de Tickets
+    Route::get('/tickets/opciones', [TicketController::class, 'getFormOptions']);
     Route::get('/tickets', [TicketController::class, 'index']);
     Route::post('/tickets', [TicketController::class, 'store']);
+
+    // Módulo de Base de Conocimientos (Solo Técnicos/Gestores)
+    Route::get('/conocimiento', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index']);
+
+    // Módulo Gestor
+    Route::get('/gestor/opciones-asignacion', [\App\Http\Controllers\Api\GestorController::class, 'getOpcionesAsignacion']);
+    Route::post('/gestor/tickets/{id}/asignar', [\App\Http\Controllers\Api\GestorController::class, 'asignarTicket']);
+
+    // Módulo Técnico
+    Route::post('/tecnico/tickets/{id}/comentar', [\App\Http\Controllers\Api\TecnicoController::class, 'comentar']);
+    Route::post('/tecnico/tickets/{id}/resolver', [\App\Http\Controllers\Api\TecnicoController::class, 'resolverTicket']);
 });
