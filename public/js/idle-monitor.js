@@ -1,32 +1,58 @@
-// Monitor de inactividad de sesión
-let idleTime = 0;
-const idleLimit = window.config?.sesion_timeout || 30; // Minutos, tomado de la config global
+// Monitor de inactividad de sesión (Optimizado para pestañas en segundo plano y múltiples pestañas)
+const idleLimitMinutes = window.config?.sesion_timeout || 30; // Minutos, tomado de la config global
+const idleLimitMs = idleLimitMinutes * 60000;
 let countdown = 60; // Segundos
+let isModalShowing = false;
 
-function timerIncrement() {
-    idleTime++;
-    console.log('Tiempo inactivo (min): ' + idleTime + ' / ' + idleLimit);
-    if (idleTime >= idleLimit) {
+// Inicializar el tiempo de última actividad en localStorage si no existe
+if (!localStorage.getItem('lastActivityTime')) {
+    localStorage.setItem('lastActivityTime', Date.now());
+}
+
+function checkIdleTime() {
+    if (isModalShowing) return;
+    
+    const lastActivityTime = parseInt(localStorage.getItem('lastActivityTime') || Date.now());
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - lastActivityTime;
+    
+    if (elapsedTime >= idleLimitMs) {
         showIdleModal();
     }
 }
 
-// Resetear contador al detectar actividad
-window.addEventListener('mousemove', resetTimer);
-window.addEventListener('keypress', resetTimer);
-
+// Resetear contador al detectar actividad, guardándolo en localStorage para sincronizar pestañas
 function resetTimer() {
-    idleTime = 0;
+    if (!isModalShowing) {
+        localStorage.setItem('lastActivityTime', Date.now());
+    }
 }
 
-setInterval(timerIncrement, 60000); // 1 minuto
+// Eventos de actividad del usuario
+window.addEventListener('mousemove', resetTimer);
+window.addEventListener('keypress', resetTimer);
+window.addEventListener('scroll', resetTimer);
+window.addEventListener('click', resetTimer);
+
+// Los navegadores modernos pausan los setInterval largos en pestañas inactivas.
+// Por eso, revisamos frecuentemente (cada 10s) la diferencia de tiempo real (Date.now()).
+setInterval(checkIdleTime, 10000);
+
+// Al volver a la pestaña, comprobar inmediatamente por si la inactividad ocurrió mientras estábamos fuera
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'visible') {
+        checkIdleTime();
+    }
+});
 
 const idleModalElement = document.getElementById('idleModal');
 const idleModal = new bootstrap.Modal(idleModalElement);
 
 function showIdleModal() {
-    if (document.querySelector('.modal.show')) return;
-    console.log('Mostrando modal');
+    if (document.querySelector('.modal.show') || isModalShowing) return;
+    
+    console.log('Mostrando modal por inactividad');
+    isModalShowing = true;
     idleModal.show();
     countdown = 60;
     
@@ -57,10 +83,11 @@ window.keepAlive = function() {
     idleModal.hide();
     clearInterval(window.idleInterval);
     countdown = 60;
-    idleTime = 0;
+    isModalShowing = false;
+    localStorage.setItem('lastActivityTime', Date.now()); // Resetear para todas las pestañas
     console.log('Sesión extendida');
     
-    // Llamada al servidor para refrescar la sesión
+    // Llamada al servidor para refrescar la sesión backend
     const keepAliveUrl = window.config?.keep_alive_url || '/keep-alive';
     fetch(keepAliveUrl, {
         method: 'POST',
