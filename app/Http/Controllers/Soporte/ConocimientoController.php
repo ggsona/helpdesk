@@ -10,6 +10,7 @@ use App\Models\Tag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageKitService;
 
 class ConocimientoController extends Controller
 {
@@ -139,14 +140,15 @@ class ConocimientoController extends Controller
 
         // Procesar archivos adjuntos
         if ($request->hasFile('adjuntos')) {
+            $imageKit = new ImageKitService();
             foreach ($request->file('adjuntos') as $file) {
-                $path = $file->store('articulos/adjuntos', 'public');
+                $path = $imageKit->upload($file, 'articulos/adjuntos');
                 $articulo->adjuntos()->create([
                     'nombre_original' => $file->getClientOriginalName(),
-                    'ruta_archivo' => $path,
-                    'tipo_mime' => $file->getClientMimeType(),
-                    'tamano' => $file->getSize(),
-                    'subido_por' => Auth::id(),
+                    'ruta_archivo'    => $path,
+                    'tipo_mime'       => $file->getClientMimeType(),
+                    'tamano'          => $file->getSize(),
+                    'subido_por'      => Auth::id(),
                 ]);
             }
         }
@@ -213,15 +215,16 @@ class ConocimientoController extends Controller
             $request->validate([
                 'adjuntos.*' => "nullable|file|max:{$maxKb}|mimes:exe,msi,zip,rar,7z,bat,ps1,pdf,doc,docx,xlsx,iso,img,jpg,jpeg,png",
             ]);
-            
+
+            $imageKit = new ImageKitService();
             foreach ($request->file('adjuntos') as $file) {
-                $path = $file->store('articulos/adjuntos', 'public');
+                $path = $imageKit->upload($file, 'articulos/adjuntos');
                 $articulo->adjuntos()->create([
                     'nombre_original' => $file->getClientOriginalName(),
-                    'ruta_archivo' => $path,
-                    'tipo_mime' => $file->getClientMimeType(),
-                    'tamano' => $file->getSize(),
-                    'subido_por' => Auth::id(),
+                    'ruta_archivo'    => $path,
+                    'tipo_mime'       => $file->getClientMimeType(),
+                    'tamano'          => $file->getSize(),
+                    'subido_por'      => Auth::id(),
                 ]);
             }
         }

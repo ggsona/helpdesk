@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ImageKitService;
 
 class TicketController extends Controller
 {
@@ -88,15 +89,16 @@ class TicketController extends Controller
         ]);
 
         if ($request->hasFile("adjuntos")) {
+            $imageKit = new ImageKitService();
             foreach ($request->file("adjuntos") as $archivo) {
-                $ruta = $archivo->store("tickets/". $ticket->id_ticket, "public");
+                $ruta = $imageKit->upload($archivo, "tickets/" . $ticket->id_ticket);
 
                 \App\Models\TicketAdjunto::create([
-                    "id_ticket" => $ticket->id_ticket,
-                    "ruta_archivo" => $ruta,
+                    "id_ticket"       => $ticket->id_ticket,
+                    "ruta_archivo"    => $ruta,
                     "nombre_original" => $archivo->getClientOriginalName(),
-                    "tipo_mimo" => $archivo->getMimeType(),
-                    "tamano" => $archivo->getSize(),
+                    "tipo_mimo"       => $archivo->getMimeType(),
+                    "tamano"          => $archivo->getSize(),
                 ]);
             }
         }

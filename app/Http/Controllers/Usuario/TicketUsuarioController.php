@@ -12,6 +12,7 @@ use App\Models\Categoria;
 use App\Models\Prioridad;
 use App\Models\TipoEquipo;
 use App\Models\TicketComentario;
+use App\Services\ImageKitService;
 
 class TicketUsuarioController extends Controller
 {
@@ -64,8 +65,9 @@ class TicketUsuarioController extends Controller
 
         // 3. Procesar Adjuntos
         if ($request->hasFile("adjuntos")) {
+            $imageKit = new ImageKitService();
             foreach ($request->file("adjuntos") as $archivo) {
-                $ruta = $archivo->store("tickets/". $ticket->id_ticket, "public");
+                $ruta = $imageKit->upload($archivo, "tickets/" . $ticket->id_ticket);
 
                 TicketAdjunto::create([
                     "id_ticket" => $ticket->id_ticket,
@@ -151,9 +153,9 @@ class TicketUsuarioController extends Controller
         ]);
 
         if ($request->hasFile("archivos")) {
+            $imageKit = new ImageKitService();
             foreach ($request->file("archivos") as $file) {
-                $nombreArchivo = time() . "_". $file->getClientOriginalName();
-                $ruta = $file->storeAs("adjuntos_tickets", $nombreArchivo, "public");
+                $ruta = $imageKit->upload($file, "adjuntos_tickets");
 
                 TicketAdjunto::create([
                     "id_ticket" => $ticket->id_ticket,
