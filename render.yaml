@@ -1,17 +1,9 @@
 services:
   - type: web
     name: helpdesk-laravel
-    runtime: php
+    runtime: image
     plan: free
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader
-      npm install
-      npm run build
-      php artisan config:clear
-      php artisan route:clear
-      php artisan view:clear
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
-    healthCheckPath: /
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_ENV
         value: production
@@ -19,6 +11,8 @@ services:
         value: false
       - key: APP_KEY
         generateValue: true
+      - key: APP_URL
+        sync: false
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER
@@ -31,7 +25,7 @@ services:
         value: true
       - key: TRUSTED_PROXIES
         value: "*"
-      # Base de datos - TiDB (llenar manualmente en Render dashboard)
+      # Base de datos - TiDB Serverless (llenar en Render Dashboard)
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
@@ -46,10 +40,11 @@ services:
         sync: false
       - key: MYSQL_ATTR_SSL_CA
         value: /etc/ssl/certs/ca-certificates.crt
-      # ImageKit (llenar manualmente en Render dashboard)
+      # ImageKit (llenar en Render Dashboard)
       - key: IMAGEKIT_PUBLIC_KEY
-        sync: false
+        value: public_V771PZno9+e341QdTAy6BDa9Yqs=
       - key: IMAGEKIT_PRIVATE_KEY
         sync: false
       - key: IMAGEKIT_URL_ENDPOINT
-        sync: false
+        value: https://ik.imagekit.io/helpdeskgdc
+

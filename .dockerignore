@@ -1,0 +1,35 @@
+# Dependencias Node
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Entorno local
+.env
+.env.local
+.env.*.local
+
+# Laravel cache/logs (se generan en producción)
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+
+# Herramientas de desarrollo
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos de test
+tests/
+phpunit.xml
+
+# Documentación
+_documentacion_y_extras/
+README.md
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
