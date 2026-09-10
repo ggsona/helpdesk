@@ -24,6 +24,17 @@ php artisan view:cache
 echo "Ejecutando migraciones..."
 php artisan migrate --force
 
+# Correr seeders solo si la BD está vacía (primer deploy)
+# Se verifica si el usuario admin ya existe para evitar duplicados
+echo "Verificando si se necesitan seeders..."
+USER_EXISTS=$(php artisan tinker --no-interaction --execute="echo \App\Models\User::where('email','admin@helpdesk.com')->exists() ? 'yes' : 'no';" 2>/dev/null | tail -1)
+if [ "$USER_EXISTS" != "yes" ]; then
+    echo "Corriendo seeders (primer deploy)..."
+    php artisan db:seed --force
+else
+    echo "Seeders omitidos (datos ya existen)."
+fi
+
 # Crear enlace simbólico de storage (por si acaso)
 php artisan storage:link --force 2>/dev/null || true
 

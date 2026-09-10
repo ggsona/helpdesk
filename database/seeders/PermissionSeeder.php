@@ -125,16 +125,20 @@ class PermissionSeeder extends Seeder
         // --- Rol ADMIN: TODOS los permisos del sistema (incluye eliminar-articulo) ---
         $roleAdmin->syncPermissions(Permission::all());
 
-        $this->command->info('✅ Permisos creados y asignados correctamente.');
-        $this->command->table(
-            ['Rol', 'Nº Permisos'],
-            [
-                ['Admin',   $roleAdmin->permissions()->count()],
-                ['Gestor',  $roleGestor->permissions()->count()],
-                ['Técnico', $roleTecnico->permissions()->count()],
-                ['Usuario', $roleUsuario->permissions()->count()],
-            ]
-        );
+        // $this->command puede ser null cuando se ejecuta desde un script
+        // no interactivo (ej: startup de Docker en producción)
+        if ($this->command) {
+            $this->command->info('✅ Permisos creados y asignados correctamente.');
+            $this->command->table(
+                ['Rol', 'Nº Permisos'],
+                [
+                    ['Admin',   $roleAdmin->permissions()->count()],
+                    ['Gestor',  $roleGestor->permissions()->count()],
+                    ['Técnico', $roleTecnico->permissions()->count()],
+                    ['Usuario', $roleUsuario->permissions()->count()],
+                ]
+            );
+        }
     }
 }
 
