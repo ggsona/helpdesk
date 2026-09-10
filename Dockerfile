@@ -47,7 +47,12 @@ WORKDIR /var/www/html
 COPY . .
 
 # --- Instalar dependencias PHP (sin dev) ---
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Se usan variables dummy para que artisan package:discover no intente
+# conectarse a la BD durante el build (no hay MySQL disponible en esta fase).
+RUN APP_KEY=base64:dummykeyfordockerbuild0000000000000000000= \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/dev/null \
+    composer install --no-dev --optimize-autoloader --no-interaction
 
 # --- Instalar dependencias Node y compilar assets ---
 RUN npm ci && npm run build
