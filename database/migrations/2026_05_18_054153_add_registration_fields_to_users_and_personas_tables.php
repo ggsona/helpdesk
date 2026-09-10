@@ -15,9 +15,17 @@ return new class extends Migration
             $table->boolean('is_approved')->default(false)->after('password');
         });
 
+        // TiDB fix: separate ALTER TABLE per column when using ->after()
+        // referencing a column added in the same statement.
         Schema::table('personas', function (Blueprint $table) {
             $table->string('cedula')->unique()->nullable()->after('id_persona');
+        });
+
+        Schema::table('personas', function (Blueprint $table) {
             $table->string('segundo_nombre')->nullable()->after('nombre');
+        });
+
+        Schema::table('personas', function (Blueprint $table) {
             $table->string('segundo_apellido')->nullable()->after('apellido');
         });
     }

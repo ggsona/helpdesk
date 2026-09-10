@@ -11,9 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // TiDB fix: each column that uses ->after() referencing a column
+        // added in the same statement must be in a separate ALTER TABLE.
         Schema::table('equipos', function (Blueprint $table) {
             $table->string('ram')->nullable()->after('mac_address');
+        });
+
+        Schema::table('equipos', function (Blueprint $table) {
             $table->string('procesador')->nullable()->after('ram');
+        });
+
+        Schema::table('equipos', function (Blueprint $table) {
             $table->string('disco_duro')->nullable()->after('procesador');
         });
     }
