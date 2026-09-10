@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // TiDB fix: separate ALTER TABLE statements are required because
+        // referencing a newly-added column (created_by) via AFTER in the
+        // same ALTER TABLE statement is not supported in TiDB.
         Schema::table("categorias", function (Blueprint $table) {
             $table->unsignedBigInteger("created_by")->nullable()->after("updated_at");
             $table->foreign("created_by")->references("id")->on("users")->onDelete("set null");
-            
+        });
+
+        Schema::table("categorias", function (Blueprint $table) {
             $table->unsignedBigInteger("updated_by")->nullable()->after("created_by");
             $table->foreign("updated_by")->references("id")->on("users")->onDelete("set null");
         });
