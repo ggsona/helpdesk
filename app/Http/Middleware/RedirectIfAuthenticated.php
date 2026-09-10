@@ -24,7 +24,7 @@ class RedirectIfAuthenticated
                 $user = Auth::user();
 
                 if ($user->can('ver-panel-operativo')) {
-                    return redirect(route('soporte.dashboard'));
+                    return redirect(route('admin.dashboard'));
                 }
                 
                 return redirect(route('usuario.home'));

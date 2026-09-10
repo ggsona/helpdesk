@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 class TrustProxies extends Middleware
 {
     /**
-     * The trusted proxies for this application.
+     * Trust ALL proxies — required for Render.com (and similar PaaS platforms)
+     * which route traffic through a load balancer. Without this, Laravel sees
+     * the request as HTTP and generates insecure URLs / breaks HTTPS redirects.
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.
