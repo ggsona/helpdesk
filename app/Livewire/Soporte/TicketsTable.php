@@ -43,7 +43,7 @@ class TicketsTable extends Component
 
         if (!$this->modoGestor) {
             // El técnico solo ve sus tickets asignados o en los que participa
-            $query->where('tecnico_id', Auth::id());
+            $query->where('id_tecnico', Auth::id());
         }
 
         if ($this->filtroEstado !== 'todos') {

@@ -13,6 +13,10 @@ fi
 echo "Descubriendo paquetes..."
 php artisan package:discover --ansi
 
+# Publicar assets de Livewire (necesario en cada deploy)
+echo "Publicando assets de Livewire..."
+php artisan livewire:publish --assets 2>/dev/null || true
+
 # Limpiar y cachear configuración para producción
 echo "Optimizando configuración..."
 php artisan config:clear

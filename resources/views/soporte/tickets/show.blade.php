@@ -212,10 +212,16 @@
                         @forelse($ticket->adjuntos as $archivo)
                             <div class="col-sm-6 col-md-4 col-lg-3">
                                 <div class="card h-100 bg-secondary bg-opacity-10 border-secondary border-opacity-25 shadow-xs hover-zoom theme-bg-dark">
-                                    @php $ext = pathinfo($archivo->ruta_archivo, PATHINFO_EXTENSION); @endphp
-                                    @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
-                                        <a href="{{ asset('storage/' . $archivo->ruta_archivo) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $archivo->ruta_archivo) }}" class="card-img-top object-fit-cover" style="height: 120px;" alt="Evidencia">
+                                    @php 
+                                        $ext = pathinfo($archivo->ruta_archivo, PATHINFO_EXTENSION);
+                                        // Si ya es URL absoluta (ImageKit), usarla directo; si no, construir desde storage
+                                        $archivoUrl = str_starts_with($archivo->ruta_archivo, 'http') 
+                                            ? $archivo->ruta_archivo 
+                                            : asset('storage/' . $archivo->ruta_archivo);
+                                    @endphp
+                                    @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                        <a href="{{ $archivoUrl }}" target="_blank">
+                                            <img src="{{ $archivoUrl }}" class="card-img-top object-fit-cover" style="height: 120px;" alt="Evidencia">
                                         </a>
                                     @else
                                         <div class="card-body text-center py-4">
@@ -224,7 +230,7 @@
                                         </div>
                                     @endif
                                     <div class="card-footer bg-transparent border-0 text-center pb-3">
-                                        <a href="{{ asset('storage/' . $archivo->ruta_archivo) }}" download class="btn btn-sm btn-outline-secondary w-100 rounded-3 d-inline-flex align-items-center justify-content-center gap-1">
+                                        <a href="{{ $archivoUrl }}" download class="btn btn-sm btn-outline-secondary w-100 rounded-3 d-inline-flex align-items-center justify-content-center gap-1">
                                             <i class="bi bi-download"></i> Descargar
                                         </a>
                                     </div>
