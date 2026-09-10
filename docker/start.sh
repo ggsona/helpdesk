@@ -9,6 +9,10 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
+# Descubrir paquetes (se omitió durante el build por falta de BD)
+echo "Descubriendo paquetes..."
+php artisan package:discover --ansi
+
 # Limpiar y cachear configuración para producción
 echo "Optimizando configuración..."
 php artisan config:clear

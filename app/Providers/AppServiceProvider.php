@@ -25,7 +25,16 @@ class AppServiceProvider extends ServiceProvider
     {
         // Ensure the application uses the same timezone globally
         date_default_timezone_set(config('app.timezone'));
-        DB::statement("SET time_zone = '-04:00'"); // Align MySQL session with app timezone (offset)
+
+        // Align TiDB/MySQL session timezone with app timezone.
+        // Wrapped in try/catch to avoid crashes during artisan commands
+        // that run without DB access (e.g. package:discover during Docker build).
+        try {
+            DB::statement("SET time_zone = '-04:00'");
+        } catch (\Exception $e) {
+            // No DB available (build phase or CLI) — safe to ignore
+        }
+
         Blade::component('cliente-layout', ClienteLayout::class);
         // Ensure MySQL uses the same timezone as the application (optional, disabled to avoid errors)
         // \Illuminate\Support\Facades\DB::statement("SET time_zone = '" . config('app.timezone') . "'"); // Disabled to avoid MySQL timezone errors
